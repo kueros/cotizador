@@ -15,6 +15,7 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
+		
         $users = User::paginate();
 
         return view('user.index', compact('users'))
@@ -85,14 +86,4 @@ class UserController extends Controller
             ->with('success', 'User deleted successfully');
     }
 
-/* 
-	public function destroy($id)
-	{
-		#dd($id);
-		WooTienda::find($id)->delete();
-
-		return Redirect::route('woo-tiendasindex')
-		->with('success', 'WooTienda deleted successfully');
-	}
- */
 }
