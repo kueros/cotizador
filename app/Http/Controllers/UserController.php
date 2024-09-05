@@ -65,13 +65,30 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserRequest $request, User $user): RedirectResponse
+#	public function update($request) //UserRequest $request, User $user): RedirectResponse
+	public function update(UserRequest $request, User $user): RedirectResponse
     {
+		#dd('kdk1 ' . $request);
         $user->update($request->validated());
 
         return Redirect::route('users.index')
             ->with('success', 'User updated successfully');
     }
+
+/* 	public function update(ProfileUpdateRequest $request): RedirectResponse
+	{
+		$request->user()->fill($request->validated());
+
+		if ($request->user()->isDirty('email')) {
+			$request->user()->email_verified_at = null;
+		}
+
+		$request->user()->save();
+
+		return Redirect::route('profile.edit')->with('status', 'profile-updated');
+	}
+ */
+
 
     public function destroy($id): RedirectResponse
     {

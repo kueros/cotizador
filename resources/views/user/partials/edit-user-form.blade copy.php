@@ -49,6 +49,36 @@
 			<x-input-error :messages="$errors->updatePassword->get('bloqueado')" class="mt-2" />
 		</div>
 
+		<div>
+			<x-input-label for="ultimo_login" :value="__('Ultimo Login')" />
+			<x-text-input id="ultimo_login" value="{{ $user->ultimo_login }}" name="ultimo_login" type="text" class="mt-1 block w-full" autocomplete="ultimo_login" />
+			<x-input-error :messages="$errors->updatePassword->get('ultimo_login')" class="mt-2" />
+		</div>
+
+		<div>
+			<x-input-label for="intentos_login" :value="__('Intentos de Login')" />
+			<x-text-input id="intentos_login" value="{{ $user->intentos_login }}" name="intentos_login" type="text" class="mt-1 block w-full" autocomplete="intentos_login" />
+			<x-input-error :messages="$errors->updatePassword->get('intentos_login')" class="mt-2" />
+		</div>
+
+		<div>
+			<x-input-label for="created_at" :value="__('Fecha de Creacion')" />
+			<x-text-input id="created_at" value="{{ $user->created_at }}" name="created_at" type="text" class="mt-1 block w-full" autocomplete="new-password" />
+			<x-input-error :messages="$errors->updatePassword->get('created_at')" class="mt-2" />
+		</div>
+
+		<div>
+			<x-input-label for="updated_at" :value="__('Fecha de Modificacion')" />
+			<x-text-input id="updated_at" value="{{ $user->updated_at }}" name="updated_at" type="text" class="mt-1 block w-full" autocomplete="new-password" />
+			<x-input-error :messages="$errors->updatePassword->get('updated_at')" class="mt-2" />
+		</div>
+
+		<div>
+			<x-input-label for="deleted_at" :value="__('Fecha de Eliminacion')" />
+			<x-text-input id="deleted_at" value="{{ $user->deleted_at }}" name="deleted_at" type="text" class="mt-1 block w-full" autocomplete="new-password" />
+			<x-input-error :messages="$errors->updatePassword->get('deleted_at')" class="mt-2" />
+		</div>
+
 		<div class="flex items-center gap-4">
 			<x-primary-button>{{ __('Save') }}</x-primary-button>
 
