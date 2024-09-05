@@ -21,6 +21,11 @@
 
 			<div class="p-12 sm:p-8 bg-white shadow sm:rounded-lg">
 				<div class="table-responsive">
+					<div class="float-right">
+						<a href="{{ route('users.create') }}" class="btn btn-primary btn-sm float-right" data-placement="left">
+							{{ __('Nuevo Usuario') }}
+						</a>
+					</div>
 					<table id="example" class="cell-border" style="width:100%">
 						<thead class="thead">
 							<tr>
@@ -43,11 +48,16 @@
 								<td>{{ $user->rol }}</td>
 								<td>{{ $user->habilitado }}</td>
 								<td>
-									<a class="btn btn-sm btn-warning" href="{{ route('users.edit', $user->id) }}"><i class="fa-solid fa-pen-to-square"></i>Editar</a>
+									<form action="{{ route('users.destroy', $user->id) }}" method="POST">
+										<a class="btn btn-sm btn-success" href="{{ route('users.edit', $user->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+										@csrf
+										@method('DELETE')
+										<button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+									</form>
 								</td>
-								<td>
-									<a class="btn btn-sm btn-warning " href="{{ route('users.show', $user->id) }}"><i class="fa-solid fa-eye"></i> Borrar</a>
-								</td>
+
+
+
 							</tr>
 							@endforeach
 						</tbody>
