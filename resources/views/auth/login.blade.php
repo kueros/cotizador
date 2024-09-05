@@ -6,7 +6,7 @@
 		@csrf
 		<div>
 			<a href="/">
-				<img class="logo-home" src="/public/build/assets/images/aleph_logo.gif" alt="" title="">
+				<img class="logo-home" src="/build/assets/images/aleph_logo.gif" alt="" title="">
 			</a>
 		</div>
 

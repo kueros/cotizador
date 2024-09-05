@@ -37,7 +37,7 @@
 								<x-dropdown-link :href="route('profile.edit')">
 									Roles
 								</x-dropdown-link>
-								<x-dropdown-link :href="route('profile.edit')">
+								<x-dropdown-link :href="route('users.index')">
 									Usuarios
 								</x-dropdown-link>
 							</x-slot>

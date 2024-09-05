@@ -9,7 +9,7 @@
 	<title>{{ config('app.name', 'Laravel') }}</title>
 	<style>
 		body {
-			background-image: url('/public/build/assets/images/login-background.jpg');
+			background-image: url('/build/assets/images/login-background.jpg');
 			background-size: cover;
 			/* Hace que la imagen cubra todo el área */
 			background-repeat: no-repeat;
