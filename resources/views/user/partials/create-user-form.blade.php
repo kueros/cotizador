@@ -5,6 +5,25 @@
 			<div class="row">
 				<div class="col-md-12">
 					<h2>Usuarios</h2>
+				</div>
+
+				<!-- @php
+					$isActive = true;
+					$hasError = true;
+					@endphp
+
+					<span @class([ 'p-4' , 'font-bold'=> $isActive,
+						'text-gray-500' => ! $isActive,
+						'text-red-500' => $hasError,
+						])>
+						<h2>@php echo 'isActive: ' . $isActive . ' hasError: ' . $hasError; @endphp</h2>
+					</span>
+
+					<span class="p-4 text-gray-500 bg-red">
+						<h2>@php echo 'isActive: ' . $isActive . ' hasError: ' . $hasError; @endphp</h2>
+					</span>
+
+					<h2>Usuarios</h2>
 					<a data-toggle="collapse" data-target="#opciones-usuario">
 						<div class="colapsable-aleph"><span class="glyphicon glyphicon-chevron-right"></span> Opciones</div>
 					</a>
@@ -113,15 +132,14 @@
 							<tbody>
 							</tbody>
 						</table>
-					</div>
+					</div> -->
 				</div>
 			</div>
 		</div>
 	</header>
 
-	<form method="post" action="{{ route('users.create') }}" class="mt-6 space-y-6">
+	<form method="post" action="{{ route('users.store') }}" class="mt-6 space-y-6">
 		@csrf
-		@method('get')
 
 		<div>
 			<x-input-label for="username" :value="__('Nombre de Usuario')" />
