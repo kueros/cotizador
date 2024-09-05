@@ -17,8 +17,8 @@ class RolController extends Controller
 	public function index(Request $request): View
 	{
 		$roles = Rol::paginate();
-		dd($roles);
-		return view('roles.index', compact('roles'))
+		#dd($roles);
+		return view('rol.index', compact('roles'))
 			->with('i', ($request->input('page', 1) - 1) * $roles->perPage());
 	}
 
@@ -29,7 +29,7 @@ class RolController extends Controller
 	{
 		$roles = new Rol();
 
-		return view('roles.create', compact('roles'));
+		return view('rol.create', compact('roles'));
 	}
 
 	/**
@@ -60,19 +60,19 @@ class RolController extends Controller
 	 */
 	public function edit($id): View
 	{
-		$role = Rol::find($id);
+		$roles = Rol::find($id);
 
-		return view('rol.edit', compact('role'));
+		return view('rol.edit', compact('roles'));
 	}
 
 	/**
 	 * Update the specified resource in storage.
 	 */
 	#	public function update($request) //UserRequest $request, User $user): RedirectResponse
-	public function update(Request $request, Rol $role): RedirectResponse
+	public function update(Request $request, Rol $rol): RedirectResponse
 	{
-		#dd('kdk1 ' . $request);
-		$role->update($request->validated());
+		#dd($request->all());
+		$rol->update($request->all());
 
 		return Redirect::route('roles.index')
 			->with('success', 'Rol updated successfully');

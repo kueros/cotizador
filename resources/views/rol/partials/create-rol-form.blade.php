@@ -4,7 +4,7 @@
 		<div class="container-full-width">
 			<div class="row">
 				<div class="col-md-12">
-					<h2>Usuarios</h2>
+					<h2>Roles</h2>
 				</div>
 
 				<!-- @php
@@ -138,37 +138,13 @@
 		</div>
 	</header>
 
-	<form method="post" action="{{ route('users.store') }}" class="mt-6 space-y-6">
+	<form method="post" action="{{ route('roles.store') }}" class="mt-6 space-y-6">
 		@csrf
 
 		<div>
-			<x-input-label for="username" :value="__('Nombre de Usuario')" />
-			<x-text-input id="username" value="{{ $user->username }}" name="username" type="text" class="mt-1 block w-full" autocomplete="username" />
-			<x-input-error :messages="$errors->updatePassword->get('username')" class="mt-2" />
-		</div>
-
-		<div>
 			<x-input-label for="nombre" :value="__('Nombre')" />
-			<x-text-input id="nombre" value="{{ $user->nombre }}" name="nombre" type="text" class="mt-1 block w-full" autocomplete="nombre" />
+			<x-text-input id="nombre" value="{{ $roles->nombre }}" name="nombre" type="text" class="mt-1 block w-full" autocomplete="nombre" />
 			<x-input-error :messages="$errors->updatePassword->get('nombre')" class="mt-2" />
-		</div>
-
-		<div>
-			<x-input-label for="apellido" :value="__('Apellido')" />
-			<x-text-input id="apellido" value="{{ $user->apellido }}" name="apellido" type="text" class="mt-1 block w-full" autocomplete="apellido" />
-			<x-input-error :messages="$errors->updatePassword->get('apellido')" class="mt-2" />
-		</div>
-
-		<div>
-			<x-input-label for="email" :value="__('Email')" />
-			<x-text-input id="email" value="{{ $user->email }}" name="email" type="text" class="mt-1 block w-full" autocomplete="email" />
-			<x-input-error :messages="$errors->updatePassword->get('email')" class="mt-2" />
-		</div>
-
-		<div>
-			<x-input-label for="habilitado" :value="__('Habilitado')" />
-			<x-text-input id="habilitado" value="{{ $user->habilitado }}" name="habilitado" type="text" class="mt-1 block w-full" autocomplete="habilitado" />
-			<x-input-error :messages="$errors->updatePassword->get('habilitado')" class="mt-2" />
 		</div>
 
 		<div class="flex items-center gap-4">

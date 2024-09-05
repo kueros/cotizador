@@ -7,12 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rol extends Model
 {
-    use HasFactory;
-	/**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
+	use HasFactory;
+
+	protected $table = 'roles'; // Asegúrate de que el nombre de la tabla es correcto
+
 	protected $fillable = [
 		'nombre',
 	];

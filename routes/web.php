@@ -36,9 +36,9 @@ Route::middleware('auth')->group(function () {
 	Route::get('/show/{id}', [RolController::class, 'show'])->name('roles.show');
 	Route::get('/roles/create', [RolController::class, 'create'])->name('roles.create');
 	Route::post('/roles', [RolController::class, 'store'])->name('roles.store');
-	Route::get('/roles/{role}/edit', [RolController::class, 'edit'])->name('roles.edit');
-	Route::patch('/roles/{role}', [RolController::class, 'update'])->name('roles.update');
-	Route::delete('/roles/{role}', [RolController::class, 'destroy'])->name('roles.destroy');
+	Route::get('/roles/{rol}/edit', [RolController::class, 'edit'])->name('roles.edit');
+	Route::patch('/roles/{rol}', [RolController::class, 'update'])->name('roles.update');
+	Route::delete('/roles/{rol}', [RolController::class, 'destroy'])->name('roles.destroy');
 	Route::post('/roles/options', [RolController::class, 'options'])->name('roles.options');
 	Route::get('/roles/fields', [RolController::class, 'fields'])->name('roles.fields');
 });
