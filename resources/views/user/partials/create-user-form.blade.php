@@ -7,7 +7,13 @@
 					<h2>Usuarios</h2>
 				</div>
 
-				<!-- @php
+
+
+
+
+
+				
+				@php
 					$isActive = true;
 					$hasError = true;
 					@endphp
@@ -132,7 +138,7 @@
 							<tbody>
 							</tbody>
 						</table>
-					</div> -->
+					</div>
 				</div>
 			</div>
 		</div>
