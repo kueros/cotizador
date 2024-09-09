@@ -5,7 +5,6 @@
 		</h2>
 	</x-slot>
 
-
 	<style>
 		.div-contenedor-acceso {
 			height: 200px;
@@ -29,26 +28,34 @@
 
 		#log_accesos {
 			padding: 5px;
-			background-image: url('../assets/icons/log_accesos.png');
+			background-image: url('/build/assets/images/log_accesos.png');
 			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center;
 		}
 
-		#log_acciones {
+		#log_administracion {
 			padding: 5px;
-			background-image: url('../assets/icons/log_acciones.png');
+			background-image: url('/build/assets/images/log_acciones.png');
 			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center;
 		}
 
 		#log_notificaciones {
 			padding: 5px;
-			background-image: url('../assets/icons/log_notificaciones.png');
+			background-image: url('/build/assets/images/log_notificaciones.png');
 			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center;
 		}
 
 		#log_emails {
 			padding: 5px;
-			background-image: url('../assets/icons/log_emails.png');
+			background-image: url('/build/assets/images/log_emails.png');
 			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center;
 		}
 
 		.monitoreo-title {
@@ -57,48 +64,50 @@
 			font-weight: bold;
 		}
 	</style>
+
 	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<h2>Monitoreo</h2>
-				<div style="margin-top: 100px;">
-					<div class="col-md-3">
-						<a class="link_monitoreo" href="<?= route('monitoreo.log_accesos') ?>">
-							<div class="div-contenedor-acceso">
-								<div class="div-logs-img" id="log_accesos">
-								</div>
-								<span class="monitoreo-title">Log de accesos</span>
-							</div>
-						</a>
+		<div class="row mt-4">
+			<h2>Monitoreo</h2>
+		</div>
+		<div class="row mt-5">
+			<!-- Tarjeta 1: Log de accesos -->
+			<div class="col-md-3 col-sm-6">
+				<a class="link_monitoreo" href="<?= route('monitoreo.log_accesos') ?>">
+					<div class="div-contenedor-acceso">
+						<div class="div-logs-img" id="log_accesos"></div>
+						<span class="monitoreo-title">Log de accesos</span>
 					</div>
-					<div class="col-md-3">
-						<a class="link_monitoreo" href="<?= route('monitoreo.log_administracion') ?>">
-							<div class="div-contenedor-acceso">
-								<div class="div-logs-img" id="log_administracion">
-								</div>
-								<span class="monitoreo-title">Log de administracion</span>
-							</div>
-						</a>
+				</a>
+			</div>
+
+			<!-- Tarjeta 2: Log de administración -->
+			<div class="col-md-3 col-sm-6">
+				<a class="link_monitoreo" href="<?= route('monitoreo.log_administracion') ?>">
+					<div class="div-contenedor-acceso">
+						<div class="div-logs-img" id="log_administracion"></div>
+						<span class="monitoreo-title">Log de administración</span>
 					</div>
-					<div class="col-md-3">
-						<a class="link_monitoreo" href="<?= route('monitoreo.log_notificaciones') ?>">
-							<div class="div-contenedor-acceso">
-								<div class="div-logs-img" id="log_notificaciones">
-								</div>
-								<span class="monitoreo-title">Log de notificaciones</span>
-							</div>
-						</a>
+				</a>
+			</div>
+
+			<!-- Tarjeta 3: Log de notificaciones -->
+			<div class="col-md-3 col-sm-6">
+				<a class="link_monitoreo" href="<?= route('monitoreo.log_notificaciones') ?>">
+					<div class="div-contenedor-acceso">
+						<div class="div-logs-img" id="log_notificaciones"></div>
+						<span class="monitoreo-title">Log de notificaciones</span>
 					</div>
-					<div class="col-md-3">
-						<a class="link_monitoreo" href="<?= route('monitoreo.log_emails') ?>">
-							<div class="div-contenedor-acceso">
-								<div class="div-logs-img" id="log_emails">
-								</div>
-								<span class="monitoreo-title">Log de emails</span>
-							</div>
-						</a>
+				</a>
+			</div>
+
+			<!-- Tarjeta 4: Log de emails -->
+			<div class="col-md-3 col-sm-6">
+				<a class="link_monitoreo" href="<?= route('monitoreo.log_emails') ?>">
+					<div class="div-contenedor-acceso">
+						<div class="div-logs-img" id="log_emails"></div>
+						<span class="monitoreo-title">Log de emails</span>
 					</div>
-				</div>
+				</a>
 			</div>
 		</div>
 	</div>

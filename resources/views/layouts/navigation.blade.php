@@ -47,6 +47,9 @@
 								<x-dropdown-link :href="route('monitoreo.index')">
 									Monitoreo
 								</x-dropdown-link>
+								<x-dropdown-link :href="route('configuracion.index')">
+									Configuración
+								</x-dropdown-link>
 							</x-slot>
 						</x-dropdown>
 					</div>
