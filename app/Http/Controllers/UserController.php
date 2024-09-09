@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use App\Models\LogAdministracion;
+use App\Http\Controllers\MyController;
 
 class UserController extends Controller
 {
@@ -15,7 +19,6 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-		
         $users = User::paginate();
 
         return view('user.index', compact('users'))
@@ -32,19 +35,32 @@ class UserController extends Controller
         return view('user.create', compact('user'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store()
-    {
-		#dd($_POST);
 
-        User::create($_POST);
+	/**
+	 * Store a newly created resource in storage.
+	 */
+	public function store()
+	{
+		#dd(Auth::user()->username);
 
-        return Redirect::route('users.index')
-            ->with('success', 'User created successfully.');
-    }
+		User::create($_POST);
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		#dd($userAgent);
+		$message = "Creó el usuario " . $_POST['username'];
+		Log::info($message);
+		$log = LogAdministracion::create([
+			'username' => Auth::user()->username,
+			'action' => "users.store",
+			'detalle' => $message,
+			'ip_address' => json_encode($clientIP),
+			'user_agent' => json_encode($userAgent)
+		]);
+		$log->save();
 
+		return Redirect::route('users.index')
+		->with('success', 'Usuario creado correctamente.');
+	}
     /**
      * Display the specified resource.
      */

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RolController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MonitoreoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -43,3 +44,20 @@ Route::middleware('auth')->group(function () {
 	Route::get('/roles/fields', [RolController::class, 'fields'])->name('roles.fields');
 });
 require __DIR__.'/auth.php';
+
+
+Route::middleware('auth')->group(function () {
+	Route::get('/monitoreo', [MonitoreoController::class, 'index'])->name('monitoreo.index');
+	Route::get('/monitoreo/log_accesos', [MonitoreoController::class, 'log_accesos'])->name('monitoreo.log_accesos');
+	Route::get('/monitoreo/log_administracion', [MonitoreoController::class, 'log_administracion'])->name('monitoreo.log_administracion');
+	Route::get('/monitoreo/log_notificaciones', [MonitoreoController::class, 'log_notificaciones'])->name('monitoreo.log_notificaciones');
+	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
+
+	Route::get('/monitoreo/create', [MonitoreoController::class, 'create'])->name('monitoreo.create');
+	Route::post('/monitoreo', [MonitoreoController::class, 'store'])->name('monitoreo.store');
+	Route::get('/monitoreo/{monitoreo}/edit', [MonitoreoController::class, 'edit'])->name('monitoreo.edit');
+	Route::patch('/monitoreo/{monitoreo}', [MonitoreoController::class, 'update'])->name('monitoreo.update');
+	Route::delete('/monitoreo/{monitoreo}', [MonitoreoController::class, 'destroy'])->name('monitoreo.destroy');
+	Route::post('/monitoreo/options', [MonitoreoController::class, 'options'])->name('monitoreo.options');
+	Route::get('/monitoreo/fields', [MonitoreoController::class, 'fields'])->name('monitoreo.fields');
+});

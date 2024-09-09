@@ -1,5 +1,9 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
 	<!-- Primary Navigation Menu -->
+	@php
+	$user = Auth::user()->username;
+	$email = Auth::user()->email;
+	@endphp
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 		<div class="flex justify-between h-16">
 			<div class="flex">
@@ -39,6 +43,9 @@
 								</x-dropdown-link>
 								<x-dropdown-link :href="route('users.index')">
 									Usuarios
+								</x-dropdown-link>
+								<x-dropdown-link :href="route('monitoreo.index')">
+									Monitoreo
 								</x-dropdown-link>
 							</x-slot>
 						</x-dropdown>
@@ -117,7 +124,8 @@
 				<!-- Authentication -->
 				<form method="POST" action="{{ route('logout') }}">
 					@csrf
-
+					<input type="hidden" name="email" value="{{ $email }}">
+					<input type="hidden" name="username" value="{{ $user }}">
 					<x-responsive-nav-link :href="route('logout')"
 						onclick="event.preventDefault();
                                         this.closest('form').submit();">
