@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MonitoreoController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\SendMailController;
-
+use App\Http\Controllers\OrderShipmentController;
 
 
 Route::get('/', function () {
@@ -78,7 +78,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
 
-Route::get('send/mail', [SendMailController::class, 'sendMailWithAttachment'])->name('enviarmail');
+Route::get('send/mail', [OrderShipmentController::class, 'store'])->name('enviarmail');
 
 
 

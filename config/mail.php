@@ -2,6 +2,38 @@
 
 return [
 
+	'default' => env('MAIL_MAILER', 'smtp'),
+
+	'mailers' => [
+		'smtp' => [
+			'transport' => 'smtp',
+			'host' => env('MAIL_HOST', 'mail.omarliberatto.com.ar'),
+			'port' => env('MAIL_PORT', 465),
+			'encryption' => env('MAIL_ENCRYPTION', 'ssl'),
+			'username' => env('MAIL_USERNAME'),
+			'password' => env('MAIL_PASSWORD'),
+			'timeout' => null,
+			'auth_mode' => null,
+		],
+	],
+
+	'from' => [
+		'address' => env('MAIL_FROM_ADDRESS', '_mainaccount@omarliberatto.com.ar'),
+		'name' => env('MAIL_FROM_NAME', 'Tu Nombre o Nombre de la Aplicación'),
+	],
+
+	'markdown' => [
+		'theme' => 'default',
+
+		'paths' => [
+			resource_path('views/vendor/mail'),
+		],
+	],
+
+];
+/* 
+return [
+
     /*
     |--------------------------------------------------------------------------
     | Default Mailer
@@ -12,9 +44,9 @@ return [
     | the message. All additional mailers can be configured within the
     | "mailers" array. Examples of each type of mailer are provided.
     |
-    */
+    *
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => env('MAIL_MAILER', 'ses'),
 
     /*
     |--------------------------------------------------------------------------
@@ -33,16 +65,12 @@ return [
     |            "postmark", "resend", "log", "array",
     |            "failover", "roundrobin"
     |
-    */
+    *
 
     'mailers' => [
 
 		'postmark' => [
-			'transport' => 'postmark',
-			'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
-			// 'client' => [
-			//     'timeout' => 5,
-			// ],
+			'token' => env('POSTMARK_TOKEN'),
 		],
 
 		'mailgun' => [
@@ -66,9 +94,24 @@ return [
 
         'ses' => [
             'transport' => 'ses',
-        ],
+			'key' => env('AWS_ACCESS_KEY_ID'),
+			'secret' => env('AWS_SECRET_ACCESS_KEY'),
+			'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+			'token' => env('AWS_SESSION_TOKEN'),
+			'options' => [
+				'ConfigurationSetName' => 'MyConfigurationSet',
+				'EmailTags' => [
+					['Name' => 'foo', 'Value' => 'bar'],
+				],
+			],
+			'from' => [
+				'address' => env('MAIL_FROM_ADDRESS', 'omar@omarliberatto.com.ar'),
+				'name' => env('MAIL_FROM_NAME', 'omar ío'),
+			],
+			'reply_to' => ['address' => 'omarliberatto@yafoconsultora.com', 'name' => 'App Name'],
+		],
 
-        'resend' => [
+		'resend' => [
             'transport' => 'resend',
         ],
 
@@ -113,7 +156,7 @@ return [
     | the same address. Here you may specify a name and address that is
     | used globally for all emails that are sent by your application.
     |
-    */
+    *
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
@@ -121,3 +164,4 @@ return [
     ],
 
 ];
+ */

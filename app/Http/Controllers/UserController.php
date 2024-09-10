@@ -10,7 +10,8 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\LogAdministracion;
-use App\Http\Controllers\MyController;
+#use App\Http\Controllers\MyController;
+use App\Models\Notificacion;
 
 class UserController extends Controller
 {
@@ -42,6 +43,7 @@ class UserController extends Controller
 	public function store()
 	{
 		#dd(Auth::user()->username);
+		#dd($_POST);
 
 		User::create($_POST);
 		$clientIP = \Request::ip();
@@ -57,6 +59,15 @@ class UserController extends Controller
 			'user_agent' => json_encode($userAgent)
 		]);
 		$log->save();
+
+		$notificacion = Notificacion::create([
+			'user_id' => Auth::user()->id,
+			'mensaje' => $message,
+			'estado' => 1,
+			'user_emisor_id' => Auth::user()->id,
+			'asunto' => "Creación de usuario"
+		]);
+		$notificacion->save();
 
 		return Redirect::route('users.index')
 		->with('success', 'Usuario creado correctamente.');
