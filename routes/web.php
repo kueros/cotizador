@@ -6,6 +6,7 @@ use App\Http\Controllers\RolController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MonitoreoController;
 use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\SendMailController;
 
 
 
@@ -73,3 +74,12 @@ Route::middleware('auth')->group(function () {
 	Route::get('/monitoreo/log_notificaciones', [MonitoreoController::class, 'log_notificaciones'])->name('monitoreo.log_notificaciones');
 	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
 });
+
+
+Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+
+Route::get('send/mail', [SendMailController::class, 'sendMailWithAttachment'])->name('enviarmail');
+
+
+
+

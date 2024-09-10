@@ -37,7 +37,22 @@ return [
 
     'mailers' => [
 
-        'smtp' => [
+		'postmark' => [
+			'transport' => 'postmark',
+			'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
+			// 'client' => [
+			//     'timeout' => 5,
+			// ],
+		],
+
+		'mailgun' => [
+			'transport' => 'mailgun',
+			// 'client' => [
+			//     'timeout' => 5,
+			// ],
+        ],
+
+		'smtp' => [
             'transport' => 'smtp',
             'url' => env('MAIL_URL'),
             'host' => env('MAIL_HOST', '127.0.0.1'),
@@ -51,14 +66,6 @@ return [
 
         'ses' => [
             'transport' => 'ses',
-        ],
-
-        'postmark' => [
-            'transport' => 'postmark',
-            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
-            // 'client' => [
-            //     'timeout' => 5,
-            // ],
         ],
 
         'resend' => [
