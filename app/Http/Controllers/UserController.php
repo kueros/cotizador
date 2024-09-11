@@ -10,8 +10,8 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\LogAdministracion;
-#use App\Http\Controllers\MyController;
-use App\Models\Notificacion;
+use App\Http\Controllers\MyController;
+use Exception;
 
 class UserController extends Controller
 {
@@ -40,16 +40,16 @@ class UserController extends Controller
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store()
+	public function store(Request $request, MyController $myController): RedirectResponse
 	{
 		#dd(Auth::user()->username);
 		#dd($_POST);
 
-		User::create($_POST);
+		$user = User::create($_POST);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		#dd($userAgent);
-		$message = "Creó el usuario " . $_POST['username'];
+		$message = Auth::user()->username . " creó el usuario " . $_POST['username'];
 		Log::info($message);
 		$log = LogAdministracion::create([
 			'username' => Auth::user()->username,
@@ -60,7 +60,7 @@ class UserController extends Controller
 		]);
 		$log->save();
 
-		$notificacion = Notificacion::create([
+/* 		$notificacion = Notificacion::create([
 			'user_id' => Auth::user()->id,
 			'mensaje' => $message,
 			'estado' => 1,
@@ -68,6 +68,23 @@ class UserController extends Controller
 			'asunto' => "Creación de usuario"
 		]);
 		$notificacion->save();
+ */
+		$subject = "Creación de usuario";
+		$body = "Usuario ". $_POST['username'] . " creado correctamente por ". Auth::user()->username;
+		$to = "omarliberatto@yafoconsultora.com";
+
+		try {
+			// Llamar a enviar_email de MyController
+			$myController->enviar_email($to, $body, $subject);
+			Log::info('Correo enviado exitosamente a ' . $to);
+		} catch (Exception $e) {
+			// Manejo de la excepción
+			Log::error('Error al enviar el correo: ' . $e->getMessage());
+
+			// Puedes redirigir al usuario con un mensaje de error
+			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
+		}
+
 
 		return Redirect::route('users.index')
 		->with('success', 'Usuario creado correctamente.');
@@ -96,21 +113,84 @@ class UserController extends Controller
      * Update the specified resource in storage.
      */
 #	public function update($request) //UserRequest $request, User $user): RedirectResponse
-	public function update(UserRequest $request, User $user): RedirectResponse
+	public function update(UserRequest $request, User $user, MyController $myController): RedirectResponse
     {
 		#dd('kdk1 ' . $request);
         $user->update($request->validated());
 
+		// Encuentra el usuario por su ID
+		$user = User::find($user->id);
+
+		// Si el usuario no existe, redirige con un mensaje de error
+		if (!$user) {
+			return redirect('/users')->with('error', 'El usuario no existe.');
+		}
+
+		// Almacena el nombre de usuario antes de eliminarlo
+		$username = $user->username;
+
+		$message = Auth::user()->username . " actualizó el usuario " . $username;
+		Log::info($message);
+
+		$subject = "Actualización de usuario";
+		$body = "Usuario " . $username . " actualizado correctamente por " . Auth::user()->username;
+		$to = "omarliberatto@yafoconsultora.com";
+
+		try {
+			// Llamar a enviar_email de MyController
+			$myController->enviar_email(
+				$to,
+				$body,
+				$subject
+			);
+			Log::info('Correo enviado exitosamente a ' . $to);
+		} catch (Exception $e) {
+			// Manejo de la excepción
+			Log::error('Error al enviar el correo: ' . $e->getMessage());
+
+			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
+		}
+
         return Redirect::route('users.index')
-            ->with('success', 'User updated successfully');
+            ->with('success', 'Usuario actualizado correctamente');
     }
 
-    public function destroy($id): RedirectResponse
-    {
-        User::find($id)->delete();
+	public function destroy($id, MyController $myController): RedirectResponse
+	{
+		// Encuentra el usuario por su ID
+		$user = User::find($id);
 
-        return Redirect::route('users.index')
-            ->with('success', 'User deleted successfully');
-    }
+		// Si el usuario no existe, redirige con un mensaje de error
+		if (!$user) {
+			return redirect('/users')->with('error', 'El usuario no existe.');
+		}
 
+		// Almacena el nombre de usuario antes de eliminarlo
+		$username = $user->username;
+
+		// Elimina el usuario
+		$user->delete();
+
+		$message = Auth::user()->username . " borró el usuario " . $username;
+		Log::info($message);
+
+		$subject = "Borrado de usuario";
+		$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
+		$to = "omarliberatto@yafoconsultora.com";
+
+		try {
+			// Llamar a enviar_email de MyController
+			$myController->enviar_email($to, $body, $subject);
+			Log::info('Correo enviado exitosamente a ' . $to);
+		} catch (Exception $e) {
+			// Manejo de la excepción
+			Log::error('Error al enviar el correo: ' . $e->getMessage());
+
+			// Puedes redirigir al usuario con un mensaje de error
+			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
+		}
+
+		return Redirect::route('users.index')
+		->with('success', 'Usuario eliminado correctamente.');
+	}
 }

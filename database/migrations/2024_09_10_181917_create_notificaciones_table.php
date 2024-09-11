@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notificaciones', function (Blueprint $table) {
-            $table->id();
+			$table->integer('id')->primary()->autoIncrement();
 			$table->tinyInteger('user_id');
 			$table->text('mensaje');
 			$table->tinyInteger('estado')->default(0);

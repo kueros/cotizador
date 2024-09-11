@@ -19,7 +19,7 @@ return [
 
 	'from' => [
 		'address' => env('MAIL_FROM_ADDRESS', '_mainaccount@omarliberatto.com.ar'),
-		'name' => env('MAIL_FROM_NAME', 'Tu Nombre o Nombre de la Aplicación'),
+		'name' => env('MAIL_FROM_NAME', 'Yafo Plaft'),
 	],
 
 	'markdown' => [

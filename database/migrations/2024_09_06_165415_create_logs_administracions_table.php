@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('logs_administracion', function (Blueprint $table) {
-            $table->id();
+			$table->integer('id')->primary()->autoIncrement();
 			$table->string('username')->index();
 			$table->string('detalle', 255);
 			$table->string('ip_address', 45)->nullable();

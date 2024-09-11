@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('logs_accesos', function (Blueprint $table) {
-            $table->id();
+			$table->integer('id')->primary()->autoIncrement();
 			$table->string('email')->index();
 			$table->string('ip_address', 45)->nullable();
 			$table->text('user_agent')->nullable();

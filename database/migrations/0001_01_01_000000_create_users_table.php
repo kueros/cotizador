@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+			$table->integer('id')->primary()->autoIncrement();
             $table->string('username')->nullable();
             $table->string('nombre')->nullable();
             $table->string('apellido')->nullable();

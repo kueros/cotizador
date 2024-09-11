@@ -8,24 +8,25 @@ use App\Http\Controllers\MonitoreoController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\SendMailController;
 use App\Http\Controllers\OrderShipmentController;
-
+use App\Http\Controllers\MyController;
 
 Route::get('/', function () {
-    return view('welcome');
+	#return view('welcome');
+	return redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+	return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+	Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+	Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+	Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 Route::middleware('auth')->group(function () {
-	Route::get('/users', [UserController::class, 'index'])->name('users.index');
+	Route::get('/users', [UserController::class, 'index'])->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
 	Route::get('/show/{id}', [UserController::class, 'show'])->name('users.show');
 	Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
 	Route::post('/users', [UserController::class, 'store'])->name('users.store');
@@ -47,7 +48,7 @@ Route::middleware('auth')->group(function () {
 	Route::post('/roles/options', [RolController::class, 'options'])->name('roles.options');
 	Route::get('/roles/fields', [RolController::class, 'fields'])->name('roles.fields');
 });
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 
 Route::middleware('auth')->group(function () {
@@ -56,7 +57,6 @@ Route::middleware('auth')->group(function () {
 	Route::get('/monitoreo/log_administracion', [MonitoreoController::class, 'log_administracion'])->name('monitoreo.log_administracion');
 	Route::get('/monitoreo/log_notificaciones', [MonitoreoController::class, 'log_notificaciones'])->name('monitoreo.log_notificaciones');
 	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
-
 });
 
 
@@ -80,6 +80,4 @@ Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('c
 
 Route::get('send/mail', [OrderShipmentController::class, 'store'])->name('enviarmail');
 
-
-
-
+Route::get('/obtenerusername', [MyController::class, 'get_username'])->name('obtenerusername1');
