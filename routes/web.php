@@ -75,9 +75,7 @@ Route::middleware('auth')->group(function () {
 	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
 });
 
-
-Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
-
+Route::post('/configuracion', [ConfiguracionController::class, 'guardarestado'])->name('guardarestado');
 Route::get('send/mail', [OrderShipmentController::class, 'store'])->name('enviarmail');
 
 Route::get('/obtenerusername', [MyController::class, 'get_username'])->name('obtenerusername1');

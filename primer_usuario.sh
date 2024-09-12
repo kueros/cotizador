@@ -1,13 +1,15 @@
 #!/bin/bash
 
 #Este comando debe ejecutarse en la carpeta raiz del proyecto, con el entorno de php activo e inmediatamente despues ejecutar el comando "php artisan migrate".
+# Agregar posibilidad de ejecutar el comando con parametros para que tome los datos desde la linea de comandos.
 
 php -r '
-$db = new PDO("mysql:host=127.0.0.1;dbname=yafo_plaft", "root", "root");
+$db = new PDO("mysql:host=127.0.0.1;dbname=yafo_plaft", "root", "root") ' $1 ';
 
 $username = "omar";
 $nombre = "omar";
 $apellido = "omar";
+$rol_id = 1;
 $email = "omarliberatto@yafoconsultora.com";
 $password = password_hash("12341234", PASSWORD_DEFAULT);
 

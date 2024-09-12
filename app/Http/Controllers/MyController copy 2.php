@@ -3,144 +3,276 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use App\Models\LogAdministracion;
 
-class MyController extends Controller
+class MyController_copy extends Controller
 {
+	private $datos_vista = array();
 
-	public function enviar_email($to, $content, $subject, $api = false )
+	public function __construct()
 	{
-		$notificaciones_email = 1; #hardcodeo por ahora, luego se manejará por pantalla de configuración global
-		$notificaciones_email_default = 1; #hardcodeo por ahora, luego se manejará por pantalla de configuración global
-		if ($notificaciones_email == 0) {
-			return true;
-		} else {
-			//Verifico si usa configuracion default
-			if ($notificaciones_email_default) {
-				$api_key = $this->generate_api_key();
+		Parent::__construct();
+		header('X-Frame-Options: DENY');
 
-				$post_fields = array(
-					'api_key' => $api_key,
-					'to' => $to,
-					'content' => $content,
-					'subject' => $subject,
-					'base_url' => url('/')
-				);
+		//Cargo los modelos base
+/* 		$this->load->model("Generic_model", "generic");
+		$this->load->model("Usuario_model", "usuarios");
+ */
+		//Verifico si tiene habilitada whitelist
+		$bloquea_ip = $this->get_variable("whitelist_status");
 
+		define('ACCESO_FORM_ENCUADRAMIENTO', $this->get_variable("acceso_formulario_encuadramiento"));
+		define('ACCESO_MODULO_AUDITORIA', $this->get_variable("habilita_modulo_auditoria"));
+		define('ACCESO_CANALES_CRITICIDAD_ESCENARIOS', $this->get_variable("habilita_canales_criticidad_escenarios"));
+		define('ACCESO_CONTRATACION_STI', $this->get_variable("habilita_proceso_contratacion_sti"));
+		define('ACCESO_CMDB_CORPORATIVA', $this->get_variable("mostrar_cmdb_corporativa"));
 
-				if (defined('URL_API_EMAILS')) {
-					$url_api_emails = URL_API_EMAILS;
+		if ($bloquea_ip) {
+			if (strpos($_SERVER['REQUEST_URI'], "API") === false) {
+				if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+					$ip_1 = $_SERVER['HTTP_CF_CONNECTING_IP'];
 				} else {
-					$url_api_emails = 'https://panel.alephmanager.com/API/send_email';
+					$ip_1 = false;
 				}
 
-				$ch = curl_init();
-				curl_setopt($ch, CURLOPT_URL, $url_api_emails);
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_fields));
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-				//Guardo el email antes de enviarlo
-				$clientIP = \Request::ip();
-				$userAgent = \Request::userAgent();
-				#dd($userAgent);
-				$message = Auth::user()->username." creó el email para ". $to . " con el asunto: ". $subject;
-				Log::info($message);
-				$log = LogAdministracion::create([
-					'username' => Auth::user()->username,
-					'action' => "users.store",
-					'detalle' => $message,
-					'ip_address' => json_encode($clientIP),
-					'user_agent' => json_encode($userAgent)
-				]);
-				$log->save();
-
-				#$id_log_email = $this->generic->save_on_table("log_emails", array("email" => $to, "subject" => $subject));
-
-				//Ejecuto la llamada API
-				$server_output = curl_exec($ch);
-
-				curl_close($ch);
-				$respuesta = json_decode($server_output);
-				Log::info('Registro respuesta del panel por emails: ' . json_encode($respuesta));
-
-				if ($respuesta && isset($respuesta->status) && $respuesta->status == 1) {
-					//Actualizo el log
-					Log::info('Email con asunto: '. $subject . ' correctamente enviado');
-					#$this->generic->update("log_emails", array("id" => $id_log_email), array("enviado" => 1));
-					return true;
+				if (isset($_SERVER['REMOTE_ADDR'])) {
+					$ip_2 = $_SERVER['REMOTE_ADDR'];
 				} else {
-					return false;
-				}
-			} else {
-/* 				$configs = json_decode($notificaciones_email_config);
-
-				foreach ($configs as $key => $config) {
-					$mail_config[$key] = $config;
+					$ip_2 = false;
 				}
 
-				$from = $notificaciones_email_from;
-				$from_name = $notificaciones_email_from_name;
-
-				#$this->load->library('email', $mail_config);
-				$this->email->from($from, $from_name);
-				$this->email->set_newline("\r\n");
-				$this->email->to($to);
-				$this->email->subject($subject);
-
-				$body_email = #$this->load->view('layaout/email_template.php', array('content' => $content), TRUE);
-					$this->email->message($body_email);
-
-				//Guardo el email antes de enviarlo
-				$id_log_email = $this->generic->save_on_table("log_emails", array("email" => $to, "subject" => $subject));
-
-				if ($this->email->send()) {
-					//Actualizo el log
-					$this->generic->update("log_emails", array("id" => $id_log_email), array("enviado" => 1));
-					return true;
+				if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+					$ip_3 = $_SERVER['HTTP_X_FORWARDED_FOR'];
 				} else {
-					return false;
+					$ip_3 = false;
 				}
- */			}
+
+				if (!$this->check_ip_whitelist($ip_1)) {
+					if (!$this->check_ip_whitelist($ip_2)) {
+						if (!$this->check_ip_whitelist($ip_3)) {
+							header("HTTP/1.1 403 Forbidden");
+							exit;
+						}
+					}
+				}
+			}
 		}
-	}
 
-	public function send_email_example()
-	{
-		$config = array(
-			'protocol' => 'tls',
-			'smtp_host' => 'mail.alephmanager.com',
-			'smtp_port' => 465,
-			'smtp_user' => 'info@alephmanager.com',
-			'smtp_pass' => 'hustle2006',
-			'smtp_timeout' => '4',
-			'mailtype'  => 'html',
-			'charset'   => 'utf-8',
-			'wordwrap' => TRUE
+		$this->check_status_ambiente();
+
+		$modo_debug = $this->get_variable("habilitar_modo_debug");
+
+		$servers_debug = array(
+			'aleph.localhost',
+			'dev.alephmanager.com'
 		);
-		#$this->load->library('email', $config);
-		$this->email->set_newline("\r\n");
 
-		$this->email->from('info@alephmanager.com', 'Aleph Manager');
-		$this->email->to('adrianclaret@gmail.com');
-
-		$this->email->subject('Email Test');
-		$this->email->message('Testing the email class.');
-
-		if ($this->email->send()) {
-			//TODO: load view...
-			echo "email sent";
+		//Si esta en modo debug habilitado o es localhost muestro los errores
+		if ((isset($_SERVER['SERVER_NAME']) && in_array($_SERVER['SERVER_NAME'], $servers_debug)) || $modo_debug && $modo_debug == 1) {
+			ini_set('display_errors', 1);
+			ini_set('display_startup_errors', 1);
+			error_reporting(E_ALL);
 		} else {
-			$to = $this->input->post('email');
-			mail($to, 'test', 'Other sent option failed');
-			echo $this->input->post('email');
-			show_error($this->email->print_debugger());
+			error_reporting(0);
+		}
+
+		//Verifico que el ambiente este habilitado
+		$activado = $this->get_variable("activado");
+
+		if ($activado !== false) {
+			if (strpos($_SERVER['REQUEST_URI'], 'API') == false) {
+				if ($activado == '0') {
+					$this->mostrar_error("El ambiente se encuentra deshabilitado. Si cree que esto es un error contáctese con <a href=\"mailto:soporte@alephmanager.com\">soporte@alephmanager.com</a>.");
+				}
+			}
+		}
+
+		//Chequeo si tiene login con azure
+		$pagina_azure = strpos($_SERVER['REQUEST_URI'], 'login/azure_ad');
+
+		if ($pagina_azure != 1) {
+			$this->load->library('session');
+		}
+
+		if (strpos($_SERVER['REQUEST_URI'], 'cambiar_password') === false && strpos($_SERVER['REQUEST_URI'], 'logout') === false && isset($_SESSION['cambiar_password'])) {
+			$this->session->set_flashdata('error_message_fixed', 'Por seguridad debe cambiar su contraseña predeterminada.');
+			redirect(base_url('usuarios/cambiar_password'));
+		}
+
+		if (strpos($_SERVER['REQUEST_URI'], 'cambiar_password') === false && strpos($_SERVER['REQUEST_URI'], 'logout') === false && isset($_SESSION['cambiar_password_externo'])) {
+			$this->session->set_flashdata('error_message_fixed', 'Por seguridad debe cambiar su contraseña predeterminada.');
+			redirect(base_url('usuarios_externos/cambiar_password'));
+		}
+
+		//Google Auth
+		if (isset($_GET['code']) && isset($_GET['scope'])) {
+			redirect(base_url('usuarios/login') . "?google_data=" . json_encode($_GET));
+		}
+
+		if (isset($_SESSION['reset_password'])) {
+			if ($_SERVER['REQUEST_URI'] != '/usuarios/cambiar_password' && $_SERVER['REQUEST_URI'] != '/usuarios/logout') {
+				$this->session->set_flashdata('error_message_fixed', 'Su clave ha expirado, debe actualizarla para seguir usando la cuenta.');
+				redirect(base_url('/usuarios/cambiar_password'));
+			}
+		}
+
+		//Chequeo los modulos que estan habilitados
+		$modulos_activos = array();
+		$existe_tabla = $this->generic->check_table("modulos");
+		if ($existe_tabla) {
+			$modulos = $this->generic->get_from_table("modulos", array("estado" => 1));
+
+			if (!empty($modulos)) {
+				foreach ($modulos as $modulo) {
+					$modulos_activos[] = $modulo->nombre;
+				}
+			}
+		}
+
+		//Traigo los niveles del modelo para armar el menu
+		$cont = 0;
+		$menu_organizacion = array();
+		$niveles_ro = $this->generic->get_from_table("modelo_niveles", array("disabled" => 0), "posicion asc,dependencia_id desc");
+		if (!empty($niveles_ro)) {
+			foreach ($niveles_ro as $nivel) {
+				if (isset($nivel->disabled) && $nivel->disabled == 1) {
+					continue;
+				}
+				$menu_organizacion[$cont]['nombre'] = $nivel->nombre;
+				$menu_organizacion[$cont]['id'] = $nivel->id;
+				$cont++;
+			}
+		}
+
+		//Verifico si esta logueado y tiene permisos para ambiente coorporativo para mostrarlo en el menu
+		if ($this->is_logged_in() && $this->es_usuario_interno()) {
+			$acceso_coorporativo = $this->has_permission(388, false, false);
+
+			if ($acceso_coorporativo) {
+				$existe_tabla = $this->generic->check_table("entidades");
+
+				if ($existe_tabla) {
+					$entidades = array();
+					$entidades_corporacion = $this->generic->get_from_table("entidades", false, "nombre asc");
+
+					if (!empty($entidades_corporacion)) {
+						$cont = 0;
+						foreach ($entidades_corporacion as $entidad) {
+							$entidades[$cont]['nombre'] = $entidad->nombre;
+							$entidades[$cont]['url'] = $entidad->url;
+							$cont++;
+						}
+					}
+					define('ENTIDADES_CORPORACION', $entidades);
+				}
+			}
+		}
+
+		$niveles_modelo = $this->obtener_array_niveles_modelo();
+
+		//Verifico los datos para crear las definiciones del menu
+		define('MENU_ORG', $menu_organizacion);
+		define('NIVELES_MODELO', $niveles_modelo);
+		define('MODULOS_ACTIVOS', $modulos_activos);
+
+		//Para usuarios externos cargo configuración de menú
+		if ($this->es_usuario_externo()) {
+			define('externos_habilita_menu_formulario_control', $this->get_variable('externos_habilita_menu_formulario_control'));
+			define('externos_habilita_menu_encuestas_control', $this->get_variable('externos_habilita_menu_encuestas_control'));
+			define('externos_titulo_menu_formulario_control', $this->get_variable('externos_titulo_menu_formulario_control'));
+			define('externos_titulo_menu_encuestas_control', $this->get_variable('externos_titulo_menu_encuestas_control'));
+		}
+
+		//OBTENGO LOS ESTILOS DE LA HERRAMIENTA
+		$_SESSION['leyenda_ambiente'] = $this->get_variable('leyenda_ambiente');
+		$_SESSION['leyenda_ambiente_color'] = $this->get_variable('leyenda_ambiente_color');
+		$_SESSION['leyenda_ambiente_texto'] = $this->get_variable('leyenda_ambiente_texto');
+		$_SESSION['aleph_estilo_logotipo_default'] = $this->get_variable('aleph_estilo_logotipo_default');
+		$imagen_logo_custom = $this->get_variable('aleph_estilo_logotipo_custom_path');
+		$path_logo_custom = UPLOADS_URL . '/images/' . $imagen_logo_custom;
+		$url_logo_custom = UPLOADS_URL . '/images/' . $imagen_logo_custom;
+		$_SESSION['aleph_estilo_logotipo_custom_path'] = $path_logo_custom;
+		$_SESSION['aleph_estilo_logotipo_custom_url'] = $url_logo_custom;
+		$_SESSION['aleph_estilo_menu_default'] = $this->get_variable('aleph_estilo_menu_default');
+		$_SESSION['aleph_estilo_color_barra_menu'] = $this->get_variable('aleph_estilo_color_barra_menu');
+		$_SESSION['aleph_estilo_color_titulos_menu'] = $this->get_variable('aleph_estilo_color_titulos_menu');
+		$_SESSION['aleph_estilo_color_mouseover_menu'] = $this->get_variable('aleph_estilo_color_mouseover_menu');
+
+		$version = $this->get_variable("version");
+		$fecha_version = $this->get_variable("fecha_version");
+
+		if (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] == 'aleph.localhost') {
+			$session_time = 9999999;
+		} else {
+			$session_time = $this->get_variable("session_time");
+
+			if (!$session_time) {
+				$session_time = 900;
+			}
+		}
+
+		//Cargo traducciones
+		$this->cargar_traducciones();
+
+		define('SESSION_TIME', $session_time);
+		define('VERSION_ALEPH', "v" . $version . " - " . $fecha_version);
+
+		//21/04/2022 Filtro los contenidos por POST
+		$this->filtrar_contenido_post();
+		$this->filtrar_contenido_get();
+	}
+
+	protected function check_status_ambiente()
+	{
+		//Recupero cuando se realizó la última version
+		$fecha_version = $this->get_variable("fecha_version");
+
+		//Verifico contra fecha actual
+		$fecha_actual = date('Y-m-d');
+
+		$fecha_version = new DateTime($fecha_version);
+		$fecha_actual = new DateTime($fecha_actual);
+
+		$diferencia = $fecha_version->diff($fecha_actual);
+		$cantidad_dias = $diferencia->days;
+
+		if ($cantidad_dias > 300) {
+			$this->mostrar_error('El ambiente requiere una actualización');
 		}
 	}
 
+	public function obtener_array_niveles_modelo()
+	{
+		$niveles = array();
 
+		$niveles_modelo = $this->generic->get_from_table("modelo_niveles", false, "posicion asc, dependencia_id asc");
+		$niveles[0]['nombre'] = 'Inventario tecnológico';
+		$niveles[0]['tabla'] = 'tabla_activos';
+		if (!empty($niveles_modelo)) {
+			foreach ($niveles_modelo as $nivel_modelo) {
+				$campos = array();
+				$campos_nivel = $this->generic->get_from_table("registros_oyp_posicion", array("nivel_id" => $nivel_modelo->id), "posicion asc");
+
+				foreach ($campos_nivel as $index => $campo) {
+					foreach ($campo as $key => $value) {
+						$campos[$index][$key] = $value;
+					}
+				}
+
+				$niveles[$nivel_modelo->id]['id'] = $nivel_modelo->id;
+				$niveles[$nivel_modelo->id]['nombre'] = $nivel_modelo->nombre;
+				$niveles[$nivel_modelo->id]['tabla'] = $nivel_modelo->tabla;
+				$niveles[$nivel_modelo->id]['campos'] = $campos;
+
+				if ($nivel_modelo->dependencia_id) {
+					$niveles[$nivel_modelo->id]['dependencia_id'] = $nivel_modelo->dependencia_id;
+				} else {
+					$niveles[$nivel_modelo->id]['dependencia_id'] = false;
+				}
+			}
+		}
+
+		return $niveles;
+	}
 
 	private function filtrar_contenido_post()
 	{
@@ -260,20 +392,178 @@ class MyController extends Controller
 		return true;
 	}
 
+
+	protected function check_api_key($api_key)
+	{
+		$clave = "4l3phm4n4g3r";
+		$fecha = date('Y-m-d');
+
+		$clave .= $fecha;
+		$clave = sha1($clave);
+
+		if ($api_key == $clave) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	protected function generate_api_key()
+	{
+		// //Agrego las paginas excluidas al control de login
+		// $excluir = array('api','API','service_now','usuarios/reset_password','guardar_seguimiento_control_proveedor');
+		// $verifica_login = true;
+
+		// foreach($excluir as $pagina){
+		//     if(strpos($_SERVER['REQUEST_URI'], $pagina) !== false) {
+		//         $verifica_login = false;
+		//     }
+		// }
+
+		// //Si hay session de un usuario externo no se verifica el login
+		// if(isset($_SESSION['externo'])){
+		//     $verifica_login = false;
+		// }
+
+		// if($verifica_login){
+		//     $this->verify_logged_in();
+		// }
+
+		$clave = "4l3phm4n4g3r";
+		$fecha = date('Y-m-d');
+
+		$clave .= $fecha;
+		$clave = sha1($clave);
+
+		return $clave;
+	}
+
+	protected function check_api_credentials()
+	{
+		if (isset($_POST['api_key'])) {
+			$datos_usuario = $this->generic->get_row_from_table("usuarios", array("api_key" => $_POST['api_key']));
+
+			if ($datos_usuario) {
+				if ($datos_usuario->habilita_api == 1) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				//Si no recupera usuario verifico si tiene api key de aleph
+				if ($this->check_api_key($_POST['api_key'])) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		} else {
+			header("HTTP/1.1 403");
+			exit();
+		}
+	}
+
+	protected function get_tipo_session()
+	{
+		if ($this->es_usuario_interno()) {
+			return 'interno';
+		}
+
+		if ($this->es_usuario_externo()) {
+			return 'externo';
+		}
+
+		return false;
+	}
+
+	// Para validar si es usuario interno pregunto por el username
+	protected function es_usuario_interno()
+	{
+		if (isset($_SESSION['userdata']['username']) && $_SESSION['userdata']['username'] != '' || $this->is_root()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// Para validar si es usuario externo pregunto por el rol
+	protected function es_usuario_externo()
+	{
+		if (isset($_SESSION['userdata']['rol']) && $_SESSION['userdata']['rol'] == 'Externo') {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// Verifica si el usuario está logueado y es un usuario interno
+	public function verify_logged_in($redirigir = true)
+	{
+		// Detectar si la solicitud es AJAX
+		$ajax = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest';
+
+		// Verificar si el usuario está logueado y es un usuario interno
+		if ($this->is_logged_in() && $this->es_usuario_interno()) {
+			return true;
+		}
+
+		// Si la solicitud es AJAX y se debe redirigir, devolver un mensaje de error y detener la ejecución
+		if ($ajax) {
+			if ($redirigir) {
+				echo "Sesión de usuario caducada";
+				exit;
+			}
+			return false;
+		}
+
+		// Si no es una solicitud AJAX y se debe redirigir, guardar la URL de retorno y redirigir a la página de login
+		if ($redirigir) {
+			$_SESSION['callback_url'] = base_url() . $_SERVER['REQUEST_URI'];
+			redirect(base_url('usuarios/login'));
+		} else {
+			return false;
+		}
+	}
+
+	public function asignar_permiso()
+	{
+		//Verifico que este logueado y que sea usuario interno
+		if ($this->is_logged_in() && $this->es_usuario_interno()) {
+			return true;
+		} else {
+			$_SESSION['callback_url'] = base_url() . $_SERVER['REQUEST_URI'];
+			redirect(base_url('usuarios/login'));
+			die();
+		}
+	}
+
+	public function is_logged_in()
+	{
+		if (isset($_SESSION['userdata']) && $_SESSION['userdata'] != NULL) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function get_user_data()
+	{
+		return $_SESSION['userdata'];
+	}
+
 	public function get_username()
 	{
-		// Asegúrate de que esta función no tenga errores
-		if (isset(Auth::user()->username)) {
-			return response(Auth::user()->username, 200);
+		if (isset($_SESSION['userdata']['username'])) {
+			return $_SESSION['userdata']['username'];
 		} else {
-			return response("Alephmanager", 200);
+			return "Alephmanager";
 		}
 	}
 
 	public function get_user_id()
 	{
-		if (isset(Auth::user()->user_id)) {
-			return Auth::user()->user_id;
+		if (isset($_SESSION['userdata']['user_id'])) {
+			return $_SESSION['userdata']['user_id'];
 		} else {
 			return false;
 		}
@@ -285,7 +575,7 @@ class MyController extends Controller
 
 		//Pregunto primero si esta logueado
 		if ($this->is_logged_in() && $this->es_usuario_interno()) {
-			#$this->load->model("Configuracion_model", "configuracion");
+			$this->load->model("Configuracion_model", "configuracion");
 
 			$permiso = $this->configuracion->get_permiso($permission_id);
 
@@ -365,61 +655,6 @@ class MyController extends Controller
 		}
 	}
 
-
-
-	protected function check_status_ambiente()
-	{
-		//Recupero cuando se realizó la última version
-		$fecha_version = $this->get_variable("fecha_version");
-
-		//Verifico contra fecha actual
-		$fecha_actual = date('Y-m-d');
-
-		$fecha_version = new DateTime($fecha_version);
-		$fecha_actual = new DateTime($fecha_actual);
-
-		$diferencia = $fecha_version->diff($fecha_actual);
-		$cantidad_dias = $diferencia->days;
-
-		if ($cantidad_dias > 300) {
-			$this->mostrar_error('El ambiente requiere una actualización');
-		}
-	}
-
-	public function obtener_array_niveles_modelo()
-	{
-		$niveles = array();
-
-		$niveles_modelo = $this->generic->get_from_table("modelo_niveles", false, "posicion asc, dependencia_id asc");
-		$niveles[0]['nombre'] = 'Inventario tecnológico';
-		$niveles[0]['tabla'] = 'tabla_activos';
-		if (!empty($niveles_modelo)) {
-			foreach ($niveles_modelo as $nivel_modelo) {
-				$campos = array();
-				$campos_nivel = $this->generic->get_from_table("registros_oyp_posicion", array("nivel_id" => $nivel_modelo->id), "posicion asc");
-
-				foreach ($campos_nivel as $index => $campo) {
-					foreach ($campo as $key => $value) {
-						$campos[$index][$key] = $value;
-					}
-				}
-
-				$niveles[$nivel_modelo->id]['id'] = $nivel_modelo->id;
-				$niveles[$nivel_modelo->id]['nombre'] = $nivel_modelo->nombre;
-				$niveles[$nivel_modelo->id]['tabla'] = $nivel_modelo->tabla;
-				$niveles[$nivel_modelo->id]['campos'] = $campos;
-
-				if ($nivel_modelo->dependencia_id) {
-					$niveles[$nivel_modelo->id]['dependencia_id'] = $nivel_modelo->dependencia_id;
-				} else {
-					$niveles[$nivel_modelo->id]['dependencia_id'] = false;
-				}
-			}
-		}
-
-		return $niveles;
-	}
-
 	public function validar_root()
 	{
 		if ($this->is_root()) {
@@ -486,7 +721,7 @@ class MyController extends Controller
 	public function guardar_log($mensaje, $user_id = false)
 	{
 		if ($mensaje != '') {
-			#$this->load->model("Configuracion_model", "configuracion");
+			$this->load->model("Configuracion_model", "configuracion");
 
 			if ($user_id) {
 				$usuario_id = $user_id;
@@ -525,9 +760,200 @@ class MyController extends Controller
 		}
 	}
 
+	public function enviar_email($to, $content, $subject, $api = false, $generar_notificacion = true)
+	{
+		$emails_aleph = array(
+			'solllanes18@gmail.com',
+			'adrianclaret@gmail.com',
+			'adrianclaret@yafoconsultora.com',
+			'aclaret1@yafoconsultora.com',
+			'aclaret2@yafoconsultora.com',
+			'aclaret3@yafoconsultora.com',
+			'martingorbik@yafoconsultora.com',
+			'soporte@alephmanager.com',
+			'marting196@gmail.com'
+		);
+
+		$whitelist = array(
+			'Marcelo.LeRose@comafi.com.ar'
+		);
+
+		if (in_array($to, $emails_aleph)) {
+			$habilita_notificaciones_demo = true;
+		} else {
+			$habilita_notificaciones_demo = false;
+		}
+
+		if (!$api) {
+			//Si no es por API, siendo root solo notifica a mis correos
+			if ($this->is_root() && !$habilita_notificaciones_demo) {
+				return true;
+			}
+		}
+
+		//Si estoy en ambiente local omito el envio de notificaciones
+		if ($this->es_ambiente_local() && !$habilita_notificaciones_demo) {
+			return true;
+		}
+
+		//Verifico el usuario, si esta deshabilitado directamente no hago nada
+		if (!is_array($to)) {
+			$datos_usuario = $this->generic->get_row_from_table("usuarios", array("email" => $to));
+			if ($datos_usuario && $datos_usuario->enabled == 0) {
+				//Pregunto si no esta en la whitelist
+				if (!in_array($datos_usuario->email, $whitelist)) {
+					return false;
+				}
+			}
+		}
+
+		//Verifico si utiliza las notificaciones locales
+		$notificaciones_locales = $this->get_variable('notificaciones_locales');
+		$notificaciones_email = $this->get_variable('notificaciones_email');
+		$notificaciones_email_default = $this->get_variable('notificaciones_email_default');
+		$notificaciones_email_config = $this->get_variable('notificaciones_email_config');
+		$notificaciones_email_from = $this->get_variable('notificaciones_email_from');
+		$notificaciones_email_from_name = $this->get_variable('notificaciones_email_from_name');
+
+		if ($this->es_usuario_externo()) {
+			$notificaciones_locales = false;
+		}
+
+		if ($generar_notificacion && $notificaciones_locales == 1) {
+			$user_id = $this->get_user_id();
+
+			if (isset($datos_usuario) && $datos_usuario) {
+				$notificacion = array(
+					'user_id' => $datos_usuario->id,
+					'mensaje' => $content,
+					'asunto' => $subject
+				);
+
+				if ($user_id) {
+					$notificacion['user_emisor_id'] = $user_id;
+					$this->generic->save_on_table("notificaciones", $notificacion);
+				} else {
+					$this->generic->save_on_table("notificaciones", $notificacion);
+				}
+			}
+		}
+
+		if ($notificaciones_email == 0) {
+			return true;
+		} else {
+			//Verifico si usa configuracion default
+			if ($notificaciones_email_default) {
+				$api_key = $this->generate_api_key();
+
+				$post_fields = array(
+					'api_key' => $api_key,
+					'to' => $to,
+					'content' => $content,
+					'subject' => $subject,
+					'base_url' => base_url()
+				);
+
+
+				if (defined('URL_API_EMAILS')) {
+					$url_api_emails = URL_API_EMAILS;
+				} else {
+					$url_api_emails = 'https://panel.alephmanager.com/API/send_email';
+				}
+
+				$ch = curl_init();
+				curl_setopt($ch, CURLOPT_URL, $url_api_emails);
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_fields));
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+				//Guardo el email antes de enviarlo
+				$id_log_email = $this->generic->save_on_table("log_emails", array("email" => $to, "subject" => $subject));
+
+				//Ejecuto la llamada API
+				$server_output = curl_exec($ch);
+
+				curl_close($ch);
+
+				log_message('error', 'Registro respuesta del panel por emails: ' . json_encode($server_output));
+
+				$respuesta = json_decode($server_output);
+
+				if ($respuesta && isset($respuesta->status) && $respuesta->status == 1) {
+					//Actualizo el log
+					$this->generic->update("log_emails", array("id" => $id_log_email), array("enviado" => 1));
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				$configs = json_decode($notificaciones_email_config);
+
+				foreach ($configs as $key => $config) {
+					$mail_config[$key] = $config;
+				}
+
+				$from = $notificaciones_email_from;
+				$from_name = $notificaciones_email_from_name;
+
+				$this->load->library('email', $mail_config);
+				$this->email->from($from, $from_name);
+				$this->email->set_newline("\r\n");
+				$this->email->to($to);
+				$this->email->subject($subject);
+
+				$body_email = $this->load->view('layaout/email_template.php', array('content' => $content), TRUE);
+				$this->email->message($body_email);
+
+				//Guardo el email antes de enviarlo
+				$id_log_email = $this->generic->save_on_table("log_emails", array("email" => $to, "subject" => $subject));
+
+				if ($this->email->send()) {
+					//Actualizo el log
+					$this->generic->update("log_emails", array("id" => $id_log_email), array("enviado" => 1));
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+	}
+
+	public function send_email_example()
+	{
+		$config = array(
+			'protocol' => 'tls',
+			'smtp_host' => 'mail.alephmanager.com',
+			'smtp_port' => 465,
+			'smtp_user' => 'info@alephmanager.com',
+			'smtp_pass' => 'hustle2006',
+			'smtp_timeout' => '4',
+			'mailtype'  => 'html',
+			'charset'   => 'utf-8',
+			'wordwrap' => TRUE
+		);
+		$this->load->library('email', $config);
+		$this->email->set_newline("\r\n");
+
+		$this->email->from('info@alephmanager.com', 'Aleph Manager');
+		$this->email->to('adrianclaret@gmail.com');
+
+		$this->email->subject('Email Test');
+		$this->email->message('Testing the email class.');
+
+		if ($this->email->send()) {
+			//TODO: load view...
+			echo "email sent";
+		} else {
+			$to = $this->input->post('email');
+			mail($to, 'test', 'Other sent option failed');
+			echo $this->input->post('email');
+			show_error($this->email->print_debugger());
+		}
+	}
+
 	public function is_admin()
 	{
-		#$this->load->model("Usuario_model", "usuarios");
+		$this->load->model("Usuario_model", "usuarios");
 
 		if (in_array(1, $_SESSION['userdata']['roles_id']) || $this->is_root()) {
 			return true;
@@ -684,104 +1110,13 @@ class MyController extends Controller
 		if ($this->is_logged_in()) {
 			$this->cargar_vista($data);
 		} else {
-			#$this->load->view('master_view_externos', $data);
+			$this->load->view('master_view_externos', $data);
 		}
 	}
 
-	public function check_ip_whitelist($ip)
-	{
-		if ($ip) {
-			if ($ip == '::1') {
-				return true;
-			}
-
-			$existe_ip = $this->generic->get_row_from_table("whitelist", array("ip" => trim($ip)));
-
-			if ($existe_ip) {
-				return true;
-			} else {
-				$all_whitelist = $this->generic->get_from_table("whitelist");
-
-				if (!empty($all_whitelist)) {
-					$ip_en_rango = false;
-					foreach ($all_whitelist as $ip_whitelist) {
-						$ip_con_rango = strpos($ip_whitelist->ip, "/");
-
-						if ($ip_con_rango !== FALSE) {
-							$ip_separada = explode('.', $ip_whitelist->ip);
-
-							if (isset($ip_separada[0]) && isset($ip_separada[1]) && isset($ip_separada[2])) {
-								$ip_inicio = $ip_separada[0] . "." . $ip_separada[1] . "." . $ip_separada[2] . ".";
-								if (isset($ip_separada[3])) {
-									$rango = explode('/', $ip_separada[3]);
-
-									if (isset($rango[0]) && isset($rango[1])) {
-										$rango_inicio = (int)$rango[0];
-										$rango_hasta = (int)$rango[1];
-
-										while ($rango_inicio <= $rango_hasta) {
-											$ip_completa = $ip_inicio . $rango_inicio;
-											if ($ip == $ip_completa) {
-												$ip_en_rango = true;
-												$rango_inicio = $rango_hasta;
-											}
-											$rango_inicio++;
-										}
-									}
-								}
-							}
-						}
-					}
-
-					return $ip_en_rango;
-				} else {
-					return false;
-				}
-			}
-		} else {
-			return false;
-		}
-	}
-	protected function generate_api_key()
-	{
-		// //Agrego las paginas excluidas al control de login
-		// $excluir = array('api','API','service_now','usuarios/reset_password','guardar_seguimiento_control_proveedor');
-		// $verifica_login = true;
-
-		// foreach($excluir as $pagina){
-		//     if(strpos($_SERVER['REQUEST_URI'], $pagina) !== false) {
-		//         $verifica_login = false;
-		//     }
-		// }
-
-		// //Si hay session de un usuario externo no se verifica el login
-		// if(isset($_SESSION['externo'])){
-		//     $verifica_login = false;
-		// }
-
-		// if($verifica_login){
-		//     $this->verify_logged_in();
-		// }
-
-		$clave = "4l3phm4n4g3r";
-		$fecha = date('Y-m-d');
-
-		$clave .= $fecha;
-		$clave = sha1($clave);
-
-		return $clave;
-	}
-}
 
 
-
-/*
-
-
-OMAR
-
-
-protected function cargar_vista($datos_adicionales)
+	protected function cargar_vista($datos_adicionales)
 	{
 		//Agrego los datos que vienen del controlador
 		foreach ($datos_adicionales as $parametro => $valor) {
@@ -794,9 +1129,9 @@ protected function cargar_vista($datos_adicionales)
 			$this->datos_vista['permisos_tabla_activos'] = $this->get_variable("permisos_tabla_activos");
 
 			//Cargo la masterview con los datos recibidos
-			#$this->load->view('master_view', $this->datos_vista);
+			$this->load->view('master_view', $this->datos_vista);
 		} else {
-			#$this->load->view('master_view_externos', $this->datos_vista);
+			$this->load->view('master_view_externos', $this->datos_vista);
 		}
 	}
 
@@ -885,136 +1220,6 @@ protected function cargar_vista($datos_adicionales)
 	//     return $traducciones;
 	// }
 
-	protected function check_api_key($api_key)
-	{
-		$clave = "4l3phm4n4g3r";
-		$fecha = date('Y-m-d');
-
-		$clave .= $fecha;
-		$clave = sha1($clave);
-
-		if ($api_key == $clave) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-
-
-	protected function check_api_credentials()
-	{
-		if (isset($_POST['api_key'])) {
-			$datos_usuario = $this->generic->get_row_from_table("usuarios", array("api_key" => $_POST['api_key']));
-
-			if ($datos_usuario) {
-				if ($datos_usuario->habilita_api == 1) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				//Si no recupera usuario verifico si tiene api key de aleph
-				if ($this->check_api_key($_POST['api_key'])) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-		} else {
-			header("HTTP/1.1 403");
-			exit();
-		}
-	}
-
-	protected function get_tipo_session()
-	{
-		if ($this->es_usuario_interno()) {
-			return 'interno';
-		}
-
-		if ($this->es_usuario_externo()) {
-			return 'externo';
-		}
-
-		return false;
-	}
-
-	// Para validar si es usuario interno pregunto por el username
-	protected function es_usuario_interno()
-	{
-		if (isset($_SESSION['userdata']['username']) && $_SESSION['userdata']['username'] != '' || $this->is_root()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// Para validar si es usuario externo pregunto por el rol
-	protected function es_usuario_externo()
-	{
-		if (isset($_SESSION['userdata']['rol']) && $_SESSION['userdata']['rol'] == 'Externo') {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// Verifica si el usuario está logueado y es un usuario interno
-	public function verify_logged_in($redirigir = true)
-	{
-		// Detectar si la solicitud es AJAX
-		$ajax = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest';
-
-		// Verificar si el usuario está logueado y es un usuario interno
-		if ($this->is_logged_in() && $this->es_usuario_interno()) {
-			return true;
-		}
-
-		// Si la solicitud es AJAX y se debe redirigir, devolver un mensaje de error y detener la ejecución
-		if ($ajax) {
-			if ($redirigir) {
-				echo "Sesión de usuario caducada";
-				exit;
-			}
-			return false;
-		}
-
-		// Si no es una solicitud AJAX y se debe redirigir, guardar la URL de retorno y redirigir a la página de login
-		if ($redirigir) {
-			$_SESSION['callback_url'] = base_url() . $_SERVER['REQUEST_URI'];
-			redirect(base_url('usuarios/login'));
-		} else {
-			return false;
-		}
-	}
-
-	public function asignar_permiso()
-	{
-		//Verifico que este logueado y que sea usuario interno
-		if ($this->is_logged_in() && $this->es_usuario_interno()) {
-			return true;
-		} else {
-			$_SESSION['callback_url'] = base_url() . $_SERVER['REQUEST_URI'];
-			redirect(base_url('usuarios/login'));
-			die();
-		}
-	}
-
-	public function is_logged_in()
-	{
-		if (isset($_SESSION['userdata']) && $_SESSION['userdata'] != NULL) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public function get_user_data()
-	{
-		return $_SESSION['userdata'];
-	}
-
 
 	public function chequear_modulo_habilitado($nombre_modulo, $mensaje_error = false, $url_anterior = false, $ajax = false)
 	{
@@ -1038,10 +1243,8 @@ protected function cargar_vista($datos_adicionales)
 				'page' => 'Page error'
 			);
 			$this->cargar_vista($data);
-			/* #$this->load->view('master_view_externos',$data); 
+			/* $this->load->view('master_view_externos',$data); */
 		}
-
-
 	}
 
 	protected function obtener_url_completa()
@@ -1069,7 +1272,7 @@ protected function cargar_vista($datos_adicionales)
 
 	public function reportar_error($mensaje_error)
 	{
-		#$this->load->model("Configuracion_model", "configuracion");
+		$this->load->model("Configuracion_model", "configuracion");
 
 		$ip = "";
 		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
@@ -1342,6 +1545,60 @@ protected function cargar_vista($datos_adicionales)
 		return $new_string;
 	}
 
+	public function check_ip_whitelist($ip)
+	{
+		if ($ip) {
+			if ($ip == '::1') {
+				return true;
+			}
+
+			$existe_ip = $this->generic->get_row_from_table("whitelist", array("ip" => trim($ip)));
+
+			if ($existe_ip) {
+				return true;
+			} else {
+				$all_whitelist = $this->generic->get_from_table("whitelist");
+
+				if (!empty($all_whitelist)) {
+					$ip_en_rango = false;
+					foreach ($all_whitelist as $ip_whitelist) {
+						$ip_con_rango = strpos($ip_whitelist->ip, "/");
+
+						if ($ip_con_rango !== FALSE) {
+							$ip_separada = explode('.', $ip_whitelist->ip);
+
+							if (isset($ip_separada[0]) && isset($ip_separada[1]) && isset($ip_separada[2])) {
+								$ip_inicio = $ip_separada[0] . "." . $ip_separada[1] . "." . $ip_separada[2] . ".";
+								if (isset($ip_separada[3])) {
+									$rango = explode('/', $ip_separada[3]);
+
+									if (isset($rango[0]) && isset($rango[1])) {
+										$rango_inicio = (int)$rango[0];
+										$rango_hasta = (int)$rango[1];
+
+										while ($rango_inicio <= $rango_hasta) {
+											$ip_completa = $ip_inicio . $rango_inicio;
+											if ($ip == $ip_completa) {
+												$ip_en_rango = true;
+												$rango_inicio = $rango_hasta;
+											}
+											$rango_inicio++;
+										}
+									}
+								}
+							}
+						}
+					}
+
+					return $ip_en_rango;
+				} else {
+					return false;
+				}
+			}
+		} else {
+			return false;
+		}
+	}
 
 	public function copy_dir($src, $dst)
 	{
@@ -2818,7 +3075,7 @@ protected function cargar_vista($datos_adicionales)
 		return $protocol;
 	}
 
-	/**************************** INTERFACES PHP EXCEL **************************
+	/**************************** INTERFACES PHP EXCEL **************************/
 	protected function instanciar_objeto_php_excel()
 	{
 		$objeto_php_excel = null;
@@ -3061,7 +3318,7 @@ protected function cargar_vista($datos_adicionales)
 	{
 		$objeto_php_excel->getActiveSheet()->getStyle($celdas)->getAlignment()->setWrapText(true);
 	}
-	/**********************************************************************
+	/**********************************************************************/
 
 	//Agrego funcion para reemplazar caracteres en un string
 	public function correjir_errores_exportacion($string)
@@ -3591,7 +3848,7 @@ protected function cargar_vista($datos_adicionales)
 		return implode('', $password);
 	}
 
-	/* Funcion para verificar si la fila a importar se encuentra vacía *
+	/* Funcion para verificar si la fila a importar se encuentra vacía */
 	protected function es_fila_vacia($fila)
 	{
 		$esta_vacia = true;
@@ -3631,5 +3888,3 @@ protected function cargar_vista($datos_adicionales)
 		}
 	}
 }
-*/
-

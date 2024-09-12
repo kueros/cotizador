@@ -4,7 +4,11 @@
 			{{ __('Configuraciones') }}
 		</h2>
 	</x-slot>
+	<?php
 
+	#dd($variables);
+
+	?>
 	<div style="background-image: url('/build/assets/images/dashboard-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding-top: 3rem; padding-bottom: 3rem;">
 		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
@@ -20,42 +24,24 @@
 						</svg>
 					</button>
 					<div x-show="open1" class="mt-2 p-4 border-t border-gray-200">
+
 						<!-- Contenido de Notificaciones -->
-						<div class="form-group row">
-							<label class="control-label col-md-6">Utilizar notificaciones locales</label>
-							<div class="col-md-6">
-								<label class="switch">
-									<input name="notificaciones_locales" id="notificaciones_locales" value="1" checked="" onchange="cambiar_configuraciones()" type="checkbox">
-									<span class="slider round"></span>
-								</label>
+						<!-- resources/views/tu_vista.blade.php -->
+						<form action="{{ route('guardarestado') }}" method="POST">
+							@csrf
+							@foreach ($variables as $variable)
+							<div class="form-group row">
+								<div class="col-md-6">
+									<label>
+										<input type="checkbox" id="{{ $variable->nombre }}" name="{{ $variable->nombre }}" value="1" {{ $variable->valor == 1 ? 'checked' : '' }} /> 
+										{{ $variable->nombre }}
+									</label>
+								</div>
 							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-6">Utilizar notificaciones por email</label>
-							<div class="col-md-6">
-								<label class="switch">
-									<input name="notificaciones_email" id="notificaciones_email" value="1" checked="" onchange="cambiar_configuraciones()" type="checkbox">
-									<span class="slider round"></span>
-								</label>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-6">Utilizar servicio de envío de email de Aleph Manager</label>
-							<div class="col-md-6">
-								<label class="switch">
-									<input name="notificaciones_email_default" id="notificaciones_email_default" value="1" checked="" onchange="cambiar_configuraciones()" type="checkbox">
-									<span class="slider round"></span>
-								</label>
-							</div>
-							<div class="col-md-12">
-								<a onclick="test_config_default(this)" class="btn btn-info">
-									<span class="glyphicon glyphicon-ok"></span> Probar envio de emails
-								</a>
-							</div>
-						</div>
+							@endforeach
+						</form>
 					</div>
 				</div>
-
 				<!-- Acordeón para Opciones avanzadas -->
 				<div x-data="{ open2: false }" class="border-t border-gray-200">
 					<button @click="open2 = !open2" class="flex justify-between items-center w-full p-4 font-medium text-left text-gray-800 bg-gray-100 hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500">
@@ -90,142 +76,9 @@
 								<input class="form-control" placeholder="Ingrese el token y haga clic afuera del campo para guardar" name="open_ai_api_key" id="open_ai_api_key" type="text" onchange="cambiar_configuraciones_avanzadas()">
 							</div>
 						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-4">Habilitar Módulo de Auditoria</label>
-							<div class="col-md-8">
-								<label class="switch">
-									<input name="habilita_modulo_auditoria" id="habilita_modulo_auditoria" value="1" onchange="cambiar_configuraciones_avanzadas()" type="checkbox">
-									<span class="slider round"></span>
-								</label>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-4">Acceso módulo de Formulario de encuadramiento</label>
-							<div class="col-md-8">
-								<label class="switch">
-									<input name="acceso_formulario_encuadramiento" id="acceso_formulario_encuadramiento" value="1" onchange="cambiar_configuraciones_avanzadas()" type="checkbox">
-									<span class="slider round"></span>
-								</label>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-4">Acceso módulo de Contratacion de STI</label>
-							<div class="col-md-8">
-								<label class="switch">
-									<input name="habilita_proceso_contratacion_sti" id="habilita_proceso_contratacion_sti" value="1" onchange="cambiar_configuraciones_avanzadas()" type="checkbox">
-									<span class="slider round"></span>
-								</label>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-4">Habilitar Canales Electrónicos Criticidad de Escenarios</label>
-							<div class="col-md-8">
-								<label class="switch">
-									<input name="habilita_canales_criticidad_escenarios" id="habilita_canales_criticidad_escenarios" value="1" checked="" onchange="cambiar_configuraciones_avanzadas()" type="checkbox">
-									<span class="slider round"></span>
-								</label>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-4">Habilitar CMDB Corporativa</label>
-							<div class="col-md-8">
-								<label class="switch">
-									<input name="mostrar_cmdb_corporativa" id="mostrar_cmdb_corporativa" value="1" onchange="cambiar_configuraciones_avanzadas()" type="checkbox">
-									<span class="slider round"></span>
-								</label>
-							</div>
-						</div>
+
 					</div>
 				</div>
-
-				<!-- Acordeón para Opciones avanzadas -->
-				<div x-data="{ open3: false }" class="border-t border-gray-200">
-					<button @click="open3 = !open3" class="flex justify-between items-center w-full p-4 font-medium text-left text-gray-800 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500">
-						Sincronización de ambientes
-						<svg :class="{ 'rotate-180': open3, 'rotate-0': !open3 }" class="w-6 h-6 transform transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
-							<path fill-rule="evenodd" d="M5.293 9.707a1 1 0 011.414 0L10 13.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-						</svg>
-					</button>
-					<div x-show="open3" class="mt-2">
-						<!-- Contenido de Sincronización de ambientes -->
-						<div class="form-group row">
-							<label class="control-label col-md-4">Habilitar sincronización de ambientes</label>
-							<div class="col-md-8">
-								<label class="switch">
-									<input name="sincronizacion_ambiente" id="sincronizacion_ambiente" value="1" onchange="cambiar_configuraciones_sincronizacion(true)" type="checkbox">
-									<span class="slider round"></span>
-								</label>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Acordeón para Configuración de acceso -->
-				<div x-data="{ open4: false }" class="border-t border-gray-200">
-					<button @click="open4 = !open4" class="flex justify-between items-center w-full p-4 font-medium text-left text-gray-800 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500">
-						Configuración de acceso
-						<svg :class="{ 'rotate-180': open, 'rotate-0': !open }" class="w-6 h-6 transform transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
-							<path fill-rule="evenodd" d="M5.293 9.707a1 1 0 011.414 0L10 13.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-						</svg>
-					</button>
-					<div x-show="open4" class="mt-2">
-						<!-- Contenido de Configuración de acceso -->
-						<div class="form-group row">
-							<label class="control-label col-md-4">Accesos módulos riesgo IT</label>
-							<div class="col-md-4">
-								<select class="form-control" name="accesos_modulos_arit" id="accesos_modulos_arit" onchange="acceso_modulo()" style="width:200px;">
-									<option value="1" selected="">Todos los accesos</option>
-									<option value="2">Acciones pendientes</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-4">Accesos módulos AROP</label>
-							<div class="col-md-4">
-								<select class="form-control" name="accesos_modulos_arop" id="accesos_modulos_arop" onchange="acceso_modulo()" style="width:200px;">
-									<option value="1" selected="">Todos los accesos</option>
-									<option value="2">Acciones pendientes</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-4">Accesos módulos BIAS</label>
-							<div class="col-md-4">
-								<select class="form-control" name="accesos_modulos_bias" id="accesos_modulos_bias" onchange="acceso_modulo()" style="width:200px;">
-									<option value="1" selected="">Todos los accesos</option>
-									<option value="2">Acciones pendientes</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-4">Accesos módulos Clasificación</label>
-							<div class="col-md-4">
-								<select class="form-control" name="accesos_modulos_clasificacion" id="accesos_modulos_clasificacion" onchange="acceso_modulo()" style="width:200px;">
-									<option value="1" selected="">Todos los accesos</option>
-									<option value="2">Acciones pendientes</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-4">Accesos a descarga de archivos (permiso de "Auditoría")</label>
-							<div class="col-md-4">
-								<select class="form-control" name="acceso_auditor_archivos" id="acceso_auditor_archivos" onchange="cambiar_configuraciones_avanzadas()" style="width:200px;">
-									<option value="0">No permitir descargas</option>
-									<option value="1" selected="">Permitir descargas</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group row">
-							<label class="control-label col-md-4">Accesos a descarga de reportes (permiso de "Auditoría")</label>
-							<div class="col-md-4">
-								<select class="form-control" name="acceso_auditor_reportes" id="acceso_auditor_reportes" onchange="cambiar_configuraciones_avanzadas()" style="width:200px;">
-									<option value="0">No permitir descargas</option>
-									<option value="1" selected="">Permitir descargas</option>
-								</select>
-							</div>
-						</div>
-					</div>
-
 
 
 					<!-- Acordeón para Opciones avanzadas -->
@@ -398,6 +251,32 @@
 
 				</div>
 			</div>
+
+			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+			<script>
+				$('input[type="checkbox"]').on('change', function() {
+					let variableName = $(this).attr('name');
+					let value = $(this).is(':checked') ? 1 : 0;
+					//console.log(variableName, value);
+					$.ajax({
+						url: '{{ route("guardarestado") }}',
+						type: 'POST',
+						data: {
+							_token: '{{ csrf_token() }}',
+							[variableName]: value
+						},
+						dataType: "JSON",
+						success: function(response) {
+							alert('Estado guardado correctamente');
+							//location.reload();
+						},
+						error: function(error) {
+							alert('Error al guardar el estado', error);
+						}
+					});
+				});
+			</script>
 
 
 </x-app-layout>
