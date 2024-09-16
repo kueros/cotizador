@@ -1250,7 +1250,7 @@ class MyController_copy extends Controller
 	protected function obtener_url_completa()
 	{
 		if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'http') {
-			$host = "http://";
+			$host = "https://";
 		} else {
 			$host = "https://";
 		}
@@ -3069,7 +3069,7 @@ class MyController_copy extends Controller
 		) {
 			$protocol = 'https://';
 		} else {
-			$protocol = 'http://';
+			$protocol = 'https://';
 		}
 
 		return $protocol;

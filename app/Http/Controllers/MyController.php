@@ -1047,7 +1047,7 @@ protected function cargar_vista($datos_adicionales)
 	protected function obtener_url_completa()
 	{
 		if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'http') {
-			$host = "http://";
+			$host = "https://";
 		} else {
 			$host = "https://";
 		}
@@ -2812,7 +2812,7 @@ protected function cargar_vista($datos_adicionales)
 		) {
 			$protocol = 'https://';
 		} else {
-			$protocol = 'http://';
+			$protocol = 'https://';
 		}
 
 		return $protocol;
