@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('variables', function (Blueprint $table) {
 			$table->integer('id')->primary()->autoIncrement();
             $table->string('nombre');
+			$table->string('nombre_menu')->nullable();
             $table->string('valor');
             $table->timestamps();
         });

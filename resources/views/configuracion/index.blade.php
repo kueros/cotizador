@@ -35,7 +35,7 @@
 								<div class="col-md-6">
 									<label>
 										<input type="checkbox" id="{{ $variable->nombre }}" name="{{ $variable->nombre }}" value="1" {{ $variable->valor == 1 ? 'checked' : '' }} />
-										{{ $variable->nombre }}
+										{{ $variable->nombre_menu }}
 									</label>
 								</div>
 							</div>
@@ -62,7 +62,7 @@
 								<div class="col-md-6">
 									<label>
 										<input type="checkbox" id="{{ $variable->nombre }}" name="{{ $variable->nombre }}" value="1" {{ $variable->valor == 1 ? 'checked' : '' }} />
-										{{ $variable->nombre }}
+										{{ $variable->nombre_menu }}
 									</label>
 								</div>
 							</div>
@@ -73,7 +73,7 @@
 				</div>
 
 
-				<!-- Acordeón para Opciones avanzadas -->
+				<!-- Acordeón para Configuración de pantallas -->
 				<div x-data="{ open5: false }" class="border-t border-gray-200">
 					<button @click="open5 = !open5" class="flex justify-between items-center w-full p-4 font-medium text-left text-gray-800 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500">
 						Configuración de pantallas
@@ -91,7 +91,7 @@
 								<div class="col-md-6">
 									<label>
 										<input type="checkbox" id="{{ $variable->nombre }}" name="{{ $variable->nombre }}" value="1" {{ $variable->valor == 1 ? 'checked' : '' }} />
-										{{ $variable->nombre }}
+										{{ $variable->nombre_menu }}
 										<span class="slider round"></span>
 									</label>
 								</div>
@@ -114,39 +114,47 @@
 							@endforeach
 						</form>
 
-			</div>
-		</div>
+					</div>
+				</div>
 
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+				<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-		<script>
-			$('input[type="checkbox"]').on('change', function() {
-				let variableName = $(this).attr('name');
-				let value = $(this).is(':checked') ? 1 : 0;
-				if (value == 1) {
-					$('#' + variableName).hide();
-				} else {
-					$('#' + variableName).show();
-				}
-				//console.log(variableName, value);
-				$.ajax({
-					url: '{{ route("guardarestado") }}',
-					type: 'POST',
-					data: {
-						_token: '{{ csrf_token() }}',
-						[variableName]: value
-					},
-					dataType: "JSON",
-					success: function(response) {
-						alert('Estado guardado correctamente');
-						//location.reload();
-					},
-					error: function(error) {
-						alert('Error al guardar el estado', error);
-					}
-				});
-			});
-		</script>
+				<script>
+					$('input[type="checkbox"]').on('change', function() {
+						// Obtenemos el nombre del checkbox que ha sido clicado
+						let variableName = $(this).attr('name');
+
+						// Verificamos si está chequeado o no
+						let isChecked = $(this).is(':checked');
+
+						// Obtenemos el div correspondiente basado en el id del checkbox
+						let targetDiv = $('#div_' + variableName);
+
+						// Si está chequeado, mostramos el formulario; si no, lo ocultamos
+						if (isChecked) {
+							targetDiv.slideUp(); // Ocultar el formulario
+						} else {
+							targetDiv.slideDown(); // Mostrar el formulario
+						}
+
+						// Enviamos la petición AJAX para guardar el estado
+						$.ajax({
+							url: '{{ route("guardarestado") }}',
+							type: 'POST',
+							data: {
+								_token: '{{ csrf_token() }}',
+								[variableName]: isChecked ? 1 : 0
+							},
+							dataType: "JSON",
+							success: function(response) {
+								alert('Estado guardado correctamente');
+							},
+							error: function(error) {
+								alert('Error al guardar el estado', error);
+							}
+						});
+					});
+				</script>
 
 
 </x-app-layout>

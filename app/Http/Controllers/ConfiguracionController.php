@@ -17,7 +17,7 @@ class ConfiguracionController extends Controller
 		$variables = Variable::where('nombre', 'like', '%noti%')
 								->orWhere('nombre', 'like', '%opav%')
 								->orWhere('nombre', 'like', '%copa%')
-								->get(['nombre', 'valor']);
+								->get(['nombre', 'nombre_menu', 'valor']);
 
 		return view('configuracion.index', compact('variables'));
 	}
