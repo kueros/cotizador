@@ -123,7 +123,7 @@
 					$('input[type="checkbox"]').on('change', function() {
 						// Obtenemos el nombre del checkbox que ha sido clicado
 						let variableName = $(this).attr('name');
-
+						alert(variableName);
 						// Verificamos si está chequeado o no
 						let isChecked = $(this).is(':checked');
 
