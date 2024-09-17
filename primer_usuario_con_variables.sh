@@ -11,7 +11,7 @@ $nombre = "'$2'";
 $apellido = "'$3'";
 $rol_id = 1;
 $email = "'$4'";
-$password = password_hash("12341234", PASSWORD_DEFAULT);
+$password = password_hash("'$5'", PASSWORD_DEFAULT);
 
 $sql = "INSERT INTO users (username, nombre, apellido, email, password) 
         VALUES (:username, :nombre, :apellido, :email, :password)";
