@@ -52,7 +52,7 @@ return [
     |
     */
 
-	'url' => env('APP_URL', 'https://plaft.alephmanager.com'),
+    'url' => env('APP_URL', 'https://localhost'),
 
     /*
     |--------------------------------------------------------------------------
