@@ -32,7 +32,7 @@ class ConfiguracionController extends Controller
 		return view('configuracion.variables', compact('variables'));
 	}
 
-    public function guardarEstado(Request $request)
+    public function guardar_estado(Request $request)
     {
         try {
             // Itera sobre las variables enviadas y guarda sus valores
@@ -55,6 +55,23 @@ class ConfiguracionController extends Controller
             return response()->json(['error' => 'Hubo un error al guardar el estado'], 500);
         }
     }
+	public function guardar_remitente_email()
+	{
+		$from = trim($_POST['from']);
+		$from_name = trim($_POST['from_name']);
+
+		if ($from != '' || $from_name != '') {
+			Variable::where('nombre', 'notificaciones_email_from')->update(['valor' => $from]);
+			Variable::where('nombre', 'notificaciones_email_from_name')->update(['valor' => $from_name]);
+
+			session()->flash('success_message', 'Datos del remitente guardados.');
+		} else {
+			session()->flash('error_message', 'Ninguno de los 2 valores puede quedar vacío.');
+		}
+
+		return; // redirect()->route('configuracion');
+	}
+
 
 }
 
