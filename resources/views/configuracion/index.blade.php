@@ -64,8 +64,10 @@
 							<label class="control-label col-md-6">Utilizar servicio de envío de email de Aleph Manager</label>
 							<div class="col-md-6">
 								<label class="switch">
-									<input type="checkbox" id="notificaciones_email_aleph" name="notificaciones_email_aleph" value="1" 
-									<?php if ($notificaciones_email_aleph == 1) { echo "checked"; } ?> />
+									<input type="checkbox" id="notificaciones_email_aleph" name="notificaciones_email_aleph" value="1"
+										<?php if ($notificaciones_email_aleph == 1) {
+											echo "checked";
+										} ?> />
 									<span class="slider round"></span>
 								</label>
 							</div>
@@ -81,7 +83,6 @@
 						<?php
 						if ($notificaciones_email == 1 && $notificaciones_email_aleph == 0) {
 
-							# VER POR QUÉ REMIERDA ME CARGA EL VALOR DE $notificaciones_email_aleph EN 1 CUANDO RECARGO LA PÁGINA!!!!!!
 
 						?>
 							<h4>Configuración del remitente</h4>
@@ -317,23 +318,19 @@
 
 				<script>
 					$('input[type="checkbox"]').on('change', function() {
-						// Obtenemos el nombre del checkbox que ha sido clicado
+						// Guardo el nombre del checkbox que ha sido clickeado
 						let variableName = $(this).attr('name');
-
-						// Verificamos si está chequeado o no
+						// Verifico si está checked
 						let isChecked = $(this).is(':checked');
-
-						// Obtenemos el div correspondiente basado en el id del checkbox
+						// Obtengo el div correspondiente basado en el id del checkbox
 						let targetDiv = $('#div_' + variableName);
-
-						// Si está chequeado, mostramos el formulario; si no, lo ocultamos
+						// Si está checked, muestro el formulario
 						if (isChecked) {
-							targetDiv.slideUp(); // Ocultar el formulario
+							targetDiv.slideUp(); // Oculto el formulario
 						} else {
-							targetDiv.slideDown(); // Mostrar el formulario
+							targetDiv.slideDown(); // Muestro el formulario
 						}
-
-						// Enviamos la petición AJAX para guardar el estado
+						// Envío el AJAX para guardar el estado
 						$.ajax({
 							url: '{{ route("configuracion.guardar_estado") }}',
 							type: 'POST',
