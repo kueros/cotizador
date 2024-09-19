@@ -20,7 +20,7 @@
 	</style>
 
 	<!-- Fonts -->
-	<link href="/build/assets/css/ex-vite1.css" rel="stylesheet">
+	<link href="/build/assets/css/exvite.css" rel="stylesheet">
 
 	<!-- Scripts -->
 </head>
