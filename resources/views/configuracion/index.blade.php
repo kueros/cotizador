@@ -108,7 +108,7 @@
 								Alterar la configuración puede implicar detener el envio de notificaciones via email, realicé la prueba antes de guardar su configuración
 							</div>
 							<div class="alert alert-info" role="alert">
-								Para conocer las configuraciones disponibles de la libreria siga <a class="alert-link" target="_blank" href="https://codeigniter.com/userguide3/libraries/email.html">este enlace</a> y baje hasta la sección con el título "Email Preferences"
+								Para conocer las configuraciones disponibles de la libreria siga <a class="alert-link" target="_blank" href="#">este enlace</a> y baje hasta la sección con el título "Email Preferences"
 							</div>
 							<div class="form-group row">
 								<a class="btn btn-success" onclick="add_parametro()">Agregar parametro</a>
@@ -206,7 +206,7 @@
 							Alterar la configuración puede implicar detener el envio de notificaciones via email, realicé la prueba antes de guardar su configuración
 						</div>
 						<div class="alert alert-info" role="alert">
-							Para conocer las configuraciones disponibles de la libreria siga <a class="alert-link" target="_blank" href="https://codeigniter.com/userguide3/libraries/email.html">este enlace</a> y baje hasta la sección con el título "Email Preferences"
+							Para conocer las configuraciones disponibles de la libreria siga <a class="alert-link" target="_blank" href="#">este enlace</a> y baje hasta la sección con el título "Email Preferences"
 						</div>
 						<div class="form-group row">
 							<a class="btn btn-success" onclick="add_parametro()">Agregar parametro</a>
@@ -294,8 +294,9 @@
 								</div>
 							</div>
 							<div id="div_{{ $variable->nombre }}" style="display:none">
-								<form action="https://demo.alephmanager.com/configuracion/guardar_imagen_aleph" id="{{ $variable->nombre }}_path" method="post" enctype="multipart/form-data" class="form-horizontal">
-									<div class="form-group row">
+								<form action="/guardar_imagen_aleph" id="{{ $variable->nombre }}_path" method="post" enctype="multipart/form-data" class="form-horizontal">
+				<!-- ver qué hace este form en el aleph de code igniter -->
+								<div class="form-group row">
 										<label class="control-label col-md-4">Subir imagen</label>
 										<div class="col-md-8">
 											<input type="file" class="form-control" id="{{ $variable->nombre }}_path" name="{{ $variable->nombre }}_path" accept="image/png, .jpeg, .jpg, .webp, image/gif" required="">
@@ -314,7 +315,7 @@
 					</div>
 				</div>
 
-				<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+				<script src="/build/assets/js/jquery-3.6.0.min.js"></script>
 
 				<script>
 					$('input[type="checkbox"]').on('change', function() {
