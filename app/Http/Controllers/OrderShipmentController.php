@@ -22,7 +22,7 @@ class OrderShipmentController extends Controller
         #$user = User::findOrFail($request->user_id);
         $user = User::all();
         // Enviar el pedido...
-
+dd("kdkdkdkdkdkdk ".$user);
         $subject = "Prueba de envío de correo desde Laravel";
         $body = "Prueba de envío de correo desde Laravel. Esto es el body del correo.";
         $to = "omarliberatto@yafoconsultora.com";

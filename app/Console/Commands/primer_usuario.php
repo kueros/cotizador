@@ -30,13 +30,15 @@ class primer_usuario extends Command
             'password' => 'required|string|min:8',
         ]);
 
-        if ($validator->fails()) {
+        #dd($data);
+
+/*         if ($validator->fails()) {
             foreach ($validator->errors()->all() as $error) {
                 $this->error($error);
             }
             return 1; // Retornar un código de error
         }
-
+ */
         // Aplicar hash al password
         $data['password'] = Hash::make($data['password']);
 

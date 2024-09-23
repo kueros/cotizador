@@ -10,7 +10,7 @@
 
 	<link href="/build/assets/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Fonts -->
-	<link href="/build/assets/css/dataTables.dataTables.css" rel="stylesheet">
+	<link href="/build/assets/css/dataTables.css" rel="stylesheet">
 	<link href="/build/assets/css/exvite.css" rel="stylesheet">
 	<link href="/build/assets/css/jquery-ui.css" rel="Stylesheet">
 	<!-- Scripts -->

@@ -32,7 +32,7 @@
 			<!-- Session Status -->
 			<!-- x-auth-session-status class="mb-4" :status="session('status')" / -->
 
-			<form method="POST" action="{{ secure_url('login') }}">
+			<form method="POST" action="{{ url('login') }}">
 				@csrf
 				<div>
 					<a href="/">
@@ -43,7 +43,7 @@
 				<!-- Email Address -->
 				<div>
 					<label for="email" value="__('Email')" class="text-white" >
-					<input id="email" class="block mt-1 w-full" type="email" name="email" value="old('email')" required autofocus autocomplete="username" />
+					<input id="email" class="block mt-1 w-full text-black" type="email" name="email" value="" placeholder="Email" required autofocus autocomplete="username" />
 					<input-error messages="$errors->get('email')" class="mt-2" />
 				</div>
 
@@ -51,7 +51,7 @@
 				<div class="mt-4">
 					<label for="password" value="__('Password')" class="text-white" >
 
-					<input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
+					<input id="password" class="block mt-1 w-full text-black" type="password" name="password" required autocomplete="current-password" />
 
 					<input-error messages="$errors->get('password')" class="mt-2" />
 				</div>

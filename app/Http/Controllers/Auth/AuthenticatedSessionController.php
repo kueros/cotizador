@@ -49,7 +49,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+		#dd($request->all());
         $request->authenticate();
+		#dd($request->all());
 		$request->session()->regenerate();
 		$message = "Solicitud de autenticacion recibida. " . json_encode($request->all());
 		$users = User::find(Auth::user()->id);

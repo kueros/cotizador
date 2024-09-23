@@ -61,22 +61,24 @@ Route::middleware('auth')->group(function () {
 
 
 Route::middleware('auth')->group(function () {
-	Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
-
-	Route::get('/configuracion/variables', [ConfiguracionController::class, 'variables'])->name('configuracion.variables');
-
-	Route::get('/configuracion/variables/create', [ConfiguracionController::class, 'create'])->name('configuracion.variables.create');
-	Route::post('/configuracion/variables', [ConfiguracionController::class, 'store'])->name('configuracion.variables.store');
-	Route::get('/configuracion/variables/{variable}/edit', [ConfiguracionController::class, 'edit'])->name('configuracion.variables.edit');
-	Route::patch('/configuracion/variables/{variable}', [ConfiguracionController::class, 'update'])->name('configuracion.variables.update');
-	Route::delete('/configuracion/variables/{variable}', [ConfiguracionController::class, 'destroy'])->name('configuracion.variables.destroy');
 	Route::get('/monitoreo/log_administracion', [MonitoreoController::class, 'log_administracion'])->name('monitoreo.log_administracion');
 	Route::get('/monitoreo/log_notificaciones', [MonitoreoController::class, 'log_notificaciones'])->name('monitoreo.log_notificaciones');
 	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
 });
 
-Route::post('/configuracion', [ConfiguracionController::class, 'guardar_estado'])->name('configuracion.guardar_estado');
-Route::post('/configuracion/remitente', [ConfiguracionController::class, 'guardar_remitente_email'])->name('configuracion.guardar_remitente_email');
+Route::middleware('auth')->group(
+	function () {
+		Route::post('/configuracion/remitente', [ConfiguracionController::class, 'guardar_remitente_email'])->name('configuracion.guardar_remitente_email');
+		Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+		Route::get('/configuracion/variables', [ConfiguracionController::class, 'variables'])->name('configuracion.variables');
+		Route::get('/configuracion/variables/create', [ConfiguracionController::class, 'create'])->name('configuracion.variables.create');
+		Route::post('/configuracion/variables', [ConfiguracionController::class, 'store'])->name('configuracion.variables.store');
+		Route::get('/configuracion/variables/{variable}/edit', [ConfiguracionController::class, 'edit'])->name('configuracion.variables.edit');
+		Route::patch('/configuracion/variables/{variable}', [ConfiguracionController::class, 'update'])->name('configuracion.variables.update');
+		Route::delete('/configuracion/variables/{variable}', [ConfiguracionController::class, 'destroy'])->name('configuracion.variables.destroy');
+		Route::post('/configuracion', [ConfiguracionController::class, 'guardar_estado'])->name('configuracion.guardar_estado');
+	}
+);
 
 Route::get('send/mail', [OrderShipmentController::class, 'store'])->name('enviarmail');
 Route::get('/obtenerusername', [MyController::class, 'get_username'])->name('obtenerusername1');
