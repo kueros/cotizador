@@ -79,7 +79,7 @@
 						</x-dropdown-link>
 
 						<!-- Authentication -->
-						<form method="POST" action="url('logout')">
+						<form method="POST" action="{{ secure_url('logout') }}">
 							@csrf
 
 							<x-dropdown-link :href="url('logout')"
@@ -125,11 +125,11 @@
 				</x-responsive-nav-link>
 
 				<!-- Authentication -->
-				<form method="POST" action="url('logout')">
+				<form method="POST" action="{{ route('logout') }}">
 					@csrf
 					<input type="hidden" name="email" value="{{ $email }}">
 					<input type="hidden" name="username" value="{{ $user }}">
-					<x-responsive-nav-link :href="url('logout')"
+					<x-responsive-nav-link :href="route('logout')"
 						onclick="event.preventDefault();
                                         this.closest('form').submit();">
 						{{ __('Log Out') }}
