@@ -123,13 +123,6 @@ class UserController extends Controller
     {
 		$roles = Rol::all();
         $users = User::find($id);
-/* 		echo "<pre>";
-		print_r($id);
-		print_r($users);
-		print_r($roles);
-		echo "</pre>";
-		die();
- */        
         return view('user.edit', compact('users', 'roles'));
     }
 
@@ -137,7 +130,8 @@ class UserController extends Controller
      * Update the specified resource in storage.
      */
 	public function update(UserRequest $request, User $user, MyController $myController): RedirectResponse
-    {
+	{
+		#dd($request->all());
 		// Definir los mensajes de error personalizados
 		$messages = [
 			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
@@ -151,10 +145,8 @@ class UserController extends Controller
 			'nombre' => 'required|string|max:255',
 			'apellido' => 'required|string|max:255',
 			'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-			'rol_id' => 'required|exists:roles,id',
-			'habilitado' => 'required|boolean',
-			'bloqueado' => 'required|boolean',
 		], $messages);
+		#dd('asdf1234');
 
 		// Actualizar el usuario con los datos validados
 		$user->update($validatedData);
@@ -187,10 +179,12 @@ class UserController extends Controller
 			Log::error('Error al enviar el correo: ' . $e->getMessage());
 			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
 		}
-        return Redirect::route('users.index')
-            ->with('success', 'Usuario actualizado correctamente');
-    }
+		#return Redirect::route('users.index')
+		#	->with('success', 'Usuario actualizado correctamente');
+		return redirect()->route('users.index')->with('status', 'profile-updated');
+	}
 
+	
 	public function destroy($id, MyController $myController): RedirectResponse
 	{
 		// Encuentra el usuario por su ID
