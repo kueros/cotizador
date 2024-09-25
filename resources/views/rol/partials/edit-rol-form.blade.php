@@ -16,7 +16,7 @@
 		<div>
 			<x-input-label for="nombre" :value="__('Nombre')" />
 			<x-text-input id="nombre" value="{{ $roles->nombre }}" name="nombre" type="text" class="mt-1 block w-full" autocomplete="nombre" />
-			<x-input-error :messages="$errors->updatePassword->get('nombre')" class="mt-2" />
+			<x-input-error :messages="$errors->get('nombre')" class="mt-2" />
 		</div>
 
 

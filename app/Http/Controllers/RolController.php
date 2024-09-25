@@ -17,7 +17,6 @@ class RolController extends Controller
 	public function index(Request $request): View
 	{
 		$roles = Rol::paginate();
-		#dd($roles);
 		return view('rol.index', compact('roles'))
 			->with('i', ($request->input('page', 1) - 1) * $roles->perPage());
 	}
@@ -69,11 +68,13 @@ class RolController extends Controller
 	/**
 	 * Update the specified resource in storage.
 	 */
-	#	public function update($request) //UserRequest $request, User $user): RedirectResponse
 	public function update(Request $request, Rol $rol): RedirectResponse
 	{
-		#dd($request->all());
-		$rol->update($request->all());
+		// Validar los datos del usuario
+		$validatedData = $request->validate([
+			'nombre' => 'required|string|max:255|unique:roles,nombre',
+		]);
+		$rol->update($validatedData);
 
 		return Redirect::route('roles.index')
 			->with('success', 'Rol updated successfully');
