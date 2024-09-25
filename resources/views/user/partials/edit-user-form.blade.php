@@ -8,32 +8,32 @@
 			{{ __('Edición de usuarios.') }}
 		</p>
 	</header>
-
-	<form method="post" action="{{ route('users.update', $user->id) }}" class="mt-6 space-y-6">
+<?php //dd($users); ?>
+	<form method="post" action="{{ route('users.update', $users->id) }}" class="mt-6 space-y-6">
 		@csrf
 		@method('patch')
 
 		<div>
 			<x-input-label for="username" :value="__('Nombre de Usuario')" />
-			<x-text-input id="username" value="{{ old('username', $user->username) }}" name="username" type="text" class="mt-1 block w-full" autocomplete="username" />
+			<x-text-input id="username" value="{{ old('username', $users->username) }}" name="username" type="text" class="mt-1 block w-full" autocomplete="username" />
 			<x-input-error :messages="$errors->updatePassword->get('username')" class="mt-2" />
 		</div>
 
 		<div>
 			<x-input-label for="nombre" :value="__('Nombre')" />
-			<x-text-input id="nombre" value="{{ old('nombre', $user->nombre) }}" name="nombre" type="text" class="mt-1 block w-full" autocomplete="nombre" />
+			<x-text-input id="nombre" value="{{ old('nombre', $users->nombre) }}" name="nombre" type="text" class="mt-1 block w-full" autocomplete="nombre" />
 			<x-input-error :messages="$errors->updatePassword->get('nombre')" class="mt-2" />
 		</div>
 
 		<div>
 			<x-input-label for="apellido" :value="__('Apellido')" />
-			<x-text-input id="apellido" value="{{ old('apellido', $user->apellido) }}" name="apellido" type="text" class="mt-1 block w-full" autocomplete="apellido" />
+			<x-text-input id="apellido" value="{{ old('apellido', $users->apellido) }}" name="apellido" type="text" class="mt-1 block w-full" autocomplete="apellido" />
 			<x-input-error :messages="$errors->updatePassword->get('apellido')" class="mt-2" />
 		</div>
 
 		<div>
 			<x-input-label for="email" :value="__('Email')" />
-			<x-text-input id="email" value="{{ old('email', $user->email) }}" name="email" type="text" class="mt-1 block w-full" autocomplete="email" />
+			<x-text-input id="email" value="{{ old('email', $users->email) }}" name="email" type="text" class="mt-1 block w-full" autocomplete="email" />
 			<x-input-error :messages="$errors->updatePassword->get('email')" class="mt-2" />
 		</div>
 
@@ -41,7 +41,7 @@
 			<x-input-label for="rol_id" :value="__('Rol')" />
 			<select id="rol_id" name="rol_id" class="mt-1 block w-full">
 				@foreach($roles as $rol)
-					<option value="{{ $rol->id }}" {{ old('rol_id', $user->rol_id) == $rol->id ? 'selected' : '' }}>
+					<option value="{{ $rol->id }}" {{ old('rol_id', $users->rol_id) == $rol->id ? 'selected' : '' }}>
 						{{ $rol->nombre }}
 					</option>
 				@endforeach
@@ -54,29 +54,29 @@
 			<x-input-label for="habilitado" :value="__('Habilitado')" />
 			<div class="mt-1">
 				<label>
-					<input type="radio" name="habilitado" value="1" {{ old('habilitado', $user->habilitado) == 1 ? 'checked' : '' }}>
+					<input type="radio" name="habilitado" value="1" {{ old('habilitado', $users->habilitado) == 1 ? 'checked' : '' }}>
 					Sí
 				</label>
 				<label class="ml-4">
-					<input type="radio" name="habilitado" value="0" {{ old('habilitado', $user->habilitado) == 0 ? 'checked' : '' }}>
+					<input type="radio" name="habilitado" value="0" {{ old('habilitado', $users->habilitado) == 0 ? 'checked' : '' }}>
 					No
 				</label>
 			</div>
 			<x-input-error :messages="$errors->updatePassword->get('habilitado')" class="mt-2" />
 		</div>
 
-		<div>
+		<!--div>
 			<x-input-label for="bloqueado" :value="__('Bloqueado')" />
 			<div class="mt-1">
 				<label>
-					<input type="radio" name="bloqueado" value="1" {{ old('bloqueado', $user->bloqueado) == 1 ? 'checked' : '' }}>
+					<input type="radio" name="bloqueado" value="1" {{ old('bloqueado', $users->bloqueado) == 1 ? 'checked' : '' }}>
 					Sí
 				</label>
 				<label class="ml-4">
-					<input type="radio" name="bloqueado" value="0" {{ old('bloqueado', $user->bloqueado) == 0 ? 'checked' : '' }}>
+					<input type="radio" name="bloqueado" value="0" {{ old('bloqueado', $users->bloqueado) == 0 ? 'checked' : '' }}>
 					No
 			<x-input-error :messages="$errors->updatePassword->get('bloqueado')" class="mt-2" />
-		</div>
+		</div-->
 
 		<div class="flex items-center gap-4">
 			<x-primary-button>{{ __('Save') }}</x-primary-button>

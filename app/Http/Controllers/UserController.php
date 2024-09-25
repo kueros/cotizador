@@ -25,12 +25,11 @@ class UserController extends Controller
 	{
 		#$users = User::paginate();
 
-		$users =
-		DB::table('users')
+		$users = User::withoutTrashed()
 		->leftJoin('roles', 'users.rol_id', '=', 'roles.id')
-        ->select('users.*', 'roles.nombre as nombre_rol')
+		->select('users.*', 'roles.nombre as nombre_rol')
 		->paginate();
-
+	
 		return view('user.index', compact('users'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
@@ -40,9 +39,9 @@ class UserController extends Controller
 	 */
 	public function create(): View
 	{
+		$roles = Rol::all();
 		$user = new User();
-
-		return view('user.create', compact('user'));
+		return view('user.create', compact('user', 'roles'));
 	}
 
 
@@ -54,7 +53,11 @@ class UserController extends Controller
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
 			'username' => 'required|string|max:255|unique:users,username',
+			'nombre' => 'required|string|max:255',
+			'apellido' => 'required|string|max:255',
 			'email' => 'required|string|email|max:255|unique:users,email',
+			'rol_id' => 'required|exists:roles,id',
+			'habilitado' => 'required|boolean',
 		]);
 
 		// Crear el usuario con los datos validados
@@ -119,8 +122,15 @@ class UserController extends Controller
     public function edit($id): View
     {
 		$roles = Rol::all();
-        $user = User::find($id);
-        return view('user.edit', compact('user', 'roles'));
+        $users = User::find($id);
+/* 		echo "<pre>";
+		print_r($id);
+		print_r($users);
+		print_r($roles);
+		echo "</pre>";
+		die();
+ */        
+        return view('user.edit', compact('users', 'roles'));
     }
 
     /**
@@ -184,7 +194,7 @@ class UserController extends Controller
 	public function destroy($id, MyController $myController): RedirectResponse
 	{
 		// Encuentra el usuario por su ID
-		$user = User::find($id);
+		$user = User::withTrashed()->find($id);
 
 		// Si el usuario no existe, redirige con un mensaje de error
 		if (!$user) {
@@ -193,7 +203,6 @@ class UserController extends Controller
 
 		// Almacena el nombre de usuario antes de eliminarlo
 		$username = $user->username;
-
 		// Elimina el usuario
 		$user->delete();
 

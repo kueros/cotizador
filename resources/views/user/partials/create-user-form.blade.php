@@ -38,8 +38,30 @@
 	</div>
 
 	<div>
+		<x-input-label for="rol_id" :value="__('Rol')" />
+		<select id="rol_id" name="rol_id" class="mt-1 block w-full">
+			@foreach($roles as $rol)
+				<option value="{{ $rol->id }}" {{ old('rol_id', $user->rol_id) == $rol->id ? 'selected' : '' }}>
+					{{ $rol->nombre }}
+				</option>
+			@endforeach
+		</select>
+
+		<x-input-error :messages="$errors->updatePassword->get('rol_id')" class="mt-2" />
+	</div>
+
+	<div>
 		<x-input-label for="habilitado" :value="__('Habilitado')" />
-		<x-text-input id="habilitado" value="{{ old('habilitado', $user->habilitado) }}" name="habilitado" type="text" class="mt-1 block w-full" placeholder="Habilitado" />
+		<div class="mt-1">
+			<label>
+				<input type="radio" name="habilitado" value="1" {{ old('habilitado', $user->habilitado) == 1 ? 'checked' : '' }}>
+				Sí
+			</label>
+			<label class="ml-4">
+				<input type="radio" name="habilitado" value="0" {{ old('habilitado', $user->habilitado) == 0 ? 'checked' : '' }}>
+				No
+			</label>
+		</div>
 		<x-input-error :messages="$errors->get('habilitado')" class="mt-2" />
 	</div>
 
