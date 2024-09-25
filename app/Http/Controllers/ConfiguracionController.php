@@ -16,7 +16,7 @@ class ConfiguracionController extends Controller
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index(Request $request): View
+	public function index(): View
 	{
 		$variables = Variable::where('nombre', 'like', '%noti%')
 								->orWhere('nombre', 'like', '%opav%')
@@ -26,7 +26,7 @@ class ConfiguracionController extends Controller
 								$variables = $variables->filter(function ($variable) {
 									return !is_null($variable);
 								});
-								
+		#dd($variables);
 		return view('configuracion.index', compact('variables'));
 	}
 

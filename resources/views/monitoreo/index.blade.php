@@ -92,22 +92,22 @@
 
 			<!-- Tarjeta 3: Log de notificaciones -->
 			<div class="col-md-3 col-sm-6">
-				<a class="link_monitoreo" href="<?= route('monitoreo.log_notificaciones') ?>">
+				<!-- <a class="link_monitoreo" href="<?= route('monitoreo.log_notificaciones') ?>"> -->
 					<div class="div-contenedor-acceso">
 						<div class="div-logs-img" id="log_notificaciones"></div>
 						<span class="monitoreo-title">Log de notificaciones</span>
 					</div>
-				</a>
+				<!-- </a> -->
 			</div>
 
 			<!-- Tarjeta 4: Log de emails -->
 			<div class="col-md-3 col-sm-6">
-				<a class="link_monitoreo" href="<?= route('monitoreo.log_emails') ?>">
+				<!-- <a class="link_monitoreo" href="<?= route('monitoreo.log_emails') ?>"> -->
 					<div class="div-contenedor-acceso">
 						<div class="div-logs-img" id="log_emails"></div>
 						<span class="monitoreo-title">Log de emails</span>
 					</div>
-				</a>
+				<!-- </a> -->
 			</div>
 		</div>
 	</div>
