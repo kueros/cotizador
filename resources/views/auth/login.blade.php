@@ -26,6 +26,8 @@
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
+
+
 	<div class="min-h-screen flex flex-col items-center">
 		<div class="w-full smmax-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm rounded-lg" style=" background-color: rgba(8, 34, 71, 0.82); margin-top: 100px; width: 36rem;">
 
@@ -39,21 +41,30 @@
 						<img class="logo-home" src="/build/assets/images/aleph_logo.gif" alt="" title="">
 					</a>
 				</div>
-
 				<!-- Email Address -->
-				<div>
-					<label for="email" value="__('Email')" class="text-white" >
-					<input id="email" class="block mt-1 w-full text-black" type="email" name="email" value="" placeholder="Email" required autofocus autocomplete="username" />
-					<input-error messages="$errors->get('email')" class="mt-2" />
-				</div>
 
+				@if ($errors->any())
+				<div class="alert alert-danger text-red-500">
+					<ul>
+						@foreach ($errors->all() as $error)
+						<li>{{ $error }}</li>
+						@endforeach
+					</ul>
+				</div>
+				@endif
+
+				<div>
+					<label for="email" value="__('Email')" class="text-white">
+						<input id="email" class="block mt-1 w-full text-black" type="email" name="email" value="" placeholder="Email" required autofocus autocomplete="username" />
+						<input-error messages="$errors->get('email')" class="mt-2" />
+				</div>
 				<!-- Password -->
 				<div class="mt-4">
-					<label for="password" value="__('Password')" class="text-white" >
+					<label for="password" value="__('Password')" class="text-white">
 
-					<input id="password" class="block mt-1 w-full text-black" type="password" name="password" required autocomplete="current-password" />
+						<input id="password" class="block mt-1 w-full text-black" type="password" name="password" required autocomplete="current-password" />
 
-					<input-error messages="$errors->get('password')" class="mt-2" />
+						<input-error messages="$errors->get('password')" class="mt-2" />
 				</div>
 
 				<!-- Remember Me -->
