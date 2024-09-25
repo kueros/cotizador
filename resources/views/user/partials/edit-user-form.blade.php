@@ -16,25 +16,25 @@
 		<div>
 			<x-input-label for="username" :value="__('Nombre de Usuario')" />
 			<x-text-input id="username" value="{{ $users->username }}" name="username" type="text" class="mt-1 block w-full" autocomplete="username" />
-			<x-input-error :messages="$errors->updatePassword->get('username')" class="mt-2" />
+			<x-input-error :messages="$errors->get('username')" class="mt-2" />
 		</div>
 
 		<div>
 			<x-input-label for="nombre" :value="__('Nombre')" />
 			<x-text-input id="nombre" value="{{ $users->nombre }}" name="nombre" type="text" class="mt-1 block w-full" autocomplete="nombre" />
-			<x-input-error :messages="$errors->updatePassword->get('nombre')" class="mt-2" />
+			<x-input-error :messages="$errors->get('nombre')" class="mt-2" />
 		</div>
 
 		<div>
 			<x-input-label for="apellido" :value="__('Apellido')" />
 			<x-text-input id="apellido" value="{{ $users->apellido }}" name="apellido" type="text" class="mt-1 block w-full" autocomplete="apellido" />
-			<x-input-error :messages="$errors->updatePassword->get('apellido')" class="mt-2" />
+			<x-input-error :messages="$errors->get('apellido')" class="mt-2" />
 		</div>
 
 		<div>
 			<x-input-label for="email" :value="__('Email')" />
 			<x-text-input id="email" value="{{ $users->email }}" name="email" type="text" class="mt-1 block w-full" autocomplete="email" />
-			<x-input-error :messages="$errors->updatePassword->get('email')" class="mt-2" />
+			<x-input-error :messages="$errors->get('email')" class="mt-2" />
 		</div>
 
 		<div>
@@ -56,7 +56,7 @@
 		<div style="display: none;">
 			<x-input-label for="bloqueado" :value="__('Bloqueado')" />
 			<x-text-input id="bloqueado" value="{{ $users->bloqueado }}" name="bloqueado" type="text" class="mt-1 block w-full" autocomplete="bloqueado" />
-			<x-input-error :messages="$errors->updatePassword->get('bloqueado')" class="mt-2" />
+			<x-input-error :messages="$errors->get('bloqueado')" class="mt-2" />
 		</div>
 
 		<div class="flex items-center gap-4">
