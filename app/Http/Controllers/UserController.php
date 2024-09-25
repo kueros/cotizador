@@ -10,7 +10,9 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\LogAdministracion;
+use App\Models\Rol;
 use App\Http\Controllers\MyController;
+use Illuminate\Support\Facades\DB;
 use Exception;
 
 
@@ -21,7 +23,13 @@ class UserController extends Controller
      */
 	public function index(Request $request): View
 	{
-		$users = User::paginate();
+		#$users = User::paginate();
+
+		$users =
+		DB::table('users')
+		->leftJoin('roles', 'users.rol_id', '=', 'roles.id')
+        ->select('users.*', 'roles.nombre as nombre_rol')
+		->paginate();
 
 		return view('user.index', compact('users'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
@@ -110,8 +118,9 @@ class UserController extends Controller
      */
     public function edit($id): View
     {
+		$roles = Rol::all();
         $user = User::find($id);
-        return view('user.edit', compact('user'));
+        return view('user.edit', compact('user', 'roles'));
     }
 
     /**
@@ -123,12 +132,19 @@ class UserController extends Controller
 		$messages = [
 			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
 			'email.unique' => 'El correo electrónico ya está registrado por otro usuario.',
+			'rol_id.required' => 'El rol es obligatorio.',
+			'rol_id.exists' => 'El rol seleccionado no es válido.',
 		];
 		// Validar los datos del usuario, ignorando al usuario actual
 		$validatedData = $request->validate([
 			'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+			'nombre' => 'required|string|max:255',
+			'apellido' => 'required|string|max:255',
 			'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-		]);
+			'rol_id' => 'required|exists:roles,id',
+			'habilitado' => 'required|boolean',
+			'bloqueado' => 'required|boolean',
+		], $messages);
 
 		// Actualizar el usuario con los datos validados
 		$user->update($validatedData);

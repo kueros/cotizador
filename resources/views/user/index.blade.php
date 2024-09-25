@@ -103,6 +103,7 @@
 								<th>Email</th>
 								<th>Rol</th>
 								<th>Habilitado</th>
+								<th>Bloqueado</th>
 								<th colspan="2" class="text-center">Acciones</th>
 							</tr>
 						</thead>
@@ -113,8 +114,9 @@
 								<td>{{ $user->apellido }}</td>
 								<td>{{ $user->username }}</td>
 								<td>{{ $user->email }}</td>
-								<td>{{ $user->rol }}</td>
-								<td>{{ $user->habilitado }}</td>
+								<td>{{ $user->nombre_rol }}</td>
+								<td>{{ $user->habilitado ? 'Sí' : 'No' }}</td>
+								<td>{{ $user->bloqueado ? 'Sí' : 'No' }}</td>
 								<td>
 									<form action="{{ route('users.destroy', $user->id) }}" method="POST">
 										<a class="btn btn-sm btn-success" href="{{ route('users.edit', $user->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
