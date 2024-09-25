@@ -13,28 +13,29 @@ use App\Models\LogAdministracion;
 use App\Http\Controllers\MyController;
 use Exception;
 
+
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): View
-    {
-        $users = User::paginate();
+	public function index(Request $request): View
+	{
+		$users = User::paginate();
 
-        return view('user.index', compact('users'))
-            ->with('i', ($request->input('page', 1) - 1) * $users->perPage());
-    }
+		return view('user.index', compact('users'))
+			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
+	}
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): View
-    {
-        $user = new User();
+	/**
+	 * Show the form for creating a new resource.
+	 */
+	public function create(): View
+	{
+		$user = new User();
 
-        return view('user.create', compact('user'));
-    }
+		return view('user.create', compact('user'));
+	}
 
 
 	/**
@@ -42,10 +43,22 @@ class UserController extends Controller
 	 */
 	public function store(Request $request, MyController $myController): RedirectResponse
 	{
-		#dd(Auth::user()->username);
-		#dd($_POST);
+		// Definir los mensajes de error personalizados
+		$messages = [
+			'username.unique' => 'El nombre de usuario ya está en uso.',
+			'email.unique' => 'El correo electrónico ya está registrado.',
+		];
 
-		$user = User::create($_POST);
+		// Validar los datos del usuario
+		$validatedData = $request->validate([
+			'username' => 'required|string|max:255|unique:users,username',
+			'email' => 'required|string|email|max:255|unique:users,email',
+		]);
+
+		// Crear el usuario con los datos validados
+		$user = User::create($validatedData);
+		
+		#$user = User::create($_POST);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		#dd($userAgent);
@@ -60,7 +73,7 @@ class UserController extends Controller
 		]);
 		$log->save();
 
-/* 		$notificacion = Notificacion::create([
+		/* 		$notificacion = Notificacion::create([
 			'user_id' => Auth::user()->id,
 			'mensaje' => $message,
 			'estado' => 1,
@@ -68,7 +81,7 @@ class UserController extends Controller
 			'asunto' => "Creación de usuario"
 		]);
 		$notificacion->save();
- */
+		*/
 		$subject = "Creación de usuario";
 		$body = "Usuario ". $_POST['username'] . " creado correctamente por ". Auth::user()->username;
 		$to = "omarliberatto@yafoconsultora.com";
@@ -85,18 +98,17 @@ class UserController extends Controller
 			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
 		}
 
-
 		return Redirect::route('users.index')
 		->with('success', 'Usuario creado correctamente.');
 	}
+
     /**
      * Display the specified resource.
      */
     public function show($id): View
     {
         $user = User::find($id);
-
-        return view('user.show', compact('user'));
+    return view('user.show', compact('user'));
     }
 
     /**
@@ -105,19 +117,27 @@ class UserController extends Controller
     public function edit($id): View
     {
         $user = User::find($id);
-
         return view('user.edit', compact('user'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-#	public function update($request) //UserRequest $request, User $user): RedirectResponse
 	public function update(UserRequest $request, User $user, MyController $myController): RedirectResponse
     {
-		#dd('kdk1 ' . $request);
-        $user->update($request->validated());
+		// Definir los mensajes de error personalizados
+		$messages = [
+			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
+			'email.unique' => 'El correo electrónico ya está registrado por otro usuario.',
+		];
+		// Validar los datos del usuario, ignorando al usuario actual
+		$validatedData = $request->validate([
+			'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+			'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+		]);
 
+		// Actualizar el usuario con los datos validados
+		$user->update($validatedData);
 		// Encuentra el usuario por su ID
 		$user = User::find($user->id);
 
@@ -128,10 +148,8 @@ class UserController extends Controller
 
 		// Almacena el nombre de usuario antes de eliminarlo
 		$username = $user->username;
-
 		$message = Auth::user()->username . " actualizó el usuario " . $username;
 		Log::info($message);
-
 		$subject = "Actualización de usuario";
 		$body = "Usuario " . $username . " actualizado correctamente por " . Auth::user()->username;
 		$to = "omarliberatto@yafoconsultora.com";
@@ -147,10 +165,8 @@ class UserController extends Controller
 		} catch (Exception $e) {
 			// Manejo de la excepción
 			Log::error('Error al enviar el correo: ' . $e->getMessage());
-
 			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
 		}
-
         return Redirect::route('users.index')
             ->with('success', 'Usuario actualizado correctamente');
     }
