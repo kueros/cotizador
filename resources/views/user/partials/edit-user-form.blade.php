@@ -38,6 +38,20 @@
 		</div>
 
 		<div>
+			<x-input-label for="rol_id" :value="__('Rol')" />
+			
+			<select id="rol_id" name="rol_id" class="mt-1 block w-full">
+				@foreach($roles as $rol)
+					<option value="{{ $rol->id }}" {{ $users->rol_id == $rol->id ? 'selected' : '' }}>
+						{{ $rol->nombre }}
+					</option>
+				@endforeach
+			</select>
+
+			<x-input-error :messages="$errors->updatePassword->get('rol_id')" class="mt-2" />
+		</div>
+
+		<div>
 			<x-input-label for="habilitado" :value="__('Habilitado')" />
 			<div class="mt-1">
 				<label>

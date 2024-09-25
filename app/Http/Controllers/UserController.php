@@ -145,6 +145,7 @@ class UserController extends Controller
 			'nombre' => 'required|string|max:255',
 			'apellido' => 'required|string|max:255',
 			'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+			'rol_id' => 'required|exists:roles,id',
 		], $messages);
 		#dd('asdf1234');
 
