@@ -43,12 +43,6 @@ class UserController extends Controller
 	 */
 	public function store(Request $request, MyController $myController): RedirectResponse
 	{
-		// Definir los mensajes de error personalizados
-		$messages = [
-			'username.unique' => 'El nombre de usuario ya está en uso.',
-			'email.unique' => 'El correo electrónico ya está registrado.',
-		];
-
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
 			'username' => 'required|string|max:255|unique:users,username',

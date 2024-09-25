@@ -35,12 +35,13 @@ class RolController extends Controller
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store()
+	public function store(Request $request): RedirectResponse
 	{
-		#dd($_POST);
-
-		Rol::create($_POST);
-
+		// Validar los datos del usuario
+		$validatedData = $request->validate([
+			'nombre' => 'required|string|max:255|unique:roles,nombre',
+		]);
+		Rol::create($validatedData);
 		return Redirect::route('roles.index')
 			->with('success', 'Rol created successfully.');
 	}
