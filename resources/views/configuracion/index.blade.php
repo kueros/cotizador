@@ -30,6 +30,7 @@
 						<form id="form_notificaciones" action="{{ route('configuracion.guardar_estado') }}" method="POST">
 							@csrf
 							<?php
+							#dd($variables->firstWhere('nombre', 'notificaciones_email')->valor);
 							$notificaciones_email = $variables->firstWhere('nombre', 'notificaciones_email')->valor;
 							$notificaciones_email_aleph = $variables->firstWhere('nombre', '_notificaciones_email_aleph')->valor;
 							$notificaciones_email_from = $variables->firstWhere('nombre', '_notificaciones_email_from')->valor;
