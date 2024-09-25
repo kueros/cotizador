@@ -48,9 +48,6 @@
 								<x-dropdown-link :href="route('configuracion.index')">
 									Configuración
 								</x-dropdown-link>
-								<x-dropdown-link :href="route('enviarmail')">
-									Mails
-								</x-dropdown-link>
 							</x-slot>
 						</x-dropdown>
 					</div>

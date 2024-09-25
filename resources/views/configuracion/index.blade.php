@@ -29,35 +29,26 @@
 						<!-- resources/views/tu_vista.blade.php -->
 						<form id="form_notificaciones" action="{{ route('configuracion.guardar_estado') }}" method="POST">
 							@csrf
+							<?php
+							$notificaciones_email = $variables->firstWhere('nombre', 'notificaciones_email')->valor;
+							$notificaciones_email_aleph = $variables->firstWhere('nombre', '_notificaciones_email_aleph')->valor;
+							$notificaciones_email_from = $variables->firstWhere('nombre', '_notificaciones_email_from')->valor;
+							$notificaciones_email_from_name = $variables->firstWhere('nombre', '_notificaciones_email_from_name')->valor;
+							?>
 							@foreach ($variables as $variable)
-							@if(Str::startsWith($variable->nombre, 'noti'))
-							<div class="form-group row">
-								<div class="col-md-6">
-									<label>
-										<input type="checkbox" id="{{ $variable->nombre }}" name="{{ $variable->nombre }}" value="1" {{ $variable->valor == 1 ? 'checked' : '' }} />
-										{{ $variable->nombre_menu }}
-									</label>
+								@if(Str::startsWith($variable->nombre, 'noti'))
+								<div class="form-group row">
+									<div class="col-md-6">
+										<label>
+											<input type="checkbox" id="{{ $variable->nombre }}" name="{{ $variable->nombre }}" value="1" {{ $variable->valor == 1 ? 'checked' : '' }} />
+											{{ $variable->nombre_menu }}
+										</label>
+									</div>
 								</div>
-							</div>
-							@endif
+								@endif
 							@endforeach
 						</form>
 
-
-
-						<?php
-						/* 				echo '<pre>';
-				print_r($variables);
-				echo '</pre>';
-				die();
- 				*/
-						#$notificaciones_locales = $variables->firstWhere('nombre', 'notificaciones_locales')->valor;
-						$notificaciones_email = $variables->firstWhere('nombre', 'notificaciones_email')->valor;
-						$notificaciones_email_aleph = $variables->firstWhere('nombre', '_notificaciones_email_aleph')->valor;
-						$notificaciones_email_from = $variables->firstWhere('nombre', '_notificaciones_email_from')->valor;
-						$notificaciones_email_from_name = $variables->firstWhere('nombre', '_notificaciones_email_from_name')->valor;
-						#$notificaciones_email_config = [];
-						?>
 
 						<!-- Contenido de Notificaciones -->
 						<!-- resources/views/tu_vista.blade.php -->
@@ -75,7 +66,7 @@
 							<?php
 							if ($notificaciones_email == 1 && $notificaciones_email_aleph == 1) {
 							?>
-								<div class="col-md-12"><a onclick="{{route('enviarmail')}}" class="btn btn-info"><span class="glyphicon glyphicon-ok"></span> Probar envio de emails</a></div>
+								<div class="col-md-12"><a href="{{ route('enviarmail') }}" class="btn btn-info"><span class="glyphicon glyphicon-ok"></span> Probar envio de emails</a></div>
 							<?php
 							}
 
@@ -87,7 +78,7 @@
 
 						?>
 							<h4>Configuración del remitente</h4><br>
-							<form id="form_config_remitente" action="{{ route('configuracion.guardar_remitente_email') }}" id="form_remitente" method="post" enctype="multipart/form-data" class="form-horizontal">
+							<form id="form_config_remitente" action="{{ route('configuracion.guardar_remitente') }}" method="post"><!-- id="form_remitente" enctype="multipart/form-data" class="form-horizontal"-->
 								@csrf
 								<div class="form-group row">
 									<label class="control-label col-md-4">Email*</label>
@@ -96,7 +87,7 @@
 									</div>
 								</div>
 								<div class="form-group row">
-									<label class="control-label col-md-4">Nombre2*</label>
+									<label class="control-label col-md-4">Nombre*</label>
 									<div class="col-md-8">
 										<input type="text" minlength="3" name="from_name" value="<?= $notificaciones_email_from_name ?>" required placeholder="Aleph Manager">
 									</div>
@@ -106,7 +97,7 @@
 							<br>
 							<h4>Configuración de parametros email</h4>
 							<div class="alert alert-warning" role="alert">
-								Alterar la configuración puede implicar detener el envio de notificaciones via email, realicé la prueba antes de guardar su configuración
+								Alterar la configuración puede implicar detener el envio de notificaciones via email, realice la prueba antes de guardar su configuración
 							</div>
 							<div class="alert alert-info" role="alert">
 								Para conocer las configuraciones disponibles de la libreria siga <a class="alert-link" target="_blank" href="#">este enlace</a> y baje hasta la sección con el título "Email Preferences"
@@ -121,7 +112,13 @@
 									<th>Acción</th>
 								</thead>
 								<tbody>
+									@csrf
 									<?php
+									$nec = $variables->firstWhere('nombre', 'notificaciones_email_config')->valor;
+									#dd($nec);
+									$notificaciones_email_config = json_decode($nec);
+									#var_dump($notificaciones_email_config);
+									#die();
 									if (!empty($notificaciones_email_config)) {
 										foreach ($notificaciones_email_config as $parametro => $valor) {
 											echo '<tr>';
@@ -136,17 +133,12 @@
 									?>
 								</tbody>
 							</table>
-							<a class="btn btn-info" onclick="probar_configuracion_email()">Probar configuración</a>
+							<a class="btn btn-info" href="{{ route('enviarmail') }}">Probar configuración</a>
+							<!--<a class="btn btn-info" onclick="enviarmail()">Probar configuración</a>-->
 						<?php
 						}
 						#dd($notificaciones_email_aleph);
-
 						?>
-
-
-
-
-
 
 
 					</div>
@@ -226,16 +218,52 @@
 						</div>
 					</div>
 
+
+
+					<div class="modal fade" id="modal_form_parametro" role="dialog">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+									<h3 class="modal-title_parametro"></h3>
+								</div>
+								<div class="modal-body form">
+								<?php //route('configuracion/add_parametro_email') ?>
+									<form action="{{ route('configuracion.add_parametro_email') }}" id="form_parametro" method="post" enctype="multipart/form-data" class="form-horizontal">
+										@csrf
+										<div class="form-body">
+											<div class="form-group">
+												<label class="control-label col-md-3">Parametro</label>
+												<div class="col-md-9">
+													<input name="parametro" required class="form-control" maxlength="255" type="text">
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-md-3">Valor</label>
+												<div class="col-md-9">
+													<input name="valor" required class="form-control" maxlength="255" type="text">
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="submit" class="btn btn-primary">Guardar</button>
+											<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
 					<script src="/build/assets/js/jquery-3.6.0.min.js"></script>
 					<script>
 						$('input[type="checkbox"]').on('change', function() {
 							// Guardo el nombre del checkbox que ha sido clickeado
 							let variableName = $(this).attr('name');
-							// Verifico si está checked
+							// Verifico si está checkeado
 							let isChecked = $(this).is(':checked');
 							// Obtengo el div correspondiente basado en el id del checkbox
 							let targetDiv = $('#div_' + variableName);
-							// Si está checked, muestro el formulario
+							// Si está checkeado, muestro el formulario
 							if (isChecked) {
 								targetDiv.slideUp(); // Oculto el formulario
 							} else {
@@ -270,17 +298,17 @@
 							event.preventDefault();
 
 							// Recopilar los datos del formulario
-							let from = $('input[name="from"]').val();
-							let from_name = $('input[name="from_name"]').val();
-
+							let from1 = $('input[name="from"]').val();
+							let from_name1 = $('input[name="from_name"]').val();
+							console.log(from1, from_name1);
 							// Enviar el AJAX
 							$.ajax({
-								url: '{{ route("configuracion.guardar_remitente_email") }}',
+								url: '{{ route("configuracion.guardar_remitente") }}',
 								type: 'POST',
 								data: {
 									_token: '{{ csrf_token() }}',
-									from: from,
-									from_name: from_name
+									from: from1,
+									from_name: from_name1
 								},
 								dataType: "JSON",
 								success: function(response) {
@@ -291,6 +319,73 @@
 								}
 							});
 						});
+
+
+						function add_parametro(){
+							$('#form_parametro')[0].reset();
+							$('.form-group').removeClass('has-error');
+							$('.help-block').empty();
+							$('#modal_form_parametro').modal('show');
+							$('.modal-title_parametro').text('Agregar parametro');
+							$('#accion_parametro').val('add');
+						}
+
+						function probar_configuracion_email(){
+							show_loading();
+							<?php //echo route('configuracion/probar_configuracion_email/')?>
+							$.ajax({
+								url : "<?php echo route('configuracion.index')?>",
+								type: "POST",
+								dataType: "JSON",
+								success: function(data){
+														hide_loading();
+														swal("Aviso", "La configuración es correcta OK.", "success");
+									},
+								error: function(jqXHR, textStatus, errorThrown) {
+														show_ajax_error_message(jqXHR, textStatus, errorThrown);
+									}
+								});
+						}
+
+						$.ajaxSetup({
+							headers: {
+								'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+							}
+						});
+
+						function delete_parametro_email(parametro){
+							swal({
+								title: "¿Está seguro que desea borrar el parametro?",
+								icon: "warning",
+								buttons: true,
+								dangerMode: true,
+							}).then((willProcess) => {
+								if (willProcess) {
+									console.log($('meta[name="csrf-token"]').attr('content')); // Asegúrate de que no sea `undefined`
+									console.log(parametro);
+									$.ajax({
+										url : "/configuracion/ajax_delete_parametro_email",
+										data: {parametro:parametro},
+										type: "POST",
+										dataType: "JSON",
+										headers: {
+											'X-CSRF-TOKEN': '{{ csrf_token() }}'
+										},
+										success: function(data){
+											swal("Aviso", "El parametro ha sido eliminado", "success").then(function(){
+											location.reload();
+											});
+										},
+										error: function (jqXHR, textStatus, errorThrown)
+										{
+											show_ajax_error_message(jqXHR, textStatus, errorThrown);
+										}
+									});
+								}
+							});
+						}
+
+
 					</script>
 
 

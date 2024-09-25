@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\MyController;
 use App\Mail\OrderShipped;
 use App\Models\User;
+use App\Models\Variable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -19,13 +20,23 @@ class OrderShipmentController extends Controller
      */
     public function store(Request $request, MyController $myController): RedirectResponse
     {
+        #dd($request->all());
         #$user = User::findOrFail($request->user_id);
         $user = User::all();
+        $variable = Variable::where('nombre', 'like', '%_notificaciones%')->get();
         // Enviar el pedido...
-dd("kdkdkdkdkdkdk ".$user);
+#        dd("kdkdkdkdkdkdk ".$variable);
         $subject = "Prueba de envío de correo desde Laravel";
         $body = "Prueba de envío de correo desde Laravel. Esto es el body del correo.";
         $to = "omarliberatto@yafoconsultora.com";
+
+
+
+        /*
+
+        OK, FUNCIONA, AHORA HAY QUE DESHARDCODEAR EL SUBJECT, EL BODY Y EL TO!!!!!!
+
+        */
 
         try {
             // Llamar a enviar_email de MyController
@@ -51,7 +62,7 @@ dd("kdkdkdkdkdkdk ".$user);
             return redirect('/users')->with('error', 'No se pudo enviar el correo Mailable. Inténtalo de nuevo.');
         }
  */
-        return redirect('/users')->with('success', 'Correo enviado correctamente.');
+        return redirect('/configuracion')->with('success', 'Correo enviado correctamente.');
     }
 }
 

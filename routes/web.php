@@ -68,20 +68,28 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(
 	function () {
-		Route::post('/configuracion/remitente', [ConfiguracionController::class, 'guardar_remitente_email'])->name('configuracion.guardar_remitente_email');
+		Route::post('/configuracion/remitente', [ConfiguracionController::class, 'guardar_remitente'])->name('configuracion.guardar_remitente');
+		Route::get('/configuracion/mail', [ConfiguracionController::class, 'enviar_mail'])->name('configuracion.enviar_mail');
 		Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+		Route::post('/configuracion', [ConfiguracionController::class, 'guardar_estado'])->name('configuracion.guardar_estado');
+		Route::post('/configuracion/add_parametro_email', [ConfiguracionController::class, 'add_parametro_email'])->name('configuracion.add_parametro_email');
 		Route::get('/configuracion/variables', [ConfiguracionController::class, 'variables'])->name('configuracion.variables');
-		Route::get('/configuracion/variables/create', [ConfiguracionController::class, 'create'])->name('configuracion.variables.create');
 		Route::post('/configuracion/variables', [ConfiguracionController::class, 'store'])->name('configuracion.variables.store');
+		Route::get('/configuracion/variables/create', [ConfiguracionController::class, 'create'])->name('configuracion.variables.create');
 		Route::get('/configuracion/variables/{variable}/edit', [ConfiguracionController::class, 'edit'])->name('configuracion.variables.edit');
 		Route::patch('/configuracion/variables/{variable}', [ConfiguracionController::class, 'update'])->name('configuracion.variables.update');
 		Route::delete('/configuracion/variables/{variable}', [ConfiguracionController::class, 'destroy'])->name('configuracion.variables.destroy');
-		Route::post('/configuracion', [ConfiguracionController::class, 'guardar_estado'])->name('configuracion.guardar_estado');
+		Route::post('/configuracion/ajax_delete_parametro_email', [ConfiguracionController::class, 'ajax_delete_parametro_email'])->name('configuracion.ajax_delete_parametro_email');
+
 	}
 );
 
-Route::get('send/mail', [OrderShipmentController::class, 'store'])->name('enviarmail');
-Route::get('/obtenerusername', [MyController::class, 'get_username'])->name('obtenerusername1');
+Route::middleware('auth')->group(
+	function () {
+		Route::get('/send/mail', [OrderShipmentController::class, 'store'])->name('enviarmail');
+		Route::get('/obtenerusername', [MyController::class, 'get_username'])->name('obtenerusername1');
+	}
+);
 
 
 

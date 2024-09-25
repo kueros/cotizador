@@ -55,6 +55,8 @@
 	<script src="/build/assets/js/popper.min.js"></script>
 	<script src="/build/assets/js/bootstrap.min.js"></script>
 	<script src="/build/assets/js/cdn.min.js" defer></script>
+	<script src="/build/assets/js/sweetalert.min.js"></script>
+	<script src="/build/assets/js/customv7.js"></script>
 	<script>
 		$(document).ready(function() {
 			new DataTable('#example');
