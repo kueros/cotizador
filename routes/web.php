@@ -79,7 +79,7 @@ Route::middleware('auth')->group(
 
 Route::middleware('auth')->group(
 	function () {
-		Route::get('/send/mail', [OrderShipmentController::class, 'store'])->name('enviarmail1');
+		Route::get('/send/mail', [OrderShipmentController::class, 'store'])->name('enviarmail');
 		Route::get('/obtenerusername', [MyController::class, 'get_username'])->name('obtenerusername1');
 	}
 );
