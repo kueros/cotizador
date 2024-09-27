@@ -10,6 +10,20 @@ use App\Models\LogAdministracion;
 class MyController extends Controller
 {
 
+	public function loguear($clientIP, $userAgent, $username, $action, $message)
+	{
+		$log = LogAdministracion::create([
+			'username' => $username,
+			'action' => $action,
+			'detalle' => $message,
+			'ip_address' => json_encode($clientIP),
+			'user_agent' => json_encode($userAgent)
+		]);
+		Log::info($message);
+		$log->save();
+		return true;
+	}
+
 	public function enviar_email($to, $content, $subject, $api = false )
 	{
 		$notificaciones_email = 1; #hardcodeo por ahora, luego se manejará por pantalla de configuración global
@@ -20,7 +34,6 @@ class MyController extends Controller
 			//Verifico si usa configuracion default
 			if ($notificaciones_email_default) {
 				$api_key = $this->generate_api_key();
-
 				$post_fields = array(
 					'api_key' => $api_key,
 					'to' => $to,
@@ -29,13 +42,11 @@ class MyController extends Controller
 					'base_url' => url('/')
 				);
 
-
 				if (defined('URL_API_EMAILS')) {
 					$url_api_emails = URL_API_EMAILS;
 				} else {
 					$url_api_emails = 'https://panel.alephmanager.com/API/send_email';
 				}
-
 				$ch = curl_init();
 				curl_setopt($ch, CURLOPT_URL, $url_api_emails);
 				curl_setopt($ch, CURLOPT_POST, 1);

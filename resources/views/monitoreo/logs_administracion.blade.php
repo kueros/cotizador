@@ -1,5 +1,5 @@
 <x-app-layout>
-	<?php #dd($logs_accesos); 
+	<?php #dd($logs_administracion); 
 	?>
 
 	<x-slot name="header">

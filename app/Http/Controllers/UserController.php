@@ -9,11 +9,8 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use App\Models\LogAdministracion;
 use App\Models\Rol;
 use App\Http\Controllers\MyController;
-use Illuminate\Support\Facades\DB;
-use Exception;
 
 
 class UserController extends Controller
@@ -23,13 +20,10 @@ class UserController extends Controller
      */
 	public function index(Request $request): View
 	{
-		#$users = User::paginate();
-
 		$users = User::withoutTrashed()
 		->leftJoin('roles', 'users.rol_id', '=', 'roles.id')
 		->select('users.*', 'roles.nombre as nombre_rol')
 		->paginate();
-	
 		return view('user.index', compact('users'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
@@ -43,7 +37,6 @@ class UserController extends Controller
 		$user = new User();
 		return view('user.create', compact('user', 'roles'));
 	}
-
 
 	/**
 	 * Store a newly created resource in storage.
@@ -59,52 +52,22 @@ class UserController extends Controller
 			'rol_id' => 'required|exists:roles,id',
 			'habilitado' => 'required|boolean',
 		]);
-
 		// Crear el usuario con los datos validados
-		$user = User::create($validatedData);
-		
-		#$user = User::create($_POST);
+		User::create($validatedData);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
-		#dd($userAgent);
-		$message = Auth::user()->username . " creó el usuario " . $_POST['username'];
-		Log::info($message);
-		$log = LogAdministracion::create([
-			'username' => Auth::user()->username,
-			'action' => "users.store",
-			'detalle' => $message,
-			'ip_address' => json_encode($clientIP),
-			'user_agent' => json_encode($userAgent)
-		]);
-		$log->save();
-
-		/* 		$notificacion = Notificacion::create([
-			'user_id' => Auth::user()->id,
-			'mensaje' => $message,
-			'estado' => 1,
-			'user_emisor_id' => Auth::user()->id,
-			'asunto' => "Creación de usuario"
-		]);
-		$notificacion->save();
-		*/
+		$username = Auth::user()->username;
+		$action = "users.store";
+		$message = $username . " creó el usuario " . $_POST['username'];
+		$myController->loguear($clientIP, $userAgent, $username, $action, $message);
 		$subject = "Creación de usuario";
 		$body = "Usuario ". $_POST['username'] . " creado correctamente por ". Auth::user()->username;
-		$to = "omarliberatto@yafoconsultora.com";
-
-		try {
-			// Llamar a enviar_email de MyController
-			$myController->enviar_email($to, $body, $subject);
-			Log::info('Correo enviado exitosamente a ' . $to);
-		} catch (Exception $e) {
-			// Manejo de la excepción
-			Log::error('Error al enviar el correo: ' . $e->getMessage());
-
-			// Puedes redirigir al usuario con un mensaje de error
-			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
-		}
-
-		return Redirect::route('users.index')
-		->with('success', 'Usuario creado correctamente.');
+		$to = Auth::user()->email;
+		// Llamar a enviar_email de MyController
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
+		return redirect()->route('users.index')
+			->with('success', 'Usuario creado correctamente.');
 	}
 
     /**
@@ -159,30 +122,17 @@ class UserController extends Controller
 			return redirect('/users')->with('error', 'El usuario no existe.');
 		}
 
-		// Almacena el nombre de usuario antes de eliminarlo
+		// Almacena el nombre de usuario antes de modificarlo
 		$username = $user->username;
 		$message = Auth::user()->username . " actualizó el usuario " . $username;
 		Log::info($message);
 		$subject = "Actualización de usuario";
 		$body = "Usuario " . $username . " actualizado correctamente por " . Auth::user()->username;
 		$to = "omarliberatto@yafoconsultora.com";
-
-		try {
-			// Llamar a enviar_email de MyController
-			$myController->enviar_email(
-				$to,
-				$body,
-				$subject
-			);
-			Log::info('Correo enviado exitosamente a ' . $to);
-		} catch (Exception $e) {
-			// Manejo de la excepción
-			Log::error('Error al enviar el correo: ' . $e->getMessage());
-			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
-		}
-		#return Redirect::route('users.index')
-		#	->with('success', 'Usuario actualizado correctamente');
-		return redirect()->route('users.index')->with('status', 'profile-updated');
+		// Llamar a enviar_email de MyController
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
+		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
 	}
 
 	
@@ -190,36 +140,18 @@ class UserController extends Controller
 	{
 		// Encuentra el usuario por su ID
 		$user = User::withTrashed()->find($id);
-
-		// Si el usuario no existe, redirige con un mensaje de error
-		if (!$user) {
-			return redirect('/users')->with('error', 'El usuario no existe.');
-		}
-
 		// Almacena el nombre de usuario antes de eliminarlo
 		$username = $user->username;
 		// Elimina el usuario
 		$user->delete();
-
 		$message = Auth::user()->username . " borró el usuario " . $username;
 		Log::info($message);
-
 		$subject = "Borrado de usuario";
 		$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
 		$to = "omarliberatto@yafoconsultora.com";
-
-		try {
-			// Llamar a enviar_email de MyController
-			$myController->enviar_email($to, $body, $subject);
-			Log::info('Correo enviado exitosamente a ' . $to);
-		} catch (Exception $e) {
-			// Manejo de la excepción
-			Log::error('Error al enviar el correo: ' . $e->getMessage());
-
-			// Puedes redirigir al usuario con un mensaje de error
-			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
-		}
-
+		// Llamar a enviar_email de MyController
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
 		return Redirect::route('users.index')
 		->with('success', 'Usuario eliminado correctamente.');
 	}

@@ -59,13 +59,6 @@ Route::middleware('auth')->group(function () {
 	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
 });
 
-
-Route::middleware('auth')->group(function () {
-	Route::get('/monitoreo/log_administracion', [MonitoreoController::class, 'log_administracion'])->name('monitoreo.log_administracion');
-	Route::get('/monitoreo/log_notificaciones', [MonitoreoController::class, 'log_notificaciones'])->name('monitoreo.log_notificaciones');
-	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
-});
-
 Route::middleware('auth')->group(
 	function () {
 		Route::post('/configuracion/remitente', [ConfiguracionController::class, 'guardar_remitente'])->name('configuracion.guardar_remitente');
@@ -86,7 +79,7 @@ Route::middleware('auth')->group(
 
 Route::middleware('auth')->group(
 	function () {
-		Route::get('/send/mail', [OrderShipmentController::class, 'store'])->name('enviarmail');
+		Route::get('/send/mail', [OrderShipmentController::class, 'store'])->name('enviarmail1');
 		Route::get('/obtenerusername', [MyController::class, 'get_username'])->name('obtenerusername1');
 	}
 );

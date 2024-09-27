@@ -50,18 +50,6 @@ class OrderShipmentController extends Controller
             return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
         }
 
-/*         // Envío del correo utilizando Mailable
-        try {
-            Mail::to("omarliberatto@yafoconsultora.com")->send(new OrderShipped($user));
-            Log::info('Correo Mailable enviado exitosamente a omarliberatto@yafoconsultora.com');
-        } catch (Exception $e) {
-            // Manejo de la excepción al enviar con Mailable
-            Log::error('Error al enviar el correo con Mailable: ' . $e->getMessage());
-
-            // Redirigir con mensaje de error
-            return redirect('/users')->with('error', 'No se pudo enviar el correo Mailable. Inténtalo de nuevo.');
-        }
- */
         return redirect('/configuracion')->with('success', 'Correo enviado correctamente.');
     }
 }
