@@ -68,10 +68,7 @@
 
 			*/
 			new DataTable('#example', {
-				columnDefs: [
-						{ targets: [0, 1], type: 'html' }, // Definir el tipo de columna
-        				{ targets: [0, 1, 2, 3], orderable: false },  // Deshabilitar la ordenación en la columna 3 (índice 2)
-				]
+				order: [[4, 'desc']]
 			});
 
 			$('.dropdown-submenu a.test').on("click", function(e) {

@@ -18,8 +18,8 @@
 								<th>ID</th>
 								<th>Usuario</th>
 								<th>Detalle</th>
-								<th>Fecha</th>
 								<th>IP</th>
+								<th>Fecha</th>
 							</tr>
 						</thead>
 						<tbody>
