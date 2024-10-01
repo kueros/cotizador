@@ -40,7 +40,7 @@ class UserController extends Controller
 
 	/**
 	 * Store a newly created resource in storage.
-	 */
+	 *
 	public function store(Request $request, MyController $myController): RedirectResponse
 	{
 		// Validar los datos del usuario
@@ -69,8 +69,73 @@ class UserController extends Controller
 		return redirect()->route('users.index')
 			->with('success', 'Usuario creado correctamente.');
 	}
+*/
 
-    /**
+	/**
+	 * Store a newly created resource in storage.
+	 */
+	public function store(Request $request, MyController $myController): RedirectResponse
+	{
+		// Validar los datos del usuario
+		$validatedData = $request->validate([
+			'username' => 'required|string|max:255',
+			'nombre' => 'required|string|max:255',
+			'apellido' => 'required|string|max:255',
+			'email' => 'required|string|email|max:255',
+			'rol_id' => 'required|exists:roles,id',
+			'habilitado' => 'required|boolean',
+		]);
+
+		// Verificar si el usuario con el mismo username o email está soft deleted
+		$existingUser = User::onlyTrashed()
+			->where('username', $validatedData['username'])
+			->orWhere('email', $validatedData['email'])
+			->first();
+
+		if ($existingUser) {
+			// Restaurar el usuario si está soft deleted
+			$existingUser->restore();
+
+			// Actualizar los datos del usuario restaurado con los nuevos valores
+			$existingUser->update($validatedData);
+
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$username = Auth::user()->username;
+			$action = "users.restore";
+			$message = $username . " restauró el usuario " . $existingUser->username;
+			$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+
+			$subject = "Restauración de usuario";
+			$body = "Usuario ". $existingUser->username . " restaurado correctamente por ". Auth::user()->username;
+			$to = Auth::user()->email;
+			$myController->enviar_email($to, $body, $subject);
+
+			Log::info('Correo enviado exitosamente a ' . $to);
+			return redirect()->route('users.index')->with('success', 'Usuario restaurado correctamente.');
+		} else {
+
+			// Si no existe un usuario soft deleted, crear uno nuevo
+			User::create($validatedData);
+
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$username = Auth::user()->username;
+			$action = "users.store";
+			$message = $username . " creó el usuario " . $validatedData['username'];
+			$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+
+			$subject = "Creación de usuario";
+			$body = "Usuario ". $validatedData['username'] . " creado correctamente por ". Auth::user()->username;
+			$to = Auth::user()->email;
+			$myController->enviar_email($to, $body, $subject);
+
+			Log::info('Correo enviado exitosamente a ' . $to);
+			return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
+		}
+	}
+
+/**
      * Display the specified resource.
      */
     public function show($id): View
