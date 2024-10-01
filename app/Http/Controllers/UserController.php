@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Rol;
 use App\Http\Controllers\MyController;
-
+use Illuminate\Session\TokenMismatchException;
 
 class UserController extends Controller
 {
@@ -94,8 +94,13 @@ class UserController extends Controller
      */
 	public function update(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
+
+		try {
+			// Lógica de actualización del usuario
+	
 		#dd($request->all());
 		// Definir los mensajes de error personalizados
+		#dd("9".Auth::user()->username );
 		$messages = [
 			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
 			'email.unique' => 'El correo electrónico ya está registrado por otro usuario.',
@@ -132,7 +137,20 @@ class UserController extends Controller
 		// Llamar a enviar_email de MyController
 		$myController->enviar_email($to, $body, $subject);
 		Log::info('Correo enviado exitosamente a ' . $to);
+		if(Auth::user()->username != "omar"){
+			dd("1".Auth::user()->username );
+		}
 		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
+    } catch (TokenMismatchException $e) {
+		dd("2".Auth::user()->username );
+        // Si se detecta un error 419, forzamos el redireccionamiento al login
+        return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
+    } catch (\Exception $e) {
+		dd("3".Auth::user()->username );
+        // Si cualquier otro error ocurre, puedes manejarlo aquí o lanzar una excepción genérica
+        return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
+    }
+
 	}
 
 	
@@ -155,4 +173,37 @@ class UserController extends Controller
 		return Redirect::route('users.index')
 		->with('success', 'Usuario eliminado correctamente.');
 	}
+	public function showPasswordForm($id)
+	{
+		// Busca el usuario por ID
+		$selectedUser = User::find($id);
+	
+		// Obtiene la lista de todos los usuarios (tal como en la función index)
+		$users = User::withoutTrashed()
+			->leftJoin('roles', 'users.rol_id', '=', 'roles.id')
+			->select('users.*', 'roles.nombre as nombre_rol')
+			->paginate();
+	
+		// Devuelve la vista de usuarios con la lista de usuarios y el formulario de cambio de contraseña activo
+		return view('user.index', compact('users', 'selectedUser'))
+			->with('i', (request()->input('page', 1) - 1) * $users->perPage());
+	}
+	
+	
+	public function updatePassword(Request $request, $id)
+	{
+		$request->validate([
+			'password' => 'required|confirmed|min:8',
+		]);
+	
+		// Actualiza la contraseña del usuario
+		$user = User::find($id);
+		$user->password = bcrypt($request->password);
+		$user->save();
+	
+		return redirect()->route('users.index')->with('success', 'Contraseña actualizada correctamente');
+	}
+	
+
+
 }

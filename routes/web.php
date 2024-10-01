@@ -8,12 +8,21 @@ use App\Http\Controllers\MonitoreoController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\OrderShipmentController;
 use App\Http\Controllers\MyController;
-
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
 	#return view('welcome');
 	return redirect()->route('login');
 });
+
+Route::get('/session/check', function () {
+    if (Auth::check()) {
+        return response()->json(['session' => 'active'], 200);
+    } else {
+        return response()->json(['session' => 'expired'], 401);
+    }
+});
+
 
 Route::get('/dashboard', function () {
 	return view('dashboard');
@@ -35,6 +44,11 @@ Route::middleware('auth')->group(function () {
 	Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 	Route::post('/users/options', [UserController::class, 'options'])->name('users.options');
 	Route::get('/users/fields', [UserController::class, 'fields'])->name('users.fields');
+// Ruta para mostrar el formulario de cambio de contraseña
+	Route::get('/users/{id}/password', [UserController::class, 'showPasswordForm'])->name('users.showPasswordForm');
+
+// Ruta para actualizar la contraseña
+	Route::patch('/users/{id}/password', [UserController::class, 'updatePassword'])->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {

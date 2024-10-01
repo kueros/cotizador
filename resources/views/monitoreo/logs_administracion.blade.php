@@ -29,8 +29,8 @@
 								<td>{{ $log->id }}</td>
 								<td>{{ $log->username }}</td>
 								<td>{{ $log->detalle }}</td>
-								<td>{{ $log->created_at }}</td>
 								<td>{{ $log->ip }}</td>
+								<td nowrap>{{ $log->created_at }}</td>
 							</tr>
 							@endforeach
 						</tbody>

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('logs_accesos', function (Blueprint $table) {
 			$table->integer('id')->primary()->autoIncrement();
+            $table->string('username')->nullable();
 			$table->string('email')->index();
 			$table->string('ip_address', 45)->nullable();
 			$table->text('user_agent')->nullable();

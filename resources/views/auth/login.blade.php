@@ -28,6 +28,12 @@
 <body class="font-sans text-gray-900 antialiased">
 
 
+		@if (session('error'))
+		<div class="alert alert-danger">
+			{{ session('error') }}
+		</div>
+		@endif
+
 	<div class="min-h-screen flex flex-col items-center">
 		<div class="w-full smmax-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm rounded-lg" style=" background-color: rgba(8, 34, 71, 0.82); margin-top: 100px; width: 36rem;">
 
@@ -52,7 +58,6 @@
 					</ul>
 				</div>
 				@endif
-
 				<div>
 					<label for="email" value="__('Email')" class="text-white">
 						<input id="email" class="block mt-1 w-full text-black" type="email" name="email" value="" placeholder="Email" required autofocus autocomplete="username" />

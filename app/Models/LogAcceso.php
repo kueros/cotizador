@@ -11,6 +11,7 @@ class LogAcceso extends Model
 	protected $table = 'logs_accesos'; // Asegúrate de que el nombre de la tabla es correcto
 	protected $fillable = [
 		'email',
+		'username',
 		'ip_address',
 		'user_agent'
 	];

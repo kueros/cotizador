@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.2",
         "aws/aws-sdk-php": "^3.321",
+        "laravel-lang/common": "^6.4",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "mailersend/laravel-driver": "^2.7",
@@ -41,7 +42,8 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@php artisan lang:update"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

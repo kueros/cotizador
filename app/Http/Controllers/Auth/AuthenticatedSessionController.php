@@ -65,19 +65,16 @@
 				'user_agent' => $_SERVER['HTTP_USER_AGENT']
 			]);
 			$log->save();
-
+            #dd("6".Auth::user()->username );
 			return redirect()->intended(route('dashboard', absolute: false));
 		} catch (\Exception $e) {
 			// Captura la excepción y redirige con un mensaje de error
+            dd("7".Auth::user()->username );
 			return redirect()->route('login')
 							->withErrors(['email' => 'Username, email o contraseña incorrectos.'])
 							->withInput($request->only('email'));
 		}
 	}
-
-
-
-
 
 	/**
 	 * Destroy an authenticated session.
@@ -85,6 +82,7 @@
 	public function destroy(Request $request, MyController $myController): RedirectResponse
 	{
 
+		#dd("8".Auth::user()->username );
 		$message = "Solicitud de logout recibida. " . json_encode($request->all());
 		$users = User::find(Auth::user()->id);
 		Log::info($message);

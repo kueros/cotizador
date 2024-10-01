@@ -40,6 +40,7 @@
 	<div>
 		<x-input-label for="rol_id" :value="__('Rol')" />
 		<select id="rol_id" name="rol_id" class="mt-1 block w-full">
+			<option value="0" selected>{{ __('Elija un Rol') }}</option>
 			@foreach($roles as $rol)
 				<option value="{{ $rol->id }}" {{ old('rol_id', $user->rol_id) == $rol->id ? 'selected' : '' }}>
 					{{ $rol->nombre }}
@@ -47,7 +48,7 @@
 			@endforeach
 		</select>
 
-		<x-input-error :messages="$errors->updatePassword->get('rol_id')" class="mt-2" />
+		<x-input-error :messages="$errors->get('rol_id')" class="mt-2" />
 	</div>
 
 	<div>
