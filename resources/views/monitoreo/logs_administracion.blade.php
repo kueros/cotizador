@@ -27,7 +27,7 @@
 							<?php #dd(Auth::user()); ?>
 							<tr>
 								<td>{{ $log->username }}</td>
-								<td>{{ $log->detalle }}</td>
+								<td style="word-wrap: break-word; width: 200px;">{{ $log->detalle }}</td>
 								<td>{{ $log->user_agent }}</td>
 								<td>{{ $log->ip_address }}</td>
 								<td nowrap>{{ $log->created_at }}</td>

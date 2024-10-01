@@ -23,7 +23,6 @@
 							</tr>
 						</thead>
 						<tbody>
-						<?php #dd($logs_accesos); ?>
 						@foreach ($logs_accesos as $log)
 							<?php #dd($log); ?>
 							<tr>
