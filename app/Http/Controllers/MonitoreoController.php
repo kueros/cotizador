@@ -35,7 +35,7 @@ class MonitoreoController extends Controller
 	 */
 	public function log_administracion(Request $request): View
 	{
-		$logs_administracion = LogAdministracion::orderBy('created_at', 'asc')->get();
+		$logs_administracion = LogAdministracion::orderBy('created_at', 'desc')->get();
 		#dd($logs_administracion);
 		return view('monitoreo.logs_administracion', compact('logs_administracion'));
 	}
