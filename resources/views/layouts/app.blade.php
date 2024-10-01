@@ -68,11 +68,7 @@
 
 			*/
 			new DataTable('#example', {
-				columnDefs: [
-						{ targets: [0, 1], type: 'html' }, 
-        				{ targets: [0, 1, 2, 3], orderable: false },  
-        				{ targets: [4], orderable: true },  
-				]
+				order: [[4, 'desc']]
 			});
 
 			$('.dropdown-submenu a.test').on("click", function(e) {
