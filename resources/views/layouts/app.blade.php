@@ -8,7 +8,7 @@
 
 	<title>{{ config('app.name', 'YAFO') }}</title>
 
-	<link href="/build/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Fonts -->
 	<link href="/build/assets/css/dataTables.css" rel="stylesheet">
 	<link href="/build/assets/css/exvite.css" rel="stylesheet">
@@ -50,14 +50,16 @@
 			{{ $slot }}
 		</main>
 	</div>
-	<script src="/build/assets/js/jquery-3.7.1.js"></script>
-	<script src="/build/assets/js/dataTables.js"></script>
-	<script src="/build/assets/js/jquery-ui.js"></script>
-	<script src="/build/assets/js/popper.min.js"></script>
-	<script src="/build/assets/js/bootstrap.min.js"></script>
-	<script src="/build/assets/js/cdn.min.js" defer></script>
-	<script src="/build/assets/js/sweetalert.min.js"></script>
-	<script src="/build/assets/js/customv7.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="/build/assets/js/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.7/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+    <script src="/build/assets/js/dataTables.js"></script>
+    <script src="/build/assets/js/cdn.min.js" defer></script>
+    <script src="/build/assets/js/sweetalert.min.js"></script>
+    <script src="/build/assets/js/customv7.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
 	<script>
 		$(document).ready(function() {
 

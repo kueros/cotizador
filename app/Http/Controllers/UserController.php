@@ -13,12 +13,17 @@ use App\Models\LogAdministracion;
 use App\Models\Rol;
 use App\Http\Controllers\MyController;
 use Illuminate\Support\Facades\DB;
+use App\Http\Middleware\CustomCsrfMiddleware;
 use Exception;
 
 
 class UserController extends Controller
 {
-    /**
+    public function __construct()
+    {
+        $this->middleware(CustomCsrfMiddleware::class);
+    }
+        /**
      * Display a listing of the resource.
      */
 	public function index(Request $request): View

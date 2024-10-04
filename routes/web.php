@@ -37,12 +37,12 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-	Route::get('/users', [UserController::class, 'index'])->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
+	Route::get('/users', [UserController::class, 'index'])->middleware('custom.csrf')->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
 	Route::get('/show/{id}', [UserController::class, 'show'])->name('users.show');
 	Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-	Route::post('/users', [UserController::class, 'store'])->name('users.store');
+	Route::post('/users', [UserController::class, 'store'])->middleware('custom.csrf')->name('users.store');
 	Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-	Route::patch('/users/{user}', [UserController::class, 'update'])->name('users.update');
+	Route::patch('/users/{user}', [UserController::class, 'update'])->middleware('custom.csrf')->name('users.update');
 	Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 	Route::post('/users/options', [UserController::class, 'options'])->name('users.options');
 	Route::get('/users/fields', [UserController::class, 'fields'])->name('users.fields');
@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
 	Route::delete('/permisos/{permiso}', [PermisoController::class, 'destroy'])->name('permisos.destroy');
 	Route::post('/permisos/options', [PermisoController::class, 'options'])->name('permisos.options');
 	Route::get('/permisos/fields', [PermisoController::class, 'fields'])->name('permisos.fields');
+    Route::post('/permisos/update-order', [PermisoController::class, 'updateOrder'])->name('permisos.updateOrder');
 });
 
 Route::middleware('auth')->group(function () {
