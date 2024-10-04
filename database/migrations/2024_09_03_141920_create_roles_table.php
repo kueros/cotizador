@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('roles', function (Blueprint $table) {
 			$table->integer('id')->primary()->autoIncrement();
 			$table->string('nombre')->nullable();
+			$table->string('guard_name')->nullable();
             $table->timestamps();
         });
         // Insertar un registro de rol "Administrador" al ejecutar la migración

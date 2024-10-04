@@ -33,8 +33,11 @@
 							</x-slot>
 
 							<x-slot name="content">
-								<x-dropdown-link :href="route('profile.edit')">
+								<x-dropdown-link :href="route('permisos.index')">
 									Permisos
+								</x-dropdown-link>
+								<x-dropdown-link :href="route('permisos_x_rol.index')">
+									Permisos x Rol
 								</x-dropdown-link>
 								<x-dropdown-link :href="route('roles.index')">
 									Roles
@@ -72,7 +75,7 @@
 
 					<x-slot name="content">
 						<x-dropdown-link :href="route('profile.edit')">
-							{{ __('Profile') }}
+							{{ __('Perfil') }}
 						</x-dropdown-link>
 
 						<!-- Authentication -->

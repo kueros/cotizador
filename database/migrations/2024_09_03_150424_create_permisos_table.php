@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('permisos', function (Blueprint $table) {
 			$table->integer('id')->primary()->autoIncrement();
-			$table->string('titulo')->nullable();
-			$table->string('descripcion')->nullable();
+			$table->string('nombre')->nullable();
+			$table->string('orden')->nullable();
 			$table->integer('modulo_id')->nullable();
             $table->timestamps();
         });

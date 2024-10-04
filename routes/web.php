@@ -3,17 +3,28 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RolController;
+use App\Http\Controllers\Permiso_x_RolController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MonitoreoController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\OrderShipmentController;
 use App\Http\Controllers\MyController;
-
+use App\Http\Controllers\PermisoController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
 	#return view('welcome');
 	return redirect()->route('login');
 });
+
+Route::get('/session/check', function () {
+    if (Auth::check()) {
+        return response()->json(['session' => 'active'], 200);
+    } else {
+        return response()->json(['session' => 'expired'], 401);
+    }
+});
+
 
 Route::get('/dashboard', function () {
 	return view('dashboard');
@@ -35,6 +46,28 @@ Route::middleware('auth')->group(function () {
 	Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 	Route::post('/users/options', [UserController::class, 'options'])->name('users.options');
 	Route::get('/users/fields', [UserController::class, 'fields'])->name('users.fields');
+// Ruta para mostrar el formulario de cambio de contraseña
+	Route::get('/users/{id}/password', [UserController::class, 'showPasswordForm'])->name('users.showPasswordForm');
+
+// Ruta para actualizar la contraseña
+	Route::patch('/users/{id}/password', [UserController::class, 'updatePassword'])->name('password.update');
+});
+
+Route::middleware('auth')->group(function () {
+	Route::get('/permisos', [PermisoController::class, 'index'])->name('permisos.index');
+	Route::get('/show/{id}', [PermisoController::class, 'show'])->name('permisos.show');
+	Route::get('/permisos/create', [PermisoController::class, 'create'])->name('permisos.create');
+	Route::post('/permisos', [PermisoController::class, 'store'])->name('permisos.store');
+	Route::get('/permisos/{permiso}/edit', [PermisoController::class, 'edit'])->name('permisos.edit');
+	Route::patch('/permisos/{permiso}', [PermisoController::class, 'update'])->name('permisos.update');
+	Route::delete('/permisos/{permiso}', [PermisoController::class, 'destroy'])->name('permisos.destroy');
+	Route::post('/permisos/options', [PermisoController::class, 'options'])->name('permisos.options');
+	Route::get('/permisos/fields', [PermisoController::class, 'fields'])->name('permisos.fields');
+});
+
+Route::middleware('auth')->group(function () {
+	Route::get('/permisos_x_rol', [Permiso_x_RolController::class, 'index'])->name('permisos_x_rol.index');
+	Route::post('/permisos_x_rol/update', [Permiso_x_RolController::class, 'updatePermisos'])->name('permisos_x_rol.update');
 });
 
 Route::middleware('auth')->group(function () {
@@ -48,19 +81,11 @@ Route::middleware('auth')->group(function () {
 	Route::post('/roles/options', [RolController::class, 'options'])->name('roles.options');
 	Route::get('/roles/fields', [RolController::class, 'fields'])->name('roles.fields');
 });
-require __DIR__ . '/auth.php';
 
 
 Route::middleware('auth')->group(function () {
 	Route::get('/monitoreo', [MonitoreoController::class, 'index'])->name('monitoreo.index');
 	Route::get('/monitoreo/log_accesos', [MonitoreoController::class, 'log_accesos'])->name('monitoreo.log_accesos');
-	Route::get('/monitoreo/log_administracion', [MonitoreoController::class, 'log_administracion'])->name('monitoreo.log_administracion');
-	Route::get('/monitoreo/log_notificaciones', [MonitoreoController::class, 'log_notificaciones'])->name('monitoreo.log_notificaciones');
-	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
-});
-
-
-Route::middleware('auth')->group(function () {
 	Route::get('/monitoreo/log_administracion', [MonitoreoController::class, 'log_administracion'])->name('monitoreo.log_administracion');
 	Route::get('/monitoreo/log_notificaciones', [MonitoreoController::class, 'log_notificaciones'])->name('monitoreo.log_notificaciones');
 	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
@@ -92,4 +117,5 @@ Route::middleware('auth')->group(
 );
 
 
+require __DIR__ . '/auth.php';
 

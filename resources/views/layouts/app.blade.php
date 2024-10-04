@@ -13,6 +13,7 @@
 	<link href="/build/assets/css/dataTables.css" rel="stylesheet">
 	<link href="/build/assets/css/exvite.css" rel="stylesheet">
 	<link href="/build/assets/css/jquery-ui.css" rel="Stylesheet">
+	<link href="/build/assets/awesome/css/all.min.css" rel="Stylesheet">
 	<!-- Scripts -->
 </head>
 
@@ -49,7 +50,7 @@
 			{{ $slot }}
 		</main>
 	</div>
-	<script src="/build/assets/js/jquery-3.6.0.min.js"></script>
+	<script src="/build/assets/js/jquery-3.7.1.js"></script>
 	<script src="/build/assets/js/dataTables.js"></script>
 	<script src="/build/assets/js/jquery-ui.js"></script>
 	<script src="/build/assets/js/popper.min.js"></script>
@@ -59,7 +60,10 @@
 	<script src="/build/assets/js/customv7.js"></script>
 	<script>
 		$(document).ready(function() {
-			new DataTable('#example');
+
+			new DataTable('#example', {
+				order: [[4, 'desc']]
+			});
 
 			$('.dropdown-submenu a.test').on("click", function(e) {
 				$(this).next('ul').toggle();
