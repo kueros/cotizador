@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class LogAdministracion extends Model
 {
     use HasFactory;
-	protected $table = 'logs_administracion'; // Asegúrate de que el nombre de la tabla es correcto
+	protected $table = 'logs_administracion'; 
 	protected $fillable = [
 		'username',
 		'detalle',

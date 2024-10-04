@@ -26,6 +26,15 @@ Route::get('/session/check', function () {
 });
 
 
+Route::get('/session/check', function () {
+    if (Auth::check()) {
+        return response()->json(['session' => 'active'], 200);
+    } else {
+        return response()->json(['session' => 'expired'], 401);
+    }
+});
+
+
 Route::get('/dashboard', function () {
 	return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

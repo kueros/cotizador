@@ -23,6 +23,15 @@ class primer_usuario extends Command
             'password' => $this->argument('password'),
         ];
 
+        // Validar los datos
+        $validator = Validator::make($data, [
+            'username' => 'required|string|max:255',
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'password' => 'required|string|min:8',
+        ]);
+
         // Aplicar hash al password
         $data['password'] = Hash::make($data['password']);
 

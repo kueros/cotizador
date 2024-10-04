@@ -16,6 +16,7 @@ class ConfirmablePasswordController extends Controller
      */
     public function show(): View
     {
+        dd("5".Auth::user()->username );
         return view('auth.confirm-password');
     }
 
@@ -29,9 +30,11 @@ class ConfirmablePasswordController extends Controller
             'password' => $request->password,
         ])) {
             throw ValidationException::withMessages([
+                dd("4".Auth::user()->username );
                 'password' => __('auth.password'),
             ]);
         }
+        dd("0".Auth::user()->username );
 
         $request->session()->put('auth.password_confirmed_at', time());
 

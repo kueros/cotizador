@@ -9,13 +9,9 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use App\Models\LogAdministracion;
 use App\Models\Rol;
 use App\Http\Controllers\MyController;
-use Illuminate\Support\Facades\DB;
-use App\Http\Middleware\CustomCsrfMiddleware;
-use Exception;
-
+use Illuminate\Session\TokenMismatchException;
 
 class UserController extends Controller
 {
@@ -28,13 +24,10 @@ class UserController extends Controller
      */
 	public function index(Request $request): View
 	{
-		#$users = User::paginate();
-
 		$users = User::withoutTrashed()
 		->leftJoin('roles', 'users.rol_id', '=', 'roles.id')
 		->select('users.*', 'roles.nombre as nombre_rol')
 		->paginate();
-	
 		return view('user.index', compact('users'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
@@ -49,10 +42,9 @@ class UserController extends Controller
 		return view('user.create', compact('user', 'roles'));
 	}
 
-
 	/**
 	 * Store a newly created resource in storage.
-	 */
+	 *
 	public function store(Request $request, MyController $myController): RedirectResponse
 	{
 		// Validar los datos del usuario
@@ -64,55 +56,90 @@ class UserController extends Controller
 			'rol_id' => 'required|exists:roles,id',
 			'habilitado' => 'required|boolean',
 		]);
-
 		// Crear el usuario con los datos validados
-		$user = User::create($validatedData);
-		
-		#$user = User::create($_POST);
+		User::create($validatedData);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
-		#dd($userAgent);
-		$message = Auth::user()->username . " creó el usuario " . $_POST['username'];
-		Log::info($message);
-		$log = LogAdministracion::create([
-			'username' => Auth::user()->username,
-			'action' => "users.store",
-			'detalle' => $message,
-			'ip_address' => json_encode($clientIP),
-			'user_agent' => json_encode($userAgent)
-		]);
-		$log->save();
-
-		/* 		$notificacion = Notificacion::create([
-			'user_id' => Auth::user()->id,
-			'mensaje' => $message,
-			'estado' => 1,
-			'user_emisor_id' => Auth::user()->id,
-			'asunto' => "Creación de usuario"
-		]);
-		$notificacion->save();
-		*/
+		$username = Auth::user()->username;
+		$action = "users.store";
+		$message = $username . " creó el usuario " . $_POST['username'];
+		$myController->loguear($clientIP, $userAgent, $username, $action, $message);
 		$subject = "Creación de usuario";
 		$body = "Usuario ". $_POST['username'] . " creado correctamente por ". Auth::user()->username;
-		$to = "omarliberatto@yafoconsultora.com";
+		$to = Auth::user()->email;
+		// Llamar a enviar_email de MyController
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
+		return redirect()->route('users.index')
+			->with('success', 'Usuario creado correctamente.');
+	}
+*/
 
-		try {
-			// Llamar a enviar_email de MyController
+	/**
+	 * Store a newly created resource in storage.
+	 */
+	public function store(Request $request, MyController $myController): RedirectResponse
+	{
+		// Validar los datos del usuario
+		$validatedData = $request->validate([
+			'username' => 'required|string|max:255',
+			'nombre' => 'required|string|max:255',
+			'apellido' => 'required|string|max:255',
+			'email' => 'required|string|email|max:255',
+			'rol_id' => 'required|exists:roles,id',
+			'habilitado' => 'required|boolean',
+		]);
+
+		// Verificar si el usuario con el mismo username o email está soft deleted
+		$existingUser = User::onlyTrashed()
+			->where('username', $validatedData['username'])
+			->orWhere('email', $validatedData['email'])
+			->first();
+
+		if ($existingUser) {
+			// Restaurar el usuario si está soft deleted
+			$existingUser->restore();
+
+			// Actualizar los datos del usuario restaurado con los nuevos valores
+			$existingUser->update($validatedData);
+
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$username = Auth::user()->username;
+			$action = "users.restore";
+			$message = $username . " restauró el usuario " . $existingUser->username;
+			$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+
+			$subject = "Restauración de usuario";
+			$body = "Usuario ". $existingUser->username . " restaurado correctamente por ". Auth::user()->username;
+			$to = Auth::user()->email;
 			$myController->enviar_email($to, $body, $subject);
+
 			Log::info('Correo enviado exitosamente a ' . $to);
-		} catch (Exception $e) {
-			// Manejo de la excepción
-			Log::error('Error al enviar el correo: ' . $e->getMessage());
+			return redirect()->route('users.index')->with('success', 'Usuario restaurado correctamente.');
+		} else {
 
-			// Puedes redirigir al usuario con un mensaje de error
-			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
+			// Si no existe un usuario soft deleted, crear uno nuevo
+			User::create($validatedData);
+
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$username = Auth::user()->username;
+			$action = "users.store";
+			$message = $username . " creó el usuario " . $validatedData['username'];
+			$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+
+			$subject = "Creación de usuario";
+			$body = "Usuario ". $validatedData['username'] . " creado correctamente por ". Auth::user()->username;
+			$to = Auth::user()->email;
+			$myController->enviar_email($to, $body, $subject);
+
+			Log::info('Correo enviado exitosamente a ' . $to);
+			return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
 		}
-
-		return Redirect::route('users.index')
-		->with('success', 'Usuario creado correctamente.');
 	}
 
-    /**
+/**
      * Display the specified resource.
      */
     public function show($id): View
@@ -136,8 +163,13 @@ class UserController extends Controller
      */
 	public function update(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
+
+		try {
+			// Lógica de actualización del usuario
+	
 		#dd($request->all());
 		// Definir los mensajes de error personalizados
+		#dd("9".Auth::user()->username );
 		$messages = [
 			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
 			'email.unique' => 'El correo electrónico ya está registrado por otro usuario.',
@@ -164,30 +196,30 @@ class UserController extends Controller
 			return redirect('/users')->with('error', 'El usuario no existe.');
 		}
 
-		// Almacena el nombre de usuario antes de eliminarlo
+		// Almacena el nombre de usuario antes de modificarlo
 		$username = $user->username;
 		$message = Auth::user()->username . " actualizó el usuario " . $username;
 		Log::info($message);
 		$subject = "Actualización de usuario";
 		$body = "Usuario " . $username . " actualizado correctamente por " . Auth::user()->username;
 		$to = "omarliberatto@yafoconsultora.com";
-
-		try {
-			// Llamar a enviar_email de MyController
-			$myController->enviar_email(
-				$to,
-				$body,
-				$subject
-			);
-			Log::info('Correo enviado exitosamente a ' . $to);
-		} catch (Exception $e) {
-			// Manejo de la excepción
-			Log::error('Error al enviar el correo: ' . $e->getMessage());
-			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
+		// Llamar a enviar_email de MyController
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
+		if(Auth::user()->username != "omar"){
+			dd("1".Auth::user()->username );
 		}
-		#return Redirect::route('users.index')
-		#	->with('success', 'Usuario actualizado correctamente');
-		return redirect()->route('users.index')->with('status', 'profile-updated');
+		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
+    } catch (TokenMismatchException $e) {
+		dd("2".Auth::user()->username );
+        // Si se detecta un error 419, forzamos el redireccionamiento al login
+        return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
+    } catch (\Exception $e) {
+		dd("3".Auth::user()->username );
+        // Si cualquier otro error ocurre, puedes manejarlo aquí o lanzar una excepción genérica
+        return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
+    }
+
 	}
 
 	
@@ -195,37 +227,52 @@ class UserController extends Controller
 	{
 		// Encuentra el usuario por su ID
 		$user = User::withTrashed()->find($id);
-
-		// Si el usuario no existe, redirige con un mensaje de error
-		if (!$user) {
-			return redirect('/users')->with('error', 'El usuario no existe.');
-		}
-
 		// Almacena el nombre de usuario antes de eliminarlo
 		$username = $user->username;
 		// Elimina el usuario
 		$user->delete();
-
 		$message = Auth::user()->username . " borró el usuario " . $username;
 		Log::info($message);
-
 		$subject = "Borrado de usuario";
 		$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
 		$to = "omarliberatto@yafoconsultora.com";
-
-		try {
-			// Llamar a enviar_email de MyController
-			$myController->enviar_email($to, $body, $subject);
-			Log::info('Correo enviado exitosamente a ' . $to);
-		} catch (Exception $e) {
-			// Manejo de la excepción
-			Log::error('Error al enviar el correo: ' . $e->getMessage());
-
-			// Puedes redirigir al usuario con un mensaje de error
-			return redirect('/users')->with('error', 'Hubo un problema al enviar el correo. Por favor, intenta nuevamente.');
-		}
-
+		// Llamar a enviar_email de MyController
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
 		return Redirect::route('users.index')
 		->with('success', 'Usuario eliminado correctamente.');
 	}
+	public function showPasswordForm($id)
+	{
+		// Busca el usuario por ID
+		$selectedUser = User::find($id);
+	
+		// Obtiene la lista de todos los usuarios (tal como en la función index)
+		$users = User::withoutTrashed()
+			->leftJoin('roles', 'users.rol_id', '=', 'roles.id')
+			->select('users.*', 'roles.nombre as nombre_rol')
+			->paginate();
+	
+		// Devuelve la vista de usuarios con la lista de usuarios y el formulario de cambio de contraseña activo
+		return view('user.index', compact('users', 'selectedUser'))
+			->with('i', (request()->input('page', 1) - 1) * $users->perPage());
+	}
+	
+	
+	public function updatePassword(Request $request, $id)
+	{
+		$request->validate([
+			'password' => 'required|confirmed|min:8',
+		]);
+	
+		// Actualiza la contraseña del usuario
+		$user = User::find($id);
+		$user->password = bcrypt($request->password);
+		$user->save();
+	
+		return redirect()->route('users.index')->with('success', 'Contraseña actualizada correctamente');
+	}
+	
+
+
 }

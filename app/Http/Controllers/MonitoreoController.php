@@ -24,10 +24,9 @@ class MonitoreoController extends Controller
 	 */
 	public function log_accesos(Request $request): View
 	{
-		$logs_accesos = LogAcceso::paginate();
+		$logs_accesos = LogAcceso::orderBy('created_at', 'desc')->get();
 		#dd($logs_accesos);
-		return view('monitoreo.logs_accesos', compact('logs_accesos'))
-			->with('i', ($request->input('page', 1) - 1) * $logs_accesos->perPage());
+		return view('monitoreo.logs_accesos', compact('logs_accesos'));
 	}
 
 
@@ -36,9 +35,8 @@ class MonitoreoController extends Controller
 	 */
 	public function log_administracion(Request $request): View
 	{
-		$logs_administracion = LogAdministracion::paginate();
+		$logs_administracion = LogAdministracion::orderBy('created_at', 'desc')->get();
 		#dd($logs_administracion);
-		return view('monitoreo.logs_administracion', compact('logs_administracion'))
-			->with('i', ($request->input('page', 1) - 1) * $logs_administracion->perPage());
+		return view('monitoreo.logs_administracion', compact('logs_administracion'));
 	}
 }

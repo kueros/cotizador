@@ -14,6 +14,7 @@
 	<link href="/build/assets/css/exvite.css" rel="stylesheet">
 	<link href="/build/assets/css/jquery-ui.css" rel="Stylesheet">
 	<link href="/build/assets/awesome/css/all.min.css" rel="Stylesheet">
+	<link href="/build/assets/awesome/css/all.min.css" rel="Stylesheet">
 	<!-- Scripts -->
 </head>
 
@@ -62,6 +63,16 @@
 
 	<script>
 		$(document).ready(function() {
+			//new DataTable('#example');
+
+			/*
+									targets: [0],
+						orderData: [4, 'desc']
+
+			*/
+			new DataTable('#example', {
+				order: [[4, 'desc']]
+			});
 
 			new DataTable('#example', {
 				order: [[4, 'desc']]

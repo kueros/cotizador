@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Rol;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\MyController;
 
 class RolController extends Controller
 {
@@ -27,20 +29,31 @@ class RolController extends Controller
 	public function create(): View
 	{
 		$roles = new Rol();
-
 		return view('rol.create', compact('roles'));
 	}
 
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store(Request $request): RedirectResponse
+	public function store(Request $request, MyController $myController): RedirectResponse
 	{
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
 			'nombre' => 'required|string|max:255|unique:roles,nombre',
 		]);
 		Rol::create($validatedData);
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		$username = Auth::user()->username;
+		$action = "roles.store";
+		$message = $username . " creó el rol " . $_POST['nombre'];
+		$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+		$subject = "Creación de rol";
+		$body = "Rol ". $_POST['nombre'] . " creado correctamente por ". Auth::user()->username;
+		$to = Auth::user()->email;
+		// Llamar a enviar_email de MyController
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
 		return Redirect::route('roles.index')
 			->with('success', 'Rol created successfully.');
 	}
@@ -51,7 +64,6 @@ class RolController extends Controller
 	public function show($id): View
 	{
 		$role = Rol::find($id);
-
 		return view('rol.show', compact('role'));
 	}
 
@@ -61,29 +73,50 @@ class RolController extends Controller
 	public function edit($id): View
 	{
 		$roles = Rol::find($id);
-
 		return view('rol.edit', compact('roles'));
 	}
 
 	/**
 	 * Update the specified resource in storage.
 	 */
-	public function update(Request $request, Rol $rol): RedirectResponse
+	public function update(Request $request, Rol $rol, MyController $myController): RedirectResponse
 	{
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
 			'nombre' => 'required|string|max:255|unique:roles,nombre',
 		]);
 		$rol->update($validatedData);
-
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		$username = Auth::user()->username;
+		$action = "roles.update";
+		$message = $username . " actualizó el rol " . $_POST['nombre'];
+		$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+		$subject = "Actualización de rol";
+		$body = "Rol ". $_POST['nombre'] . " actualizado correctamente por ". Auth::user()->username;
+		$to = Auth::user()->email;
+		// Llamar a enviar_email de MyController
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
 		return Redirect::route('roles.index')
 			->with('success', 'Rol updated successfully');
 	}
 
-	public function destroy($id): RedirectResponse
+	public function destroy($id, MyController $myController): RedirectResponse
 	{
-		Rol::find($id)->delete();
-
+		$rol = Rol::find($id);
+		// Almacena el nombre de rol antes de eliminarlo
+		$nombre = $rol->nombre;
+		// Elimina el rol
+		$rol->delete();
+		$message = Auth::user()->username . " borró el rol " . $nombre;
+		Log::info($message);
+		$subject = "Borrado de rol";
+		$body = "Rol " . $nombre . " borrado correctamente por " . Auth::user()->username;
+		$to = "omarliberatto@yafoconsultora.com";
+		// Llamar a enviar_email de MyController
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
 		return Redirect::route('roles.index')
 			->with('success', 'Rol deleted successfully');
 	}

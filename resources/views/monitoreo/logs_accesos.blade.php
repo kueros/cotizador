@@ -15,22 +15,22 @@
 					<table id="example" class="cell-border" style="width:100%">
 						<thead class="thead">
 							<tr>
-								<th>ID</th>
 								<th>Usuario</th>
-								<th>Detalle</th>
-								<th>Fecha</th>
+								<th>Email</th>
+								<th>User Agent</th>
 								<th>IP</th>
+								<th>Fecha</th>
 							</tr>
 						</thead>
 						<tbody>
-							@foreach ($logs_accesos as $log)
+						@foreach ($logs_accesos as $log)
 							<?php #dd($log); ?>
 							<tr>
-								<td>{{ $log->id }}</td>
+								<td>{{ $log->username }}</td>
 								<td>{{ $log->email }}</td>
-								<td>{{ $log->ip_address }}</td>
 								<td>{{ $log->user_agent }}</td>
-								<td>{{ $log->created_at }}</td>
+								<td>{{ $log->ip_address }}</td>
+								<td nowrap>{{ $log->created_at }}</td>
 							</tr>
 							@endforeach
 						</tbody>
