@@ -15,10 +15,6 @@ use Illuminate\Session\TokenMismatchException;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(CustomCsrfMiddleware::class);
-    }
         /**
      * Display a listing of the resource.
      */
