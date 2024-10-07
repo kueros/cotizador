@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Rol;
+
 
 class User extends Authenticatable
 {
@@ -32,8 +34,11 @@ class User extends Authenticatable
         'ultimo_login',
         'password',
     ];
+    
+	
+	protected $primaryKey = 'user_id';
 
-    /**
+	/**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
@@ -54,5 +59,32 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function roles()
+    {
+        return $this->belongsToMany(Rol::class);
+    }
+
+    public function hasRole($rol): bool
+    {
+        #return $this->roles()->where('nombre', $rol)->exists();
+		return $this->roles->contains('nombre', $rol);
+
+    }
+
+    public function hasPermission($permission)
+    {
+        foreach ($this->roles as $rol) {
+            if ($rol->permissions()->where('nombre', $permission)->exists()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function assignRole($rol)
+    {
+        $rol = Rol::where('nombre', $rol)->firstOrFail();
+        $this->roles()->attach($rol);
     }
 }

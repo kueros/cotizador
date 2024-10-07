@@ -28,7 +28,7 @@
 <body class="font-sans text-gray-900 antialiased">
 
 
-		@if (session('error'))
+		@if (session('error')) 
 		<div class="alert alert-danger">
 			{{ session('error') }}
 		</div>

@@ -56,7 +56,7 @@ class ConfiguracionController extends Controller
 				}
 			}
 			$message = "Guardar estado recibido. " . json_encode($request->all());
-			$users = User::find(Auth::user()->id);
+			$users = User::find(Auth::user()->user_id);
 			Log::info($message);
 			$log = LogAdministracion::create([
 				'username' => Auth::user()->username,
@@ -75,7 +75,7 @@ class ConfiguracionController extends Controller
 		} catch (\Exception $e) {
 			// Registrar el error para depuración
 			$message = "Guardar estado recibido. " . json_encode($request->all());
-			$users = User::find(Auth::user()->id);
+			$users = User::find(Auth::user()->user_id);
 			Log::info($message);
 			$log = LogAdministracion::create([
 				'username' => Auth::user()->username,
@@ -98,7 +98,7 @@ class ConfiguracionController extends Controller
 	public function guardar_remitente(Request $request, MyController $myController)
 	{
 		$message = "Guardar remitente recibido. " . json_encode($request->all());
-		$users = User::find(Auth::user()->id);
+		$users = User::find(Auth::user()->user_id);
 		Log::info($message);
 		$log = LogAdministracion::create([
 			'username' => Auth::user()->username,

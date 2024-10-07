@@ -40,8 +40,8 @@
 									<td>{{ $user->habilitado ? 'Sí' : 'No' }}</td>
 									<td>{{ $user->bloqueado ? 'Sí' : 'No' }}</td>
 									<td>
-										<form action="{{ route('users.destroy', $user->id) }}" method="POST">
-											<a class="btn btn-sm btn-success" href="{{ route('users.edit', $user->id) }}">
+										<form action="{{ route('users.destroy', $user->user_id) }}" method="POST">
+											<a class="btn btn-sm btn-success" href="{{ route('users.edit', $user->user_id) }}">
 												<i class="fa fa-fw fa-edit" title="Editar" ></i>
 											</a>
 											@csrf
@@ -50,10 +50,10 @@
 												<i class="fa fa-fw fa-trash" title="Borrar" ></i>
 											</button>
 
-											<!-- Botón para abrir el formulario de cambiar contraseña >
-											<a href="{{ route('users.showPasswordForm', $user->id) }}" class="btn btn-warning btn-sm">
+											<!-- Botón para abrir el formulario de cambiar contraseña -->
+											<a href="{{ route('users.showPasswordForm', $user->user_id) }}" class="btn btn-warning btn-sm">
 												{{ __('Cambiar contraseña') }}
-											</a-->
+											</a>
 										</form>
 									</td>
 								</tr>
@@ -70,7 +70,7 @@
 						{{ __('Cambiar contraseña de ') . $selectedUser->nombre }}
 					</h2>
 
-					<form method="post" action="{{ route('password.update', $selectedUser->id) }}" class="p-6">
+					<form method="post" action="{{ route('password.update', $selectedUser->user_id) }}" class="p-6">
 						@csrf
 						@method('patch')
 

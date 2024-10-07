@@ -34,7 +34,7 @@
 	{
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$message = "Solicitud de autenticacion recibida.1 " . json_encode($_POST);
-			$users = User::find(Auth::user()->id);
+			$users = User::find(Auth::user()->user_id);
 			Log::info($message);
 			$log = LogAcceso::create([
 				'email' => $users->email,
@@ -57,7 +57,7 @@
 			$request->session()->regenerate();
 
 			$message = "Solicitud de autenticacion recibida. " . json_encode($request->all());
-			$users = User::find(Auth::user()->id);
+			$users = User::find(Auth::user()->user_id);
 			Log::info($message);
 
 			$log = LogAcceso::create([
@@ -85,7 +85,7 @@
 
 		#dd("8".Auth::user()->username );
 		$message = "Solicitud de logout recibida. " . json_encode($request->all());
-		$users = User::find(Auth::user()->id);
+		$users = User::find(Auth::user()->user_id);
 		Log::info($message);
 
 		$log = LogAdministracion::create([

@@ -13,14 +13,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('roles', function (Blueprint $table) {
-			$table->integer('id')->primary()->autoIncrement();
+            $table->id('rol_id');
 			$table->string('nombre')->nullable();
 			$table->string('guard_name')->nullable();
             $table->timestamps();
         });
         // Insertar un registro de rol "Administrador" al ejecutar la migración
         DB::table('roles')->insert([
-            'id' => 1,
+            'rol_id' => 1,
             'nombre' => 'Administrador',
             'created_at' => now(),
             'updated_at' => now()

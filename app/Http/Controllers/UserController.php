@@ -21,7 +21,7 @@ class UserController extends Controller
 	public function index(Request $request): View
 	{
 		$users = User::withoutTrashed()
-		->leftJoin('roles', 'users.rol_id', '=', 'roles.id')
+		->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
 		->select('users.*', 'roles.nombre as nombre_rol')
 		->paginate();
 		return view('user.index', compact('users'))
@@ -38,38 +38,6 @@ class UserController extends Controller
 		return view('user.create', compact('user', 'roles'));
 	}
 
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	public function store(Request $request, MyController $myController): RedirectResponse
-	{
-		// Validar los datos del usuario
-		$validatedData = $request->validate([
-			'username' => 'required|string|max:255|unique:users,username',
-			'nombre' => 'required|string|max:255',
-			'apellido' => 'required|string|max:255',
-			'email' => 'required|string|email|max:255|unique:users,email',
-			'rol_id' => 'required|exists:roles,id',
-			'habilitado' => 'required|boolean',
-		]);
-		// Crear el usuario con los datos validados
-		User::create($validatedData);
-		$clientIP = \Request::ip();
-		$userAgent = \Request::userAgent();
-		$username = Auth::user()->username;
-		$action = "users.store";
-		$message = $username . " creó el usuario " . $_POST['username'];
-		$myController->loguear($clientIP, $userAgent, $username, $action, $message);
-		$subject = "Creación de usuario";
-		$body = "Usuario ". $_POST['username'] . " creado correctamente por ". Auth::user()->username;
-		$to = Auth::user()->email;
-		// Llamar a enviar_email de MyController
-		$myController->enviar_email($to, $body, $subject);
-		Log::info('Correo enviado exitosamente a ' . $to);
-		return redirect()->route('users.index')
-			->with('success', 'Usuario creado correctamente.');
-	}
-*/
 
 	/**
 	 * Store a newly created resource in storage.
@@ -174,10 +142,10 @@ class UserController extends Controller
 		];
 		// Validar los datos del usuario, ignorando al usuario actual
 		$validatedData = $request->validate([
-			'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+			'username' => 'required|string|max:255|unique:users,username,' . $user->user_id,
 			'nombre' => 'required|string|max:255',
 			'apellido' => 'required|string|max:255',
-			'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+			'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id,
 			'rol_id' => 'required|exists:roles,id',
 		], $messages);
 		#dd('asdf1234');
@@ -185,7 +153,7 @@ class UserController extends Controller
 		// Actualizar el usuario con los datos validados
 		$user->update($validatedData);
 		// Encuentra el usuario por su ID
-		$user = User::find($user->id);
+		$user = User::find($user->user_id);
 
 		// Si el usuario no existe, redirige con un mensaje de error
 		if (!$user) {

@@ -26,15 +26,6 @@ Route::get('/session/check', function () {
 });
 
 
-Route::get('/session/check', function () {
-    if (Auth::check()) {
-        return response()->json(['session' => 'active'], 200);
-    } else {
-        return response()->json(['session' => 'expired'], 401);
-    }
-});
-
-
 Route::get('/dashboard', function () {
 	return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -44,14 +35,17 @@ Route::middleware('auth')->group(function () {
 	Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 	Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
+//->middleware('custom.csrf')
 Route::middleware('auth')->group(function () {
-	Route::get('/users', [UserController::class, 'index'])->middleware('custom.csrf')->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
+	Route::get('/users', [UserController::class, 'index'])->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
 	Route::get('/show/{id}', [UserController::class, 'show'])->name('users.show');
-	Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-	Route::post('/users', [UserController::class, 'store'])->middleware('custom.csrf')->name('users.store');
+/* 	Route::get('/admin', function () {
+		// Solo los usuarios con el rol de 'admin' pueden acceder
+	})->middleware('role:Administrador');
+ */	Route::get('/users/create', [UserController::class, 'create'])->name('users.create')->middleware('role:Administrador');
+	Route::post('/users', [UserController::class, 'store'])->name('users.store');
 	Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-	Route::patch('/users/{user}', [UserController::class, 'update'])->middleware('custom.csrf')->name('users.update');
+	Route::patch('/users/{user}', [UserController::class, 'update'])->name('users.update');
 	Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 	Route::post('/users/options', [UserController::class, 'options'])->name('users.options');
 	Route::get('/users/fields', [UserController::class, 'fields'])->name('users.fields');

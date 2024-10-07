@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Rol extends Model
 {
-	use HasFactory;
 
 	protected $table = 'roles'; // Asegúrate de que el nombre de la tabla es correcto
 
@@ -20,4 +18,10 @@ class Rol extends Model
             ->withTimestamps()
             ->withPivot('habilitado');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
 }
