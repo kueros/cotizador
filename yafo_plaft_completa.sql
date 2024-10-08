@@ -169,7 +169,7 @@ CREATE TABLE `logs_accesos` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `logs_accesos_email_index` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -178,7 +178,6 @@ CREATE TABLE `logs_accesos` (
 
 LOCK TABLES `logs_accesos` WRITE;
 /*!40000 ALTER TABLE `logs_accesos` DISABLE KEYS */;
-INSERT INTO `logs_accesos` VALUES (1,NULL,'omarliberatto@yafoconsultora.com','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 03:15:08','2024-10-07 03:15:08'),(2,NULL,'omarliberatto@yafoconsultora.com','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 12:36:21','2024-10-07 12:36:21'),(3,NULL,'omarliberatto@yafoconsultora.com','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 13:17:41','2024-10-07 13:17:41'),(4,NULL,'omarliberatto@yafoconsultora.com','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 13:29:45','2024-10-07 13:29:45'),(5,NULL,'omarliberatto@yafoconsultora.com','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 13:30:48','2024-10-07 13:30:48'),(6,NULL,'omarliberatto@yafoconsultora.com','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 17:26:38','2024-10-07 17:26:38'),(7,NULL,'omarliberatto@yafoconsultora.com','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 17:54:08','2024-10-07 17:54:08');
 /*!40000 ALTER TABLE `logs_accesos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -199,7 +198,7 @@ CREATE TABLE `logs_administracion` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `logs_administracion_username_index` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -208,7 +207,7 @@ CREATE TABLE `logs_administracion` (
 
 LOCK TABLES `logs_administracion` WRITE;
 /*!40000 ALTER TABLE `logs_administracion` DISABLE KEYS */;
-INSERT INTO `logs_administracion` VALUES (1,'omar','Solicitud de logout recibida. {\"_token\":\"F7q8OHN42JH3V56XSjhiGk6sZFxGrMLxeTNwucxS\"}','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 13:17:33','2024-10-07 13:17:33'),(2,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Logout','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 13:17:33','2024-10-07 13:17:33'),(3,'omar','Solicitud de logout recibida. {\"_token\":\"80l1vvVhZaVwsjYcWKJfo0z5ASspifqIRtMBmolX\"}','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 13:22:33','2024-10-07 13:22:33'),(4,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Logout','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 13:22:33','2024-10-07 13:22:33'),(5,'omar','Solicitud de logout recibida. {\"_token\":\"vUrhMFP7WEyvapImV4nUjQNtSQbiftIUmYoA4FFx\"}','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 13:29:57','2024-10-07 13:29:57'),(6,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Logout','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 13:29:57','2024-10-07 13:29:57'),(7,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de permiso','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 13:33:12','2024-10-07 13:33:12'),(8,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de permiso','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 13:33:25','2024-10-07 13:33:25'),(9,'omar','omar creó el usuario pepe','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 15:28:57','2024-10-07 15:28:57'),(10,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de usuario','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 15:28:57','2024-10-07 15:28:57'),(11,'omar','Solicitud de logout recibida. {\"_token\":\"4wdMdpKttVZG5oyF2xCfH2gGoI6ajBgohtBcoGXS\"}','127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','2024-10-07 17:54:03','2024-10-07 17:54:03'),(12,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Logout','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 17:54:03','2024-10-07 17:54:03');
+INSERT INTO `logs_administracion` VALUES (1,'omar','omar creó el usuario pepe','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:57:38','2024-10-07 22:57:38'),(2,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de usuario','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:57:38','2024-10-07 22:57:38'),(3,'omar','omar creó el rol Usuario Legal','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:58:19','2024-10-07 22:58:19'),(4,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de rol','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:58:19','2024-10-07 22:58:19'),(5,'omar','omar creó el rol Usuario Contable','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:58:30','2024-10-07 22:58:30'),(6,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de rol','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:58:30','2024-10-07 22:58:30'),(7,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de permiso','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:58:54','2024-10-07 22:58:54'),(8,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de permiso','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:59:10','2024-10-07 22:59:10');
 /*!40000 ALTER TABLE `logs_administracion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -224,7 +223,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -233,7 +232,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES (1,'0001_01_01_000000_create_users_table',1),(2,'0001_01_01_000001_create_cache_table',1),(3,'0001_01_01_000002_create_jobs_table',1),(4,'2024_09_03_141920_create_roles_table',1),(5,'2024_09_03_141950_create_modulos_table',1),(6,'2024_09_03_150424_create_permisos_table',1),(7,'2024_09_03_150439_create_permisos_x_rol_table',1),(8,'2024_09_06_165415_create_logs_administracions_table',1),(9,'2024_09_09_150424_create_logs_accesos_table',1),(10,'2024_09_09_165713_create_variables_table',1),(11,'2024_09_10_181917_create_notificaciones_table',1);
+INSERT INTO `migrations` VALUES (1,'0001_01_01_000000_create_users_table',1),(2,'0001_01_01_000001_create_cache_table',1),(3,'0001_01_01_000002_create_jobs_table',1),(4,'2024_09_03_141920_create_roles_table',1),(5,'2024_09_03_141950_create_modulos_table',1),(6,'2024_09_03_150424_create_permisos_table',1),(7,'2024_09_03_150439_create_permisos_x_rol_table',1),(8,'2024_09_06_165415_create_logs_administracions_table',1),(9,'2024_09_09_150424_create_logs_accesos_table',1),(10,'2024_09_09_165713_create_variables_table',1),(11,'2024_09_10_181917_create_notificaciones_table',1),(12,'2024_10_07_175957_create_rol_user_table',1);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -339,7 +338,7 @@ CREATE TABLE `permisos` (
 
 LOCK TABLES `permisos` WRITE;
 /*!40000 ALTER TABLE `permisos` DISABLE KEYS */;
-INSERT INTO `permisos` VALUES (1,'Listado de Usuarios',1,NULL,'2024-10-07 13:33:12','2024-10-07 13:33:12'),(2,'Administración de Usuarios',2,NULL,'2024-10-07 13:33:25','2024-10-07 13:33:25');
+INSERT INTO `permisos` VALUES (1,'Listado de Usuarios',1,NULL,'2024-10-07 22:58:54','2024-10-07 22:58:54'),(2,'Administración de Usuarios',2,NULL,'2024-10-07 22:59:10','2024-10-07 22:59:10');
 /*!40000 ALTER TABLE `permisos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -365,34 +364,7 @@ CREATE TABLE `permisos_x_rol` (
 
 LOCK TABLES `permisos_x_rol` WRITE;
 /*!40000 ALTER TABLE `permisos_x_rol` DISABLE KEYS */;
-INSERT INTO `permisos_x_rol` VALUES (1,2,1,'2024-10-07 15:29:54','2024-10-07 15:29:54'),(1,1,1,'2024-10-07 15:29:54','2024-10-07 15:29:54'),(2,1,1,'2024-10-07 15:29:54','2024-10-07 15:29:54');
 /*!40000 ALTER TABLE `permisos_x_rol` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `rol_user`
---
-
-DROP TABLE IF EXISTS `rol_user`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `rol_user` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) unsigned NOT NULL,
-  `rol_id` bigint(20) unsigned NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `rol_user`
---
-
-LOCK TABLES `rol_user` WRITE;
-/*!40000 ALTER TABLE `rol_user` DISABLE KEYS */;
-/*!40000 ALTER TABLE `rol_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -403,13 +375,13 @@ DROP TABLE IF EXISTS `roles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `roles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `rol_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(255) DEFAULT NULL,
   `guard_name` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  PRIMARY KEY (`rol_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -418,8 +390,39 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'Administrador',NULL,'2024-10-07 03:14:41','2024-10-07 03:14:41'),(2,'Usuario contable',NULL,'2024-10-07 13:32:43','2024-10-07 13:32:43'),(3,'Usuario Legal',NULL,'2024-10-07 13:32:50','2024-10-07 13:32:50'),(4,'Usuario normal',NULL,'2024-10-07 13:32:58','2024-10-07 13:32:58');
+INSERT INTO `roles` VALUES (1,'Administrador',NULL,'2024-10-07 21:36:01','2024-10-07 21:36:01'),(2,'Usuario Legal',NULL,'2024-10-07 22:58:19','2024-10-07 22:58:19'),(3,'Usuario Contable',NULL,'2024-10-07 22:58:30','2024-10-07 22:58:30');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `roles_x_usuario`
+--
+
+DROP TABLE IF EXISTS `roles_x_usuario`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `roles_x_usuario` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `rol_id` bigint(20) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `roles_x_usuario_user_id_foreign` (`user_id`),
+  KEY `roles_x_usuario_rol_id_foreign` (`rol_id`),
+  CONSTRAINT `roles_x_usuario_rol_id_foreign` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`rol_id`) ON DELETE CASCADE,
+  CONSTRAINT `roles_x_usuario_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `roles_x_usuario`
+--
+
+LOCK TABLES `roles_x_usuario` WRITE;
+/*!40000 ALTER TABLE `roles_x_usuario` DISABLE KEYS */;
+INSERT INTO `roles_x_usuario` VALUES (1,1,1,'2024-10-07 21:36:03','2024-10-07 21:36:03');
+/*!40000 ALTER TABLE `roles_x_usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -448,7 +451,6 @@ CREATE TABLE `sessions` (
 
 LOCK TABLES `sessions` WRITE;
 /*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
-INSERT INTO `sessions` VALUES ('kByQMGJ0udIRmvhkTy9mjTUF5ooQtWqkLSOlTC1q',1,'127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15','YTo1OntzOjY6Il90b2tlbiI7czo0MDoiTWJ5c2dFQ21meGxUVEdGSktKSk9UazY4anhQRnJ1QkJuV2x2eFVvNyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzM6Imh0dHBzOi8vcGxhZnQudGVzdC9wZXJtaXNvc194X3JvbCI7fXM6MjI6IlR1IHNlc2nDs24gaGEgZXhwaXJhZG8iO2E6MTp7czozNToiIFBvciBmYXZvciwgaW5pY2lhIHNlc2nDs24gZGUgbnVldm8iO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=',1728314996);
 /*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -460,7 +462,7 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(255) DEFAULT NULL,
   `nombre` varchar(255) DEFAULT NULL,
   `apellido` varchar(255) DEFAULT NULL,
@@ -481,7 +483,7 @@ CREATE TABLE `users` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`user_id`),
   UNIQUE KEY `users_email_unique` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -492,7 +494,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'omar','omar','liberatto','omarliberatto@yafoconsultora.com',1,1,0,NULL,0,0,NULL,NULL,0,NULL,NULL,'$2y$12$F3s21i5HTNE565IdqeUPjeNVMv9iskYt0CBWt3kGgf4Smx7Ue6p.C',NULL,NULL,'2024-10-07 03:15:00','2024-10-07 03:15:00'),(2,'pepe','jose','lopez','pepe@kdk.com',2,1,0,NULL,0,0,NULL,NULL,0,NULL,NULL,NULL,NULL,NULL,'2024-10-07 15:28:57','2024-10-07 15:28:57');
+INSERT INTO `users` VALUES (1,'omar','omar','liberatto','omarliberatto@yafoconsultora.com',1,1,0,NULL,0,0,NULL,NULL,0,NULL,NULL,'$2y$12$OVvGQDBix0OHjyrz/qZoXu4ITcjxMQ6LF87omApbcDazm/bYtyWSG',NULL,NULL,'2024-10-07 21:36:03','2024-10-07 21:36:03'),(2,'pepe','jose','perez','pepe@kdk.com',1,1,0,NULL,0,0,NULL,NULL,0,NULL,NULL,NULL,NULL,NULL,'2024-10-07 22:57:38','2024-10-07 22:57:38');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -520,7 +522,7 @@ CREATE TABLE `variables` (
 
 LOCK TABLES `variables` WRITE;
 /*!40000 ALTER TABLE `variables` DISABLE KEYS */;
-INSERT INTO `variables` VALUES (3,'fecha_minima_edicion_eventos','','2019-01-15','2024-10-07 03:14:41','2024-10-07 03:14:41'),(7,'version','','3.7.3','2024-10-07 03:14:41','2024-10-07 03:14:41'),(8,'fecha_ultima_actualizacion','','2024-08-30','2024-10-07 03:14:41','2024-10-07 03:14:41'),(9,'reset_password_30_dias','','0','2024-10-07 03:14:41','2024-10-07 03:14:41'),(10,'session_time','','900','2024-10-07 03:14:41','2024-10-07 03:14:41'),(11,'notificaciones_locales','','1','2024-10-07 03:14:41','2024-10-07 03:14:41'),(12,'notificaciones_email','','1','2024-10-07 03:14:41','2024-10-07 03:14:41'),(13,'_notificaciones_email_aleph','','0','2024-10-07 03:14:41','2024-10-07 03:14:41'),(18,'integracion_azure','','0','2024-10-07 03:14:41','2024-10-07 03:14:41'),(19,'integracion_gmail','','0','2024-10-07 03:14:41','2024-10-07 03:14:41'),(20,'opav_habilitar_modo_debug','','1','2024-10-07 03:14:41','2024-10-07 03:14:41'),(73,'copa_background_home_custom','','0','2024-10-07 03:14:41','2024-10-07 03:14:41'),(74,'background_home_custom_path','','slide0028_image054.jpg','2024-10-07 03:14:41','2024-10-07 03:14:41'),(75,'copa_background_login_custom','','1','2024-10-07 03:14:41','2024-10-07 03:14:41'),(76,'background_login_custom_path','','login-background.jpg','2024-10-07 03:14:41','2024-10-07 03:14:41'),(97,'opav_habilitar_ia_ciberseguridad','','0','2024-10-07 03:14:41','2024-10-07 03:14:41'),(98,'opav_open_ai_api_key','','0','2024-10-07 03:14:41','2024-10-07 03:14:41'),(126,'copa_aleph_estilo_logotipo_default','','1','2024-10-07 03:14:41','2024-10-07 03:14:41'),(127,'copa_aleph_estilo_color_barra_menu','','1','2024-10-07 03:14:41','2024-10-07 03:14:41'),(130,'aleph_estilo_color_titulos_menu','','#FFFFFF','2024-10-07 03:14:41','2024-10-07 03:14:41'),(131,'aleph_estilo_color_mouseover_menu','','#F5F5F5','2024-10-07 03:14:41','2024-10-07 03:14:41'),(145,'fecha_version','','2024-08-30','2024-10-07 03:14:41','2024-10-07 03:14:41'),(158,'_notificaciones_email_from','','omarliberatto@yafoconsultora.com','2024-10-07 03:14:41','2024-10-07 03:14:41'),(159,'_notificaciones_email_from_name','','omar','2024-10-07 03:14:41','2024-10-07 03:14:41'),(160,'notificaciones_email_config','','[]','2024-10-07 03:14:41','2024-10-07 03:14:41');
+INSERT INTO `variables` VALUES (3,'fecha_minima_edicion_eventos','','2019-01-15','2024-10-07 21:36:01','2024-10-07 21:36:01'),(7,'version','','3.7.3','2024-10-07 21:36:01','2024-10-07 21:36:01'),(8,'fecha_ultima_actualizacion','','2024-08-30','2024-10-07 21:36:01','2024-10-07 21:36:01'),(9,'reset_password_30_dias','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(10,'session_time','','900','2024-10-07 21:36:01','2024-10-07 21:36:01'),(11,'notificaciones_locales','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(12,'notificaciones_email','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(13,'_notificaciones_email_aleph','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(18,'integracion_azure','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(19,'integracion_gmail','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(20,'opav_habilitar_modo_debug','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(73,'copa_background_home_custom','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(74,'background_home_custom_path','','slide0028_image054.jpg','2024-10-07 21:36:01','2024-10-07 21:36:01'),(75,'copa_background_login_custom','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(76,'background_login_custom_path','','login-background.jpg','2024-10-07 21:36:01','2024-10-07 21:36:01'),(97,'opav_habilitar_ia_ciberseguridad','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(98,'opav_open_ai_api_key','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(126,'copa_aleph_estilo_logotipo_default','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(127,'copa_aleph_estilo_color_barra_menu','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(130,'aleph_estilo_color_titulos_menu','','#FFFFFF','2024-10-07 21:36:01','2024-10-07 21:36:01'),(131,'aleph_estilo_color_mouseover_menu','','#F5F5F5','2024-10-07 21:36:01','2024-10-07 21:36:01'),(145,'fecha_version','','2024-08-30','2024-10-07 21:36:01','2024-10-07 21:36:01'),(158,'_notificaciones_email_from','','omarliberatto@yafoconsultora.com','2024-10-07 21:36:01','2024-10-07 21:36:01'),(159,'_notificaciones_email_from_name','','omar','2024-10-07 21:36:01','2024-10-07 21:36:01'),(160,'notificaciones_email_config','','[]','2024-10-07 21:36:01','2024-10-07 21:36:01');
 /*!40000 ALTER TABLE `variables` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -533,4 +535,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-07 15:13:11
+-- Dump completed on 2024-10-07 20:16:55

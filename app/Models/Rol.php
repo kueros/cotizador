@@ -12,6 +12,9 @@ class Rol extends Model
 	protected $fillable = [
 		'nombre',
 	];
+
+    protected $primaryKey = 'rol_id'; // Cambia 'rol_id' por el nombre correcto de tu clave primaria
+
     public function permisos()
     {
         return $this->belongsToMany(Permiso::class, 'permisos_x_rol', 'rol_id', 'permiso_id')
@@ -21,7 +24,6 @@ class Rol extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
-    }
-
+		return $this->belongsToMany(User::class, 'roles_x_usuario', 'rol_id', 'user_id');
+	}
 }

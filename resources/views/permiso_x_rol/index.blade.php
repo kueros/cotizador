@@ -17,7 +17,7 @@
                 <div class="table-responsive">
                     <form action="{{ route('permisos_x_rol.update') }}" method="POST">
                         @csrf
-                        <table id="example" class="cell-border" style="width:100%">
+                        <table id="example2" class="cell-border" style="width:100%">
                             <thead class="thead">
                                 <tr>
                                     <th>Permisos</th>
@@ -32,7 +32,7 @@
                                         <td>{{ $permiso->nombre }}</td>
                                         @foreach ($rols as $rol)
                                             <td>
-                                                <input type="checkbox" name="permisos[{{ $rol->id }}][{{ $permiso->id }}]"
+                                                <input type="checkbox" name="permisos[{{ $rol->rol_id }}][{{ $permiso->id }}]"
                                                        value="1"
                                                        @if($rol->permisos && $rol->permisos->pluck('id')->contains($permiso->id)) checked @endif>
                                             </td>

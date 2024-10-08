@@ -50,7 +50,7 @@ class UserController extends Controller
 			'nombre' => 'required|string|max:255',
 			'apellido' => 'required|string|max:255',
 			'email' => 'required|string|email|max:255',
-			'rol_id' => 'required|exists:roles,id',
+			'rol_id' => 'required|exists:roles,rol_id',
 			'habilitado' => 'required|boolean',
 		]);
 
@@ -213,7 +213,7 @@ class UserController extends Controller
 	
 		// Obtiene la lista de todos los usuarios (tal como en la función index)
 		$users = User::withoutTrashed()
-			->leftJoin('roles', 'users.rol_id', '=', 'roles.id')
+			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
 			->select('users.*', 'roles.nombre as nombre_rol')
 			->paginate();
 	

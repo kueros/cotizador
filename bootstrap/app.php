@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Registro de middlewares de ruta
         $middleware->alias([
-            'role' => App\Http\Middleware\CheckRole::class,
+            'role' => App\Http\Middleware\CheckRol::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
