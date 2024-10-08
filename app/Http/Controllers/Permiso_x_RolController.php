@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Permiso_x_Rol;
 use App\Models\Permiso;
 use App\Models\Rol;
+use App\Models\Modulo;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\RolController;
 
@@ -15,17 +16,21 @@ class Permiso_x_RolController extends Controller
 
 	public function index()
 	{
-		// Obtener todos los roles con sus permisos
-		#$rols = Rol::with('permisos')->get();
-		$rols = Rol::get();
-		// Obtener todos los permisos
-		$permisos = Permiso::all();
-		#dd($permisos);
-		return view('permiso_x_rol.index', compact('rols', 'permisos'));
+		$rols = Rol::with('permisos')->get();
+		$permisos = Permiso::orderBy('modulo_id')->get();
+		$modulos = Modulo::with('permisos')->get();
+		return view('permiso_x_rol.index', compact('rols', 'permisos', 'modulos'));
 	}
 
+/* 	public function showPermisosPorRol()
+	{
+		$rols = Rol::with('permisos')->get();
+		$permisos = Permiso::orderBy('modulo_id')->get();
+		$modulos = Modulo::with('permisos')->get();
 
-
+		return view('permisos_x_rol', compact('rols', 'permisos', 'modulos'));
+	}
+ */
 	public function updatePermisos(Request $request)
 	{
 		#dd($request);

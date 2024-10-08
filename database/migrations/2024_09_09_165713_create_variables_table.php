@@ -20,7 +20,7 @@ return new class extends Migration
 			$table->timestamps();
 		});
 
-		// Insertar un registro de rol "Administrador" al ejecutar la migración
+		// Insertar registros de variables por default al ejecutar la migración
 		DB::table('variables')->insert([
 			[
 				'id' => 3,

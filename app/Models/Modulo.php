@@ -7,5 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Modulo extends Model
 {
-    use HasFactory;
+	use HasFactory;
+	protected $table = 'modulos'; // Asegúrate de que el nombre de la tabla es correcto
+
+	protected $fillable = [
+		'nombre',
+	];
+
+	public function permisos()
+	{
+		return $this->hasMany(Permiso::class);
+	}
 }

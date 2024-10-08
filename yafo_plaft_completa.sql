@@ -198,7 +198,7 @@ CREATE TABLE `logs_administracion` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `logs_administracion_username_index` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -207,7 +207,6 @@ CREATE TABLE `logs_administracion` (
 
 LOCK TABLES `logs_administracion` WRITE;
 /*!40000 ALTER TABLE `logs_administracion` DISABLE KEYS */;
-INSERT INTO `logs_administracion` VALUES (1,'omar','omar creó el usuario pepe','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:57:38','2024-10-07 22:57:38'),(2,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de usuario','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:57:38','2024-10-07 22:57:38'),(3,'omar','omar creó el rol Usuario Legal','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:58:19','2024-10-07 22:58:19'),(4,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de rol','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:58:19','2024-10-07 22:58:19'),(5,'omar','omar creó el rol Usuario Contable','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:58:30','2024-10-07 22:58:30'),(6,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de rol','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:58:30','2024-10-07 22:58:30'),(7,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de permiso','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:58:54','2024-10-07 22:58:54'),(8,'omar','omar creó el email para omarliberatto@yafoconsultora.com con el asunto: Creación de permiso','\"127.0.0.1\"','\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\\/605.1.15 (KHTML, like Gecko) Version\\/17.6 Safari\\/605.1.15\"','2024-10-07 22:59:10','2024-10-07 22:59:10');
 /*!40000 ALTER TABLE `logs_administracion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -223,7 +222,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -232,7 +231,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES (1,'0001_01_01_000000_create_users_table',1),(2,'0001_01_01_000001_create_cache_table',1),(3,'0001_01_01_000002_create_jobs_table',1),(4,'2024_09_03_141920_create_roles_table',1),(5,'2024_09_03_141950_create_modulos_table',1),(6,'2024_09_03_150424_create_permisos_table',1),(7,'2024_09_03_150439_create_permisos_x_rol_table',1),(8,'2024_09_06_165415_create_logs_administracions_table',1),(9,'2024_09_09_150424_create_logs_accesos_table',1),(10,'2024_09_09_165713_create_variables_table',1),(11,'2024_09_10_181917_create_notificaciones_table',1),(12,'2024_10_07_175957_create_rol_user_table',1);
+INSERT INTO `migrations` VALUES (25,'0001_01_01_000000_create_users_table',1),(26,'0001_01_01_000001_create_cache_table',1),(27,'0001_01_01_000002_create_jobs_table',1),(28,'2024_09_03_141920_create_roles_table',1),(29,'2024_09_03_141950_create_modulos_table',1),(30,'2024_09_03_150424_create_permisos_table',1),(31,'2024_09_03_150439_create_permisos_x_rol_table',1),(32,'2024_09_06_165415_create_logs_administracions_table',1),(33,'2024_09_09_150424_create_logs_accesos_table',1),(34,'2024_09_09_165713_create_variables_table',1),(35,'2024_09_10_181917_create_notificaciones_table',1),(36,'2024_10_07_175957_create_rol_user_table',1);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -249,7 +248,7 @@ CREATE TABLE `modulos` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -258,6 +257,7 @@ CREATE TABLE `modulos` (
 
 LOCK TABLES `modulos` WRITE;
 /*!40000 ALTER TABLE `modulos` DISABLE KEYS */;
+INSERT INTO `modulos` VALUES (1,'Usuarios','2024-10-08 14:44:44','2024-10-08 14:44:44'),(2,'Permisos','2024-10-08 14:44:44','2024-10-08 14:44:44'),(3,'Roles','2024-10-08 14:44:44','2024-10-08 14:44:44'),(4,'Configuraciones','2024-10-08 14:44:44','2024-10-08 14:44:44'),(5,'Logs de Accesos','2024-10-08 14:44:44','2024-10-08 14:44:44'),(6,'Logs de Administración','2024-10-08 14:44:44','2024-10-08 14:44:44');
 /*!40000 ALTER TABLE `modulos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -329,7 +329,7 @@ CREATE TABLE `permisos` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -338,7 +338,7 @@ CREATE TABLE `permisos` (
 
 LOCK TABLES `permisos` WRITE;
 /*!40000 ALTER TABLE `permisos` DISABLE KEYS */;
-INSERT INTO `permisos` VALUES (1,'Listado de Usuarios',1,NULL,'2024-10-07 22:58:54','2024-10-07 22:58:54'),(2,'Administración de Usuarios',2,NULL,'2024-10-07 22:59:10','2024-10-07 22:59:10');
+INSERT INTO `permisos` VALUES (1,'Administración',1,1,'2024-10-08 14:44:44','2024-10-08 14:44:44'),(2,'Administración',2,2,'2024-10-08 14:44:44','2024-10-08 14:44:44'),(3,'Administración',3,3,'2024-10-08 14:44:44','2024-10-08 14:44:44'),(4,'Administración',4,4,'2024-10-08 14:44:44','2024-10-08 14:44:44'),(5,'Administración',5,5,'2024-10-08 14:44:44','2024-10-08 14:44:44'),(6,'Administración',6,6,'2024-10-08 14:44:44','2024-10-08 14:44:44');
 /*!40000 ALTER TABLE `permisos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -381,7 +381,7 @@ CREATE TABLE `roles` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`rol_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -390,7 +390,7 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'Administrador',NULL,'2024-10-07 21:36:01','2024-10-07 21:36:01'),(2,'Usuario Legal',NULL,'2024-10-07 22:58:19','2024-10-07 22:58:19'),(3,'Usuario Contable',NULL,'2024-10-07 22:58:30','2024-10-07 22:58:30');
+INSERT INTO `roles` VALUES (1,'Administrador',NULL,'2024-10-08 14:44:41','2024-10-08 14:44:41');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -421,7 +421,7 @@ CREATE TABLE `roles_x_usuario` (
 
 LOCK TABLES `roles_x_usuario` WRITE;
 /*!40000 ALTER TABLE `roles_x_usuario` DISABLE KEYS */;
-INSERT INTO `roles_x_usuario` VALUES (1,1,1,'2024-10-07 21:36:03','2024-10-07 21:36:03');
+INSERT INTO `roles_x_usuario` VALUES (1,1,1,'2024-10-08 14:44:44','2024-10-08 14:44:44');
 /*!40000 ALTER TABLE `roles_x_usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -485,7 +485,7 @@ CREATE TABLE `users` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -494,7 +494,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'omar','omar','liberatto','omarliberatto@yafoconsultora.com',1,1,0,NULL,0,0,NULL,NULL,0,NULL,NULL,'$2y$12$OVvGQDBix0OHjyrz/qZoXu4ITcjxMQ6LF87omApbcDazm/bYtyWSG',NULL,NULL,'2024-10-07 21:36:03','2024-10-07 21:36:03'),(2,'pepe','jose','perez','pepe@kdk.com',1,1,0,NULL,0,0,NULL,NULL,0,NULL,NULL,NULL,NULL,NULL,'2024-10-07 22:57:38','2024-10-07 22:57:38');
+INSERT INTO `users` VALUES (1,'omar','omar','liberatto','omarliberatto@yafoconsultora.com',1,1,0,NULL,0,0,NULL,NULL,0,NULL,NULL,'$2y$12$enZ2/rZQdvJiWjwZ2vAyNur1bFEf2XKwm8rwaxeHpu4cZEj24AFy.',NULL,NULL,'2024-10-08 14:44:44','2024-10-08 14:44:44');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -522,7 +522,7 @@ CREATE TABLE `variables` (
 
 LOCK TABLES `variables` WRITE;
 /*!40000 ALTER TABLE `variables` DISABLE KEYS */;
-INSERT INTO `variables` VALUES (3,'fecha_minima_edicion_eventos','','2019-01-15','2024-10-07 21:36:01','2024-10-07 21:36:01'),(7,'version','','3.7.3','2024-10-07 21:36:01','2024-10-07 21:36:01'),(8,'fecha_ultima_actualizacion','','2024-08-30','2024-10-07 21:36:01','2024-10-07 21:36:01'),(9,'reset_password_30_dias','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(10,'session_time','','900','2024-10-07 21:36:01','2024-10-07 21:36:01'),(11,'notificaciones_locales','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(12,'notificaciones_email','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(13,'_notificaciones_email_aleph','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(18,'integracion_azure','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(19,'integracion_gmail','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(20,'opav_habilitar_modo_debug','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(73,'copa_background_home_custom','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(74,'background_home_custom_path','','slide0028_image054.jpg','2024-10-07 21:36:01','2024-10-07 21:36:01'),(75,'copa_background_login_custom','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(76,'background_login_custom_path','','login-background.jpg','2024-10-07 21:36:01','2024-10-07 21:36:01'),(97,'opav_habilitar_ia_ciberseguridad','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(98,'opav_open_ai_api_key','','0','2024-10-07 21:36:01','2024-10-07 21:36:01'),(126,'copa_aleph_estilo_logotipo_default','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(127,'copa_aleph_estilo_color_barra_menu','','1','2024-10-07 21:36:01','2024-10-07 21:36:01'),(130,'aleph_estilo_color_titulos_menu','','#FFFFFF','2024-10-07 21:36:01','2024-10-07 21:36:01'),(131,'aleph_estilo_color_mouseover_menu','','#F5F5F5','2024-10-07 21:36:01','2024-10-07 21:36:01'),(145,'fecha_version','','2024-08-30','2024-10-07 21:36:01','2024-10-07 21:36:01'),(158,'_notificaciones_email_from','','omarliberatto@yafoconsultora.com','2024-10-07 21:36:01','2024-10-07 21:36:01'),(159,'_notificaciones_email_from_name','','omar','2024-10-07 21:36:01','2024-10-07 21:36:01'),(160,'notificaciones_email_config','','[]','2024-10-07 21:36:01','2024-10-07 21:36:01');
+INSERT INTO `variables` VALUES (3,'fecha_minima_edicion_eventos','','2019-01-15','2024-10-08 14:44:41','2024-10-08 14:44:41'),(7,'version','','3.7.3','2024-10-08 14:44:41','2024-10-08 14:44:41'),(8,'fecha_ultima_actualizacion','','2024-08-30','2024-10-08 14:44:41','2024-10-08 14:44:41'),(9,'reset_password_30_dias','','0','2024-10-08 14:44:41','2024-10-08 14:44:41'),(10,'session_time','','900','2024-10-08 14:44:41','2024-10-08 14:44:41'),(11,'notificaciones_locales','','1','2024-10-08 14:44:41','2024-10-08 14:44:41'),(12,'notificaciones_email','','1','2024-10-08 14:44:41','2024-10-08 14:44:41'),(13,'_notificaciones_email_aleph','','0','2024-10-08 14:44:41','2024-10-08 14:44:41'),(18,'integracion_azure','','0','2024-10-08 14:44:41','2024-10-08 14:44:41'),(19,'integracion_gmail','','0','2024-10-08 14:44:41','2024-10-08 14:44:41'),(20,'opav_habilitar_modo_debug','','1','2024-10-08 14:44:41','2024-10-08 14:44:41'),(73,'copa_background_home_custom','','0','2024-10-08 14:44:41','2024-10-08 14:44:41'),(74,'background_home_custom_path','','slide0028_image054.jpg','2024-10-08 14:44:41','2024-10-08 14:44:41'),(75,'copa_background_login_custom','','1','2024-10-08 14:44:41','2024-10-08 14:44:41'),(76,'background_login_custom_path','','login-background.jpg','2024-10-08 14:44:41','2024-10-08 14:44:41'),(97,'opav_habilitar_ia_ciberseguridad','','0','2024-10-08 14:44:41','2024-10-08 14:44:41'),(98,'opav_open_ai_api_key','','0','2024-10-08 14:44:41','2024-10-08 14:44:41'),(126,'copa_aleph_estilo_logotipo_default','','1','2024-10-08 14:44:41','2024-10-08 14:44:41'),(127,'copa_aleph_estilo_color_barra_menu','','1','2024-10-08 14:44:41','2024-10-08 14:44:41'),(130,'aleph_estilo_color_titulos_menu','','#FFFFFF','2024-10-08 14:44:41','2024-10-08 14:44:41'),(131,'aleph_estilo_color_mouseover_menu','','#F5F5F5','2024-10-08 14:44:41','2024-10-08 14:44:41'),(145,'fecha_version','','2024-08-30','2024-10-08 14:44:41','2024-10-08 14:44:41'),(158,'_notificaciones_email_from','','omarliberatto@yafoconsultora.com','2024-10-08 14:44:41','2024-10-08 14:44:41'),(159,'_notificaciones_email_from_name','','omar','2024-10-08 14:44:41','2024-10-08 14:44:41'),(160,'notificaciones_email_config','','[]','2024-10-08 14:44:41','2024-10-08 14:44:41');
 /*!40000 ALTER TABLE `variables` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -535,4 +535,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-07 20:16:55
+-- Dump completed on 2024-10-08 13:35:09

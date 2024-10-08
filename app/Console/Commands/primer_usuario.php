@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Rol;
 use App\Models\Permiso;
+use App\Models\Modulo;
 
 class primer_usuario extends Command
 {
@@ -46,16 +47,127 @@ class primer_usuario extends Command
 			]
 		);
 
-		// Verificar si el permiso "Administrador" ya existe, si no, crearlo
-		$permiso_administrador = Permiso::firstOrCreate(
-			['nombre' => 'Permiso de Administrador'],  // Condición para buscar el permiso
+		// Verificar si los módulos ya existen, si no, crearlos
+		DB::table('modulos')->insert([
 			[
-				'orden' => 1,  // Proporciona un valor por defecto para orden
+				'nombre' => 'Usuarios',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Permisos',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Roles',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Configuraciones',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Logs de Accesos',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Logs de Administración',
 				'created_at' => now(),
 				'updated_at' => now()
 			]
-		);
+		]);
 
+		// Verificar si el permiso "Permiso deAdministrador" ya existe, si no, crearlo
+		DB::table('permisos')->insert([
+			[
+				'nombre' => 'Administración',  // Condición para buscar el permiso
+				'orden' => 1,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 1,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Administración',  // Condición para buscar el permiso
+				'orden' => 2,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 2,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Administración',  // Condición para buscar el permiso
+				'orden' => 3,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 3,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Administración',  // Condición para buscar el permiso
+				'orden' => 4,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 4,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Administración',  // Condición para buscar el permiso
+				'orden' => 5,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 5,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Administración',  // Condición para buscar el permiso
+				'orden' => 6,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 6,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],[
+				'nombre' => 'Listado',  // Condición para buscar el permiso
+				'orden' => 7,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 1,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Listado',  // Condición para buscar el permiso
+				'orden' => 8,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 2,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Listado',  // Condición para buscar el permiso
+				'orden' => 9,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 3,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Listado',  // Condición para buscar el permiso
+				'orden' => 10,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 4,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Listado',  // Condición para buscar el permiso
+				'orden' => 11,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 5,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Listado',  // Condición para buscar el permiso
+				'orden' => 12,  // Proporciona un valor por defecto para orden
+				'modulo_id' => 6,  // Proporciona un valor por defecto para modulo_id
+				'created_at' => now(),
+				'updated_at' => now()
+			]
+		]);
+		
 		// Insertar el usuario en la tabla
 		DB::table('yafo_plaft.users')->insert([
 			'username' => $data['username'],
