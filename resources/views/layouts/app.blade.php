@@ -32,6 +32,9 @@
 			margin-top: 10px;
 			margin-bottom: 10px;
 		}
+        .error403{
+            font-size: 3rem;
+        }
 	</style>
 
 	<div class="min-h-screen bg-gray-100">

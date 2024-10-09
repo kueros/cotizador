@@ -70,7 +70,7 @@
 			return redirect()->intended(route('dashboard', absolute: false));
 		} catch (\Exception $e) {
 			// Captura la excepción y redirige con un mensaje de error
-            dd("7".Auth::user()->username );
+            #dd("7".Auth::user()->username );
 			return redirect()->route('login')
 							->withErrors(['email' => 'Username, email o contraseña incorrectos.'])
 							->withInput($request->only('email'));
