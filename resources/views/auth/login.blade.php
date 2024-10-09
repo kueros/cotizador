@@ -59,9 +59,10 @@
 				</div>
 				@endif
 				<div>
-					<label for="email" value="__('Email')" class="text-white">
-						<input id="email" class="block mt-1 w-full text-black" type="email" name="email" value="" placeholder="Email" required autofocus autocomplete="username" />
+					<label for="email" value="__('Email o Username')" class="text-white">
+						<input id="email" class="block mt-1 w-full text-black" type="text" name="email" value="{{ old('email') }}" placeholder="Email o Username" required autofocus autocomplete="username" />
 						<input-error messages="$errors->get('email')" class="mt-2" />
+					</label>
 				</div>
 				<!-- Password -->
 				<div class="mt-4">

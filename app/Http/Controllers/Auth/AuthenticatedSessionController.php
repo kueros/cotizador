@@ -49,34 +49,48 @@
 	/**
 	 * Handle an incoming authentication request.
 	 */
-	public function store(LoginRequest $request): RedirectResponse
-	{
-        #dd($_REQUEST);
-		try {
-			$request->authenticate();
-			$request->session()->regenerate();
+public function store(LoginRequest $request): RedirectResponse
+{
+    try {
+        // Verificamos si la entrada es un email o un username
+        $loginField = filter_var($request->input('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-			$message = "Solicitud de autenticacion recibida. " . json_encode($request->all());
-			$users = User::find(Auth::user()->user_id);
-			Log::info($message);
+        // Intentamos autenticar al usuario con el campo detectado
+        $credentials = [
+            $loginField => $request->input('email'),
+            'password' => $request->input('password'),
+        ];
 
-			$log = LogAcceso::create([
-				'email' => $users->email,
-				'ip_address' => $_SERVER['REMOTE_ADDR'],
-				'user_agent' => $_SERVER['HTTP_USER_AGENT']
-			]);
-			$log->save();
-            #dd("6".Auth::user()->username );
-			return redirect()->intended(route('dashboard', absolute: false));
-		} catch (\Exception $e) {
-			// Captura la excepción y redirige con un mensaje de error
-            #dd("7".Auth::user()->username );
-			return redirect()->route('login')
-							->withErrors(['email' => 'Username, email o contraseña incorrectos.'])
-							->withInput($request->only('email'));
-		}
-	}
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
 
+            // Registro del login exitoso
+            $message = "Solicitud de autenticación recibida. " . json_encode($request->all());
+            $users = User::find(Auth::user()->user_id);
+            Log::info($message);
+
+            // Guardar en la tabla de logs de acceso
+            LogAcceso::create([
+                'email' => $users->email,
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+            ]);
+
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+
+        // En caso de que la autenticación falle
+        return redirect()->route('login')
+                         ->withErrors(['email' => 'Username, email o contraseña incorrectos.'])
+                         ->withInput($request->only('email'));
+
+    } catch (\Exception $e) {
+        // Manejar la excepción
+        return redirect()->route('login')
+                         ->withErrors(['email' => 'Se produjo un error en el inicio de sesión.'])
+                         ->withInput($request->only('email'));
+    }
+}
 	/**
 	 * Destroy an authenticated session.
 	 */
