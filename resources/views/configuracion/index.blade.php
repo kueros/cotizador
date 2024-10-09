@@ -115,7 +115,7 @@
 								<tbody>
 									@csrf
 									<?php
-									$nec = $variables->firstWhere('nombre', 'notificaciones_email_config')->valor;
+									$nec = $variables->firstWhere('nombre', '_notificaciones_email_config')->valor;
 									#dd($nec);
 									$notificaciones_email_config = json_decode($nec);
 									#var_dump($notificaciones_email_config);
@@ -255,8 +255,72 @@
 							</div>
 						</div>
 					</div>
+
+
+                    <div id="loadingModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:rgba(0,0,0,0.5); color:white; padding:20px; border-radius:5px;">
+                        <p>Cargando...</p>
+                    </div>
+
 					<script src="/build/assets/js/jquery-3.6.0.min.js"></script>
 					<script>
+						const loadingModal = document.getElementById('loadingModal');
+						const successMessage = document.getElementById('successMessage');
+
+						// Función para mostrar el modal
+						function showLoading() {
+							loadingModal.style.display = 'block';
+						}
+
+						// Función para ocultar el modal
+						function hideLoading() {
+							loadingModal.style.display = 'none';
+						}
+
+						// Función para mostrar el mensaje de éxito
+						function showSuccessMessage() {
+							successMessage.style.display = 'block';
+
+							// Ocultar el mensaje después de 3 segundos (opcional)
+							setTimeout(() => {
+								successMessage.style.display = 'none';
+							}, 3000);
+						}
+
+						// Manejamos el evento de clic de los checkboxes
+						document.addEventListener('DOMContentLoaded', function() {
+							document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+								checkbox.addEventListener('change', function() {
+									showLoading();
+
+									// Aquí haces la solicitud de actualización (AJAX, Fetch API, etc.)
+									fetch('/configuracion/guardar_estado', {
+										method: 'POST',
+										body: JSON.stringify({ id: this.id, checked: this.checked }),
+										headers: {
+											'Content-Type': 'application/json',
+											'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+										}
+									})
+									.then(response => response.json())
+									.then(data => {
+										// Ocultamos el modal justo antes de mostrar el mensaje de éxito
+										hideLoading();
+
+										// Mostramos el mensaje de éxito
+										showSuccessMessage();
+									})
+									.catch(error => {
+										console.error('Error al guardar:', error);
+
+										// Ocultamos el modal aunque haya un error
+										hideLoading();
+									});
+								});
+							});
+						});
+
+
+
 						$('input[type="checkbox"]').on('change', function() {
 							// Guardo el nombre del checkbox que ha sido clickeado
 							let variableName = $(this).attr('name');

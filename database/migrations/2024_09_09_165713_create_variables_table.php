@@ -216,7 +216,7 @@ return new class extends Migration
 			],
 			[
 				'id' => 160,
-				'nombre' => 'notificaciones_email_config',
+				'nombre' => '_notificaciones_email_config',
 				'nombre_menu' => '',
 				'valor' => '[]',
 				'created_at' => now(),

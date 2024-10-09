@@ -100,7 +100,7 @@ Route::middleware('auth')->group(
 		Route::post('/configuracion/remitente', [ConfiguracionController::class, 'guardar_remitente'])->name('configuracion.guardar_remitente');
 		Route::get('/configuracion/mail', [ConfiguracionController::class, 'enviar_mail'])->name('configuracion.enviar_mail');
 		Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
-		Route::post('/configuracion', [ConfiguracionController::class, 'guardar_estado'])->name('configuracion.guardar_estado');
+		Route::post('/configuracion/guardar_estado', [ConfiguracionController::class, 'guardar_estado'])->name('configuracion.guardar_estado');
 		Route::post('/configuracion/add_parametro_email', [ConfiguracionController::class, 'add_parametro_email'])->name('configuracion.add_parametro_email');
 		Route::get('/configuracion/variables', [ConfiguracionController::class, 'variables'])->name('configuracion.variables');
 		Route::post('/configuracion/variables', [ConfiguracionController::class, 'store'])->name('configuracion.variables.store');
