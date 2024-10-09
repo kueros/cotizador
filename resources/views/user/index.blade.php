@@ -40,15 +40,9 @@
 									<td>{{ $user->habilitado ? 'Sí' : 'No' }}</td>
 									<td>{{ $user->bloqueado ? 'Sí' : 'No' }}</td>
 									<td>
-										<form action="{{ route('users.destroy', $user->user_id) }}" method="POST">
 											<a class="btn btn-sm btn-success" href="{{ route('users.edit', $user->user_id) }}">
 												<i class="fa fa-fw fa-edit" title="Editar" ></i>
 											</a>
-											@csrf
-											@method('DELETE')
-											<button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('¿Estás seguro de eliminar este usuario?') ? this.closest('form').submit() : false;">
-												<i class="fa fa-fw fa-trash" title="Borrar" ></i>
-											</button>
 
 											<!-- Botón para abrir el formulario de cambiar contraseña -->
 											<a href="{{ route('users.showPasswordForm', $user->user_id) }}" class="btn btn-warning btn-sm">
