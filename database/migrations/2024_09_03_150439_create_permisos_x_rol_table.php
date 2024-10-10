@@ -6,24 +6,39 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::create('permisos_x_rol', function (Blueprint $table) {
+	/**
+	 * Run the migrations.
+	 */
+	public function up(): void
+	{
+		Schema::create('permisos_x_rol', function (Blueprint $table) {
 			$table->integer('rol_id')->nullable();
 			$table->integer('permiso_id')->nullable();
 			$table->tinyInteger('habilitado')->default(1);
-            $table->timestamps();
-        });
-    }
+			$table->timestamps();
+		});
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('permisos_x_rol');
-    }
+		$rol = DB::table('roles')->first();
+		$rol_id = $rol->rol_id;
+		$permisos = DB::table('permisos')->get('id');
+		foreach ($permisos as $permiso) {
+			DB::table('permisos_x_rol')->insert([
+				[
+					'rol_id' => $rol_id,
+					'permiso_id' => $permiso->id,
+					'habilitado' => 1,
+					'created_at' => now(),
+					'updated_at' => now()
+				]
+			]);
+		}
+	}
+
+	/**
+	 * Reverse the migrations.
+	 */
+	public function down(): void
+	{
+		Schema::dropIfExists('permisos_x_rol');
+	}
 };

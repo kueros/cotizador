@@ -17,7 +17,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-		// Verificar si los módulos ya existen, si no, crearlos
 		DB::table('modulos')->insert([
 			[
 				'nombre' => 'Gestión de Usuarios',
