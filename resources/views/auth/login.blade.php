@@ -81,12 +81,14 @@
 					</label>
 				</div>
 
-				<div class="flex items-center justify-end mt-4">
-					<!--
+				<div class="flex items-center justify-between mt-4">
+				</div>
+				<div class="flex items-center justify-between mt-4">
+					<!-- Forgot Password Link -->
+					<a class="underline text-sm text-white hover:text-gray-200" href="{{ route('password.request') }}">
+						{{ __('¿Olvidaste tu contraseña?') }}
+					</a>
 
-ACA DEBERIA IR EL FORGOT PASSWORD
-
--->
 
 					<button class="btn btn-success btn-lg ms-3 text-white">
 						Entrar

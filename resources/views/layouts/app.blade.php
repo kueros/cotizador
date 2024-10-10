@@ -77,9 +77,7 @@
 				order: [[4, 'desc']]
 			});
 
-			new DataTable('#example', {
-				order: [[4, 'desc']]
-			});
+			new DataTable('#permisos');
 
 			$('.dropdown-submenu a.test').on("click", function(e) {
 				$(this).next('ul').toggle();
