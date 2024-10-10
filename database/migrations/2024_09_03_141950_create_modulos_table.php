@@ -16,6 +16,30 @@ return new class extends Migration
 			$table->string('nombre')->nullable();
             $table->timestamps();
         });
+
+		// Verificar si los módulos ya existen, si no, crearlos
+		DB::table('modulos')->insert([
+			[
+				'nombre' => 'Gestión de Usuarios',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Asignación de Permisos por Rol',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Gestión de Roles',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'nombre' => 'Configuraciones',
+				'created_at' => now(),
+				'updated_at' => now()
+			]
+		]);
     }
 
     /**
