@@ -37,6 +37,16 @@ class primer_usuario extends Command
 		// Aplicar hash al password
 		$data['password'] = Hash::make($data['password']);
 
+		// Verificar si el rol "Administrador" ya existe, si no, crearlo
+		$rol_administrador = Rol::firstOrCreate(
+			['nombre' => 'Administrador'],
+			[
+				'guard_name' => 'web',
+				'created_at' => now(),
+				'updated_at' => now()
+			]
+		);
+
 		
 		// Insertar el usuario en la tabla
 		DB::table('yafo_plaft.users')->insert([
