@@ -237,6 +237,73 @@ class UserController extends Controller
 		return redirect()->route('users.index')->with('success', 'Contraseña actualizada correctamente');
 	}
 	
+/* 	public function deshabilitar_usuario($id) {
+		try {
+			$user = User::findOrFail($id);
+			$user->habilitado = false;
+			$user->save();
+			return response()->json(['success' => true]);
+		} catch (\Exception $e) {
+			return response()->json(['error' => $e->getMessage()], 500);
+		}
+	}
+ */
+
+
+	public function deshabilitar_usuario(Request $request, $id) {
+		try {
+			$user = User::findOrFail($id);
+			$user->habilitado = $request->input('temporal'); // Valor enviado por AJAX
+			#echo $user->habilitado;
+			$user->save(); // Guardar los cambios en la base de datos
+			return response()->json(['success' => true]);
+		} catch (\Exception $e) {
+			return response()->json(['error' => $e->getMessage()], 500);
+		}
+	}
+
+	public function blanquear_password($user_id)
+	{
+		#echo Auth::user()->user_id;
+		if(Auth::user()->user_id != $user_id) 
+		{
+			// Actualiza la contraseña del usuario
+			$user = User::find($user_id);
+			$user->password = null;
+			$user->save();
+			return response()->json(['success'=> true]);
+		} else {
+	        return response()->json('No se puede blanquear tu propia clave', 403);
+		}
+	}				
+
+
+/* 			if($_SESSION['userdata']['user_id'] != $id){
+				$datos_usuario = $this->usuarios->get_by_id($id);
+				$this->guardar_log("Blanqueó la password del usuario ".$datos_usuario->username);
+				$token = $this->generar_random(250);
+				$data = array(
+					'token' => $token,
+					'password' => '',
+					'intentos_login' => 0,
+					'bloqueado' => 0,
+					'ultima_fecha_restablecimiento' => ''
+				);
+				$this->usuarios->update(array('id' => $id), $data);
+
+				$link = base_url('usuarios')."/cambiar_password?token=".$token;
+				$subject = "Aviso de blanqueo de contraseña";
+				$body = 'Se ha realizado un blanqueo de su contraseña en Aleph Manager, para continuar y cambiar la contraseña siga el siguiente link a continuacion:<br><a href="'.$link.'">Haz clic aquí</a>';
+
+				$this->enviar_email($datos_usuario->email, $body, $subject, true, false);
+
+				echo json_encode(array("status" => TRUE));
+			}else{
+				echo "No puedes blanquear la contraseña de tu propio usuario!";
+				exit();
+			}
+ */		
+
 
 
 }

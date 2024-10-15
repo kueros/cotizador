@@ -291,6 +291,7 @@ function show_ajax_error_message(jqXHR, textStatus = false, errorThrown = false,
                 var mensaje = "Se esta procesando la petición, recibirá una notificación al finalizar, si esto no ocurre contáctese con soporte@alephmanager.com";
                 break;
             case 500:
+                console.log(jqXHR)
                 var mensaje = "Ocurrió un error interno, recargue la página y vuelva a intentar más tarde, si este error persiste contáctese con soporte@alephmanager.com";
                 break;
             default://Por defecto traigo el error del controller

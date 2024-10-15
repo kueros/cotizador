@@ -51,9 +51,12 @@ Route::middleware('auth')->group(function () {
 	Route::get('/users/fields', [UserController::class, 'fields'])->name('users.fields');
 // Ruta para mostrar el formulario de cambio de contraseña
 	Route::get('/users/{id}/password', [UserController::class, 'showPasswordForm'])->name('users.showPasswordForm');
-
 // Ruta para actualizar la contraseña
 	Route::patch('/users/{id}/password', [UserController::class, 'updatePassword'])->name('password.update');
+// Ruta para blanquear la contraseña
+	Route::patch('/users/{id}/blanquear_password', [UserController::class, 'blanquear_password'])->name('users.blanquear_password');
+// Ruta para deshabilitar usuarios
+	Route::patch('/users/{id}/deshabilitar', [UserController::class, 'deshabilitar_usuario'])->name('users.deshabilitar_usuario');
 });
 
 Route::middleware('auth')->group(function () {

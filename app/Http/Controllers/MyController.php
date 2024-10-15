@@ -677,7 +677,7 @@ class MyController extends Controller
 				return false;
 				die();
 			} else {
-				echo "Ocurrió un error interno, recargue la página e intente nuevamente, si este error persiste contáctese con soporte@alephmanager.com";
+				echo "1Ocurrió un error interno, recargue la página e intente nuevamente, si este error persiste contáctese con soporte@alephmanager.com";
 				return false;
 				die();
 			}
