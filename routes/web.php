@@ -35,7 +35,9 @@ Route::middleware('auth')->group(function () {
 	Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 	Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-//->middleware('custom.csrf')
+
+
+//->USUARIOS
 Route::middleware('auth')->group(function () {
 	Route::get('/users', [UserController::class, 'index'])->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
 	Route::get('/show/{id}', [UserController::class, 'show'])->name('users.show');
@@ -49,6 +51,8 @@ Route::middleware('auth')->group(function () {
 	Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 	Route::post('/users/options', [UserController::class, 'options'])->name('users.options');
 	Route::get('/users/fields', [UserController::class, 'fields'])->name('users.fields');
+// Ruta para guardar opciones de usuario
+	Route::get('/users/{id}', [UserController::class, 'guardar_opciones'])->name('users.guardar_opciones');
 // Ruta para mostrar el formulario de cambio de contraseña
 	Route::get('/users/{id}/password', [UserController::class, 'showPasswordForm'])->name('users.showPasswordForm');
 // Ruta para actualizar la contraseña

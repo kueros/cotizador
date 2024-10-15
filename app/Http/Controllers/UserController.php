@@ -127,13 +127,8 @@ class UserController extends Controller
      */
 	public function update(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
-
+dd("kdk");
 		try {
-			// Lógica de actualización del usuario
-	
-		#dd($request->all());
-		// Definir los mensajes de error personalizados
-		#dd("9".Auth::user()->username );
 		$messages = [
 			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
 			'email.unique' => 'El correo electrónico ya está registrado por otro usuario.',
@@ -148,7 +143,6 @@ class UserController extends Controller
 			'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id,
 			'rol_id' => 'required|exists:roles,id',
 		], $messages);
-		#dd('asdf1234');
 
 		// Actualizar el usuario con los datos validados
 		$user->update($validatedData);
@@ -278,32 +272,20 @@ class UserController extends Controller
 	}				
 
 
-/* 			if($_SESSION['userdata']['user_id'] != $id){
-				$datos_usuario = $this->usuarios->get_by_id($id);
-				$this->guardar_log("Blanqueó la password del usuario ".$datos_usuario->username);
-				$token = $this->generar_random(250);
-				$data = array(
-					'token' => $token,
-					'password' => '',
-					'intentos_login' => 0,
-					'bloqueado' => 0,
-					'ultima_fecha_restablecimiento' => ''
-				);
-				$this->usuarios->update(array('id' => $id), $data);
-
-				$link = base_url('usuarios')."/cambiar_password?token=".$token;
-				$subject = "Aviso de blanqueo de contraseña";
-				$body = 'Se ha realizado un blanqueo de su contraseña en Aleph Manager, para continuar y cambiar la contraseña siga el siguiente link a continuacion:<br><a href="'.$link.'">Haz clic aquí</a>';
-
-				$this->enviar_email($datos_usuario->email, $body, $subject, true, false);
-
-				echo json_encode(array("status" => TRUE));
-			}else{
-				echo "No puedes blanquear la contraseña de tu propio usuario!";
-				exit();
-			}
- */		
-
+	public function guardar_opciones(Request $request, $user_id)
+	{
+		#echo Auth::user()->user_id;
+		if(Auth::user()->user_id != $user_id) 
+		{
+			// Actualiza la contraseña del usuario
+			$user = User::find($user_id);
+			$user->password = null;
+			$user->save();
+			return response()->json(['success'=> true]);
+		} else {
+	        return response()->json('No se puede blanquear tu propia clave', 403);
+		}
+	}				
 
 
 }

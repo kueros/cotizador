@@ -8,6 +8,66 @@
 		<div style="background-image: url('/build/assets/images/dashboard_bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding-top: 3rem; padding-bottom: 3rem;">
 			<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
+				<!-- Acordeón para Opciones -->
+				<div x-data="{ open2: false }" class="border-t border-gray-200 bg-gray-100">
+					<button @click="open2 = !open2" class="flex justify-between items-center w-full p-4 font-medium text-left text-gray-800 bg-gray-100 hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500">
+						Opciones
+						<svg :class="{ 'rotate-180': open2, 'rotate-0': !open2 }" class="w-6 h-6 transform transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M5.293 9.707a1 1 0 011.414 0L10 13.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+						</svg>
+					</button>
+					<div x-show="open2" class="mt-2 p-4 border-t border-gray-200">
+						<!-- Contenido de Opciones avanzadas -->
+						<form action="{{ route('users.guardar_opciones', ':id') }}".replace(':id', id) method="POST">
+							@csrf
+								<div class="row">
+									<div class="form-body">
+										<div class="form-group">
+											<label class="control-label col-md-3">Requerir cambio de contraseña después de 30 días</label>
+											<div class="col-md-9">
+												<input type="checkbox" value="1" <?php #if($reset_password){ echo 'checked'; }?> name="request_change" id="request_change">
+												<span class="help-block"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-body">
+										<div class="form-group">
+											<label class="control-label col-md-3">Configurar contraseñas</label>
+											<div class="col-md-3">
+												<input type="checkbox" value="1" <?php #if($configurar_claves){ echo 'checked'; }?> name="configurar_claves" id="configurar_claves">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-body">
+										<div class="form-group">
+											<label class="control-label col-md-3">Permitir múltiples sesiones</label>
+											<div class="col-md-3">
+												<input type="checkbox" value="1" <?php #if($permitir_multiples_sesiones){ echo 'checked'; }?> name="permitir_multiples_sesiones" id="permitir_multiples_sesiones">
+											</div>
+										</div>
+									</div>
+								</div>
+							<div class="row">
+								<div class="form-body">
+									<div class="form-group">
+										<label class="control-label col-md-3">Tiempo de sesión (segundos)</label>
+										<div class="col-md-3">
+											<input class="form-control" name="session_time" type="number" min="60" max="864000" step="1" value=""/><!-- "{{ route('users.blanquear_password', ':id') }}".replace(':id', id) -->
+										</div>
+									</div>
+								</div>
+							</div>
+							<br>
+							<button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-floppy-disk"></span> Guardar opciones</button>
+						</form>
+						<hr>
+					</div>
+				</div>
+
 				<!-- Tabla de usuarios -->
 				<div class="p-12 sm:p-8 bg-white shadow sm:rounded-lg">
 					<div class="table-responsive">
@@ -68,8 +128,8 @@
 												<a href="{{ route('users.showPasswordForm', $user->user_id) }}" class="btn btn-warning btn-sm">
 													{{ __('Cambiar contraseña') }}
 												</a>
-												-->
 											</form>
+												-->
 										</td>
 									</tr>
 								@endforeach
