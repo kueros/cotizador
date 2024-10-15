@@ -70,6 +70,9 @@ Route::middleware('auth')->group(function () {
 	Route::post('/permisos/options', [PermisoController::class, 'options'])->name('permisos.options');
 	Route::get('/permisos/fields', [PermisoController::class, 'fields'])->name('permisos.fields');
     Route::post('/permisos/update-order', [PermisoController::class, 'updateOrder'])->name('permisos.updateOrder');
+
+	Route::get('/permisos', [PermisoController::class, 'index'])->name('permisos.index');
+	Route::post('/permisos/reordenar', [PermisoController::class, 'reordenar'])->name('permisos.reordenar');
 });
 
 Route::middleware('auth')->group(function () {

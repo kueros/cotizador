@@ -15,7 +15,7 @@ return new class extends Migration
             $table->integer('id')->primary()->autoIncrement();
             $table->string('nombre')->nullable();
             $table->integer('orden')->nullable();  // Cambiado a integer
-            $table->integer('modulo_id')->nullable();
+            $table->integer('seccion_id')->nullable();
             $table->timestamps();
         });
 
@@ -24,105 +24,105 @@ return new class extends Migration
 			[
 				'nombre' => 'Acceder al listado de usuarios',
 				'orden' => 1,
-				'modulo_id' => 1,
+				'seccion_id' => 1,
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Agregar usuario',
 				'orden' => 2,
-				'modulo_id' => 1,
+				'seccion_id' => 1,
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Editar usuario',
 				'orden' => 3,
-				'modulo_id' => 1,
+				'seccion_id' => 1,
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Eliminar usuario',
 				'orden' => 4,
-				'modulo_id' => 1,
+				'seccion_id' => 1,
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Administrar campos adicionales para tabla de usuarios',
 				'orden' => 5,
-				'modulo_id' => 1,
+				'seccion_id' => 1,
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Habilitar / Deshabilitar usuario',
 				'orden' => 6,
-				'modulo_id' => 1,
+				'seccion_id' => 1,
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Blanquear contraseña de usuario',
 				'orden' => 7,
-				'modulo_id' => 1,
+				'seccion_id' => 1,
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Cambiar configuraciones de usuarios',
 				'orden' => 8,
-				'modulo_id' => 1,
+				'seccion_id' => 1,
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Asignar Permisos',  // Condición para buscar el permiso
 				'orden' => 9,  // Proporciona un valor por defecto para orden
-				'modulo_id' => 2,  // Proporciona un valor por defecto para modulo_id
+				'seccion_id' => 2,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Acceder al Listado de Roles',  // Condición para buscar el permiso
 				'orden' => 10,  // Proporciona un valor por defecto para orden
-				'modulo_id' => 3,  // Proporciona un valor por defecto para modulo_id
+				'seccion_id' => 3,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Agregar Rol',  // Condición para buscar el permiso
 				'orden' => 11,  // Proporciona un valor por defecto para orden
-				'modulo_id' => 3,  // Proporciona un valor por defecto para modulo_id
+				'seccion_id' => 3,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Editar Rol',  // Condición para buscar el permiso
 				'orden' => 12,  // Proporciona un valor por defecto para orden
-				'modulo_id' => 3,  // Proporciona un valor por defecto para modulo_id
+				'seccion_id' => 3,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Eliminar Rol',  // Condición para buscar el permiso
 				'orden' => 13,  // Proporciona un valor por defecto para orden
-				'modulo_id' => 3,  // Proporciona un valor por defecto para modulo_id
+				'seccion_id' => 3,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Acceder a las configuraciones del software',  // Condición para buscar el permiso
 				'orden' => 4,  // Proporciona un valor por defecto para orden
-				'modulo_id' => 4,  // Proporciona un valor por defecto para modulo_id
+				'seccion_id' => 4,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
 				'nombre' => 'Guardar las configuraciones del software',  // Condición para buscar el permiso
 				'orden' => 4,  // Proporciona un valor por defecto para orden
-				'modulo_id' => 4,  // Proporciona un valor por defecto para modulo_id
+				'seccion_id' => 4,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
 				'updated_at' => now()
 			]

@@ -35,24 +35,24 @@ class GestionarPermisos extends Command
 
     protected function listarPermisos() {
         $permisos = DB::table('permisos')
-            ->orderBy('modulo_id')
+            ->orderBy('seccion_id')
             ->orderBy('orden')
             ->get();
-
+dd($permisos);
         foreach ($permisos as $permiso) {
-            $this->info("Permiso: {$permiso->nombre}, Orden: {$permiso->orden}, Módulo: {$permiso->modulo_id}");
+            $this->info("Permiso: {$permiso->nombre}, Orden: {$permiso->orden}, sección: {$permiso->seccion_id}");
         }
     }
 
     protected function agregarPermiso() {
         $nombre = $this->ask('Ingrese el nombre del permiso');
         $orden = $this->ask('Ingrese el orden del permiso');
-        $modulo_id = $this->ask('Ingrese el ID del módulo');
+        $seccion_id = $this->ask('Ingrese el ID de la sección');
 
         DB::table('permisos')->insert([
             'nombre' => $nombre,
             'orden' => $orden,
-            'modulo_id' => $modulo_id,
+            'seccion_id' => $seccion_id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -61,27 +61,27 @@ class GestionarPermisos extends Command
     }
 
     protected function reordenarPermisos() {
-        $modulo_id = $this->ask('Ingrese el ID del módulo a reordenar');
+        $seccion_id = $this->ask('Ingrese el ID de la sección a reordenar');
         $nuevo_orden = $this->ask('Ingrese el nuevo orden de permisos, separados por comas (ej: 3,1,2)');
 
         $nuevo_orden = explode(',', $nuevo_orden);
         foreach ($nuevo_orden as $index => $permiso_id) {
             DB::table('permisos')
                 ->where('id', $permiso_id)
-                ->where('modulo_id', $modulo_id)
+                ->where('seccion_id', $seccion_id)
                 ->update(['orden' => $index + 1]);
         }
 
         $this->info('Permisos reordenados correctamente.');
     }
 
-	protected function actualizarPermiso($id, $nombre, $orden, $modulo_id) {
+	protected function actualizarPermiso($id, $nombre, $orden, $seccion_id) {
 		return DB::table('permisos')
 			->where('id', $id)
 			->update([
 				'nombre' => $nombre,
 				'orden' => $orden,
-				'modulo_id' => $modulo_id,
+				'seccion_id' => $seccion_id,
 				'updated_at' => now(),
 			]);
 	}

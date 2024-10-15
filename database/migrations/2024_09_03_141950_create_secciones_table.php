@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('modulos', function (Blueprint $table) {
-			$table->integer('id')->primary()->autoIncrement();
+        Schema::create('secciones', function (Blueprint $table) {
+			$table->integer('seccion_id')->primary()->autoIncrement();
 			$table->string('nombre')->nullable();
             $table->timestamps();
-        });
+        }); 
 
-		DB::table('modulos')->insert([
+		DB::table('secciones')->insert([
 			[
 				'nombre' => 'Gestión de Usuarios',
 				'created_at' => now(),
@@ -46,6 +46,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('modulos');
+        Schema::dropIfExists('secciones');
     }
 };
