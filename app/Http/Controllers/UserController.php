@@ -127,7 +127,7 @@ class UserController extends Controller
      */
 	public function update(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
-
+		#dd($user);
 		try {
 			// Lógica de actualización del usuario
 	
