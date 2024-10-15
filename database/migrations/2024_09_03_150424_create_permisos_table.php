@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('permisos', function (Blueprint $table) {
-            $table->integer('id')->primary()->autoIncrement();
+            $table->integer('id')->primary();
             $table->string('nombre')->nullable();
             $table->integer('orden')->nullable();  // Cambiado a integer
             $table->integer('seccion_id')->nullable();
