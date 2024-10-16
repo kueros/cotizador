@@ -9,53 +9,52 @@
 			<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
 				<!-- Acordeón para Opciones -->
-				<div x-data="{ open2: false }" class="border-t border-gray-200 bg-gray-100">
+				<div x-data="{ open2: false }" class="p-12 sm:p-8 bg-white shadow sm:rounded-lg">
 					<button @click="open2 = !open2" class="flex justify-between items-center w-full p-4 font-medium text-left text-gray-800 bg-gray-100 hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500">
 						Opciones
 						<svg :class="{ 'rotate-180': open2, 'rotate-0': !open2 }" class="w-6 h-6 transform transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M5.293 9.707a1 1 0 011.414 0L10 13.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
 						</svg>
 					</button>
-					<div x-show="open2" class="mt-2 p-4 border-t border-gray-200">
+					<div x-show="open2" class=" p-12 border-t border-gray-200">
 						<!-- Contenido de Opciones avanzadas -->
 						<form action="{{ route('users.guardar_opciones', ':id') }}".replace(':id', id) method="POST">
 							@csrf
-								<div class="row">
+								<div class="row" style="margin-bottom:0.5rem;">
 									<div class="form-body">
 										<div class="form-group">
-											<label class="control-label col-md-3">Requerir cambio de contraseña después de 30 días</label>
-											<div class="col-md-9">
+											<label class="control-label p-8">Requerir cambio de contraseña después de 30 días</label>
+											<div style="float:right; margin-right: 25rem;">
 												<input type="checkbox" value="1" <?php #if($reset_password){ echo 'checked'; }?> name="request_change" id="request_change">
-												<span class="help-block"></span>
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="row">
+								<div class="row" style="margin-bottom:0.5rem;">
 									<div class="form-body">
 										<div class="form-group">
-											<label class="control-label col-md-3">Configurar contraseñas</label>
-											<div class="col-md-3">
+											<label class="control-label p-8">Configurar contraseñas</label>
+											<div style="float:right; margin-right: 25rem;">
 												<input type="checkbox" value="1" <?php #if($configurar_claves){ echo 'checked'; }?> name="configurar_claves" id="configurar_claves">
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="row">
+								<div class="row" style="margin-bottom:0.5rem;">
 									<div class="form-body">
 										<div class="form-group">
-											<label class="control-label col-md-3">Permitir múltiples sesiones</label>
-											<div class="col-md-3">
+											<label class="control-label p-8">Permitir múltiples sesiones</label>
+											<div style="float:right; margin-right: 25rem;">
 												<input type="checkbox" value="1" <?php #if($permitir_multiples_sesiones){ echo 'checked'; }?> name="permitir_multiples_sesiones" id="permitir_multiples_sesiones">
 											</div>
 										</div>
 									</div>
 								</div>
-							<div class="row">
+								<div class="row" style="margin-bottom:0.5rem;">
 								<div class="form-body">
 									<div class="form-group">
-										<label class="control-label col-md-3">Tiempo de sesión (segundos)</label>
-										<div class="col-md-3">
+										<label class="control-label p-8">Tiempo de sesión (segundos)</label>
+											<div style="float:right; margin-right: 25rem;">
 											<input class="form-control" name="session_time" type="number" min="60" max="864000" step="1" value=""/><!-- "{{ route('users.blanquear_password', ':id') }}".replace(':id', id) -->
 										</div>
 									</div>
