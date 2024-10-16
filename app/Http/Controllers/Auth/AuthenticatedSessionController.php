@@ -48,49 +48,72 @@
 
 	/**
 	 * Handle an incoming authentication request.
-	 */
-public function store(LoginRequest $request): RedirectResponse
-{
-    try {
-        // Verificamos si la entrada es un email o un username
-        $loginField = filter_var($request->input('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+		*/
+	public function store(LoginRequest $request): RedirectResponse
+	{
+		try {
+			// Verificamos si la entrada es un email o un username
+			$loginField = filter_var($request->input('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        // Intentamos autenticar al usuario con el campo detectado
-        $credentials = [
-            $loginField => $request->input('email'),
-            'password' => $request->input('password'),
-        ];
+			// Buscar el usuario para verificar intentos previos
+			$user = User::where($loginField, $request->input('email'))->first();
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+			if ($user && $user->bloqueado) {
+				return redirect()->route('login')
+								->withErrors(['email' => 'Su cuenta está bloqueada debido a múltiples intentos fallidos.'])
+								->withInput($request->only('email'));
+			}
 
-            // Registro del login exitoso
-            $message = "Solicitud de autenticación recibida. " . json_encode($request->all());
-            $users = User::find(Auth::user()->user_id);
-            Log::info($message);
+			// Intentamos autenticar al usuario con el campo detectado
+			$credentials = [
+				$loginField => $request->input('email'),
+				'password' => $request->input('password'),
+			];
 
-            // Guardar en la tabla de logs de acceso
-            LogAcceso::create([
-                'email' => $users->email,
-                'ip_address' => $_SERVER['REMOTE_ADDR'],
-                'user_agent' => $_SERVER['HTTP_USER_AGENT'],
-            ]);
+			if (Auth::attempt($credentials)) {
+				$request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard', absolute: false));
-        }
+				// Registro del login exitoso
+				$message = "Solicitud de autenticación recibida. " . json_encode($request->all());
+				Log::info($message);
 
-        // En caso de que la autenticación falle
-        return redirect()->route('login')
-                         ->withErrors(['email' => 'Username, email o contraseña incorrectos.'])
-                         ->withInput($request->only('email'));
+				// Restablecer los intentos fallidos
+				$user->intentos_login = 0;
+				$user->ultimo_login = now();
+				$user->save();
 
-    } catch (\Exception $e) {
-        // Manejar la excepción
-        return redirect()->route('login')
-                         ->withErrors(['email' => 'Se produjo un error en el inicio de sesión.'])
-                         ->withInput($request->only('email'));
-    }
-}
+				// Guardar en la tabla de logs de acceso
+				LogAcceso::create([
+					'email' => $user->email,
+					'ip_address' => $_SERVER['REMOTE_ADDR'],
+					'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+				]);
+
+				return redirect()->intended(route('dashboard', absolute: false));
+			} else {
+				// Incrementar el número de intentos fallidos
+				if ($user) {
+					$user->intentos_login += 1;
+
+					// Bloquear la cuenta si hay 3 intentos fallidos
+					if ($user->intentos_login >= 3) {
+						$user->bloqueado = 1;
+					}
+
+					$user->save();
+				}
+
+				return redirect()->route('login')
+								->withErrors(['email' => 'Username, email o contraseña incorrectos.'])
+								->withInput($request->only('email'));
+			}
+		} catch (\Exception $e) {
+			// Manejar la excepción
+			return redirect()->route('login')
+							->withErrors(['email' => 'Se produjo un error en el inicio de sesión.'])
+							->withInput($request->only('email'));
+		}
+	}
 	/**
 	 * Destroy an authenticated session.
 	 */
