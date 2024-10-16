@@ -12,7 +12,7 @@
 	<form method="post" action="{{ route('users.update', $users->user_id) }}" class="mt-6 space-y-6">
 		@csrf
 		@method('patch')
-
+		<?php #dd(route('users.update', $users->user_id)); ?>
 		<div>
 			<x-input-label for="nombre" :value="__('Nombre')" />
 			<x-text-input id="nombre" value="{{ $users->nombre }}" name="nombre" type="text" class="mt-1 block w-full" autocomplete="nombre" />

@@ -127,7 +127,7 @@ class UserController extends Controller
      */
 	public function update(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
-dd("kdk");
+		#dd($user);
 		try {
 		$messages = [
 			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',

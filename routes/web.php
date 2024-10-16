@@ -47,7 +47,8 @@ Route::middleware('auth')->group(function () {
  */	Route::get('/users/create', [UserController::class, 'create'])->name('users.create')->middleware('role:Administrador');
 	Route::post('/users', [UserController::class, 'store'])->name('users.store');
 	Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-	Route::patch('/users/{user}', [UserController::class, 'update'])->name('users.update');
+	#Route::patch('/users/{user}', [UserController::class, 'update'])->name('users.update');
+	Route::patch('/users/{user}/update', [UserController::class, 'update'])->name('users.update');
 	Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 	Route::post('/users/options', [UserController::class, 'options'])->name('users.options');
 	Route::get('/users/fields', [UserController::class, 'fields'])->name('users.fields');
