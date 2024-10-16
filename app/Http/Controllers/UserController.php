@@ -131,6 +131,7 @@ class UserController extends Controller
 		try {
 			// Lógica de actualización del usuario
 	
+		dd($request);
 		#dd($request->all());
 		// Definir los mensajes de error personalizados
 		#dd("9".Auth::user()->username );
