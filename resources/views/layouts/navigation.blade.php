@@ -119,8 +119,7 @@
 							<div>{{ Auth::user()->username }}</div>
 
 							<div class="ms-1">
-								v
-								<span class="caret"></span>
+									<i class="fas fa-caret-down"></i>
 							</div>
 						</button>
 					</x-slot>
