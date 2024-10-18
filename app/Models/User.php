@@ -15,7 +15,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable //implements MustVerifyEmail
 {
     use HasFactory, Notifiable, SoftDeletes;
 

@@ -116,34 +116,16 @@ class UserController extends Controller
 
 			$user = User::where('email', $validatedData['email'])
 						->first();
-			#dd($user);
 			//Genero email por la creacion de usuario
 			$email = $user->email;
-			#dd($email);
 			$username = $user->username;
 			$nombre = $user->nombre;
-			#dd($nombre);
-			#$token = Password::createToken($user);
 			$token = Str::random(60);
-			#$token = $validatedData['_token'];
-			#dd($token);
-			$link = route('password.reset.form', ['token' => $token, 'email' => $email]);
-			#$link = route('password.reset.form', ['email' => $email]);
+			$link = route('create_pass_form', ['token' => $token, 'email' => $email]);
 			$subject = "Aviso de creación de cuenta y cambio de contraseña";
 			$body = '<p>Hola '.$nombre.',</p>Se ha registrado una nueva cuenta en el sistema de gestión Aleph Manager con su email, su nombre de usuario es "'.$username.'" para continuar la verificación y cambiar la contraseña siga el siguiente link a continuacion:<br><a href="'.$link.'">Haz clic aquí</a>';
 			$to = $email;
-			#dd($body);
-			#dd($email);
-			#dd($to);
 			$myController->enviar_email($to, $body, $subject);
-
-
-#			$token = Password::createToken($user);
-
-
-			#$validatedData->sendEmailVerificationNotification();
-
-
 
 			Log::info('Correo enviado exitosamente a ' . $to);
 			return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
@@ -407,7 +389,7 @@ class UserController extends Controller
 				// Generar la URL para el restablecimiento de contraseña con el token
 				#$resetUrl = route('users.password.reset?token='.$token);
 				#$resetUrl = route('password.reset') . '?token=' . $token;
-				$resetUrl = route('password.reset.form', ['token' => $token, 'email' => $email]);
+				$resetUrl = route('reset_pass_form', ['token' => $token, 'email' => $email]);
 				// Enviar correo
 				$subject = "Aviso de blanqueo de contraseña";
 				$body = 'Se ha realizado un blanqueo de su contraseña en Aleph Manager, para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';

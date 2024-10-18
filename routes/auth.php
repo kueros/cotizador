@@ -35,9 +35,16 @@ Route::middleware('guest')->group(function () {
 	*/
 
 });
-
-Route::get('password_reset/{token}/{email}', 		[NewPasswordController::class, 'create'])->name('password.reset.form');
+####	
+Route::get('reset_pass/{token}/{email}', 			[NewPasswordController::class, 'reset_pass'])->name('reset_pass_form');
 Route::post('password_reset', 						[NewPasswordController::class, 'password_reset'])->name('resetear_password');	
+
+###
+Route::get('create_pass/{token}/{email}', 			[NewPasswordController::class, 'create_pass'])->name('create_pass_form');
+Route::post('/password_create', 					[NewPasswordController::class, 'store'])->name('crear_password');
+###
+
+
 
 
 Route::middleware('auth')->group(function () {
