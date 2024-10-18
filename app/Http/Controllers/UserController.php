@@ -13,13 +13,18 @@ use App\Models\Rol;
 use App\Http\Controllers\MyController;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Password;
+use illuminate\Support\Str;
 
 
 class UserController extends Controller
 {
-        /**
-     * Display a listing of the resource.
-     */
+
+	/**************************************************************************
+	*
+	**************************************************************************/
+	/**
+	 * Display a listing of the resource.
+	 */
 	public function index(Request $request): View
 	{
 		$users = User::withoutTrashed()
@@ -30,6 +35,9 @@ class UserController extends Controller
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
 
+	/**************************************************************************
+	*
+	**************************************************************************/
 	/**
 	 * Show the form for creating a new resource.
 	 */
@@ -40,12 +48,15 @@ class UserController extends Controller
 		return view('user.create', compact('user', 'roles'));
 	}
 
-
+	/**************************************************************************
+	*
+	**************************************************************************/
 	/**
 	 * Store a newly created resource in storage.
 	 */
 	public function store(Request $request, MyController $myController): RedirectResponse
 	{
+		#dd($request);
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
 			'username' => 'required|string|max:255',
@@ -61,7 +72,7 @@ class UserController extends Controller
 			->where('username', $validatedData['username'])
 			->orWhere('email', $validatedData['email'])
 			->first();
-
+		#dd($existingUser);
 		if ($existingUser) {
 			// Restaurar el usuario si está soft deleted
 			$existingUser->restore();
@@ -86,7 +97,7 @@ class UserController extends Controller
 		} else {
 
 			// Si no existe un usuario soft deleted, crear uno nuevo
-			User::create($validatedData);
+			$user = User::create($validatedData);
 
 			$clientIP = \Request::ip();
 			$userAgent = \Request::userAgent();
@@ -95,38 +106,84 @@ class UserController extends Controller
 			$message = $username . " creó el usuario " . $validatedData['username'];
 			$myController->loguear($clientIP, $userAgent, $username, $action, $message);
 
+			#Envío de mail al administrador que creó de la cuenta del usuario
 			$subject = "Creación de usuario";
 			$body = "Usuario ". $validatedData['username'] . " creado correctamente por ". Auth::user()->username;
 			$to = Auth::user()->email;
 			$myController->enviar_email($to, $body, $subject);
+
+			#Envío de mail al usuario de la nueva cuenta creada
+
+			$user = User::where('email', $validatedData['email'])
+						->first();
+			#dd($user);
+			//Genero email por la creacion de usuario
+			$email = $user->email;
+			#dd($email);
+			$username = $user->username;
+			$nombre = $user->nombre;
+			#dd($nombre);
+			#$token = Password::createToken($user);
+			$token = Str::random(60);
+			#$token = $validatedData['_token'];
+			#dd($token);
+			$link = route('password.reset.form', ['token' => $token, 'email' => $email]);
+			#$link = route('password.reset.form', ['email' => $email]);
+			$subject = "Aviso de creación de cuenta y cambio de contraseña";
+			$body = '<p>Hola '.$nombre.',</p>Se ha registrado una nueva cuenta en el sistema de gestión Aleph Manager con su email, su nombre de usuario es "'.$username.'" para continuar la verificación y cambiar la contraseña siga el siguiente link a continuacion:<br><a href="'.$link.'">Haz clic aquí</a>';
+			$to = $email;
+			#dd($body);
+			#dd($email);
+			#dd($to);
+			$myController->enviar_email($to, $body, $subject);
+
+
+#			$token = Password::createToken($user);
+
+
+			#$validatedData->sendEmailVerificationNotification();
+
+
 
 			Log::info('Correo enviado exitosamente a ' . $to);
 			return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
 		}
 	}
 
-/**
-     * Display the specified resource.
-     */
-    public function show($id): View
-    {
-        $user = User::find($id);
-    return view('user.show', compact('user'));
-    }
+	/**************************************************************************
+	*
+	**************************************************************************/
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id): View
-    {
+	/**
+	 * Display the specified resource.
+	 */
+	public function show($id): View
+	{
+		$user = User::find($id);
+	return view('user.show', compact('user'));
+	}
+
+	/**************************************************************************
+	*
+	**************************************************************************/
+
+	/**
+	 * Show the form for editing the specified resource.
+	 */
+	public function edit($id): View
+	{
 		$roles = Rol::all();
-        $users = User::find($id);
-        return view('user.edit', compact('users', 'roles'));
-    }
+		$users = User::find($id);
+		return view('user.edit', compact('users', 'roles'));
+	}
 
-    /**
-     * Update the specified resource in storage.
-     */
+	/**************************************************************************
+	*
+	**************************************************************************/
+
+	/**
+	 * Update the specified resource in storage.
+	 */
 	public function update(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
 		#dd($user);
@@ -170,19 +227,22 @@ class UserController extends Controller
 			dd("1".Auth::user()->username );
 		}
 		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
-    } catch (TokenMismatchException $e) {
+	} catch (TokenMismatchException $e) {
 		dd("2".Auth::user()->username );
-        // Si se detecta un error 419, forzamos el redireccionamiento al login
-        return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
-    } catch (\Exception $e) {
+		// Si se detecta un error 419, forzamos el redireccionamiento al login
+		return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
+	} catch (\Exception $e) {
 		dd("3".Auth::user()->username );
-        // Si cualquier otro error ocurre, puedes manejarlo aquí o lanzar una excepción genérica
-        return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
-    }
+		// Si cualquier otro error ocurre, puedes manejarlo aquí o lanzar una excepción genérica
+		return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
+	}
 
 	}
 
-	
+	/**************************************************************************
+	*
+	**************************************************************************/
+
 	public function destroy($id, MyController $myController): RedirectResponse
 	{
 		// Encuentra el usuario por su ID
@@ -214,7 +274,7 @@ class UserController extends Controller
 			$user->save();
 			return response()->json(['success'=> true]);
 		} else {
-	        return response()->json('No se puede blanquear tu propia clave', 403);
+			return response()->json('No se puede blanquear tu propia clave', 403);
 		}
 	}				
 
@@ -244,21 +304,9 @@ class UserController extends Controller
 		return redirect()->route('users.index')->with('success', 'Contraseña actualizada correctamente');
 	}
 
-/* 	public function blanquear_password($user_id)
-	{
-		#echo Auth::user()->user_id;
-		if(Auth::user()->user_id != $user_id) 
-		{
-			// Actualiza la contraseña del usuario
-			$user = User::find($user_id);
-			$user->password = null;
-			$user->save();
-			return response()->json(['success'=> true]);
-		} else {
-	        return response()->json('No se puede blanquear tu propia clave', 403);
-		}
-	}				
- */
+	/**************************************************************************
+	*
+	**************************************************************************/
 
 	public function unlockAccount(Request $request, $userId)
 	{
@@ -278,8 +326,9 @@ class UserController extends Controller
 		return redirect()->route('password.change', ['userId' => $user->user_id]);
 	}
 
-
-
+	/**************************************************************************
+	 * Display a listing of the resource.
+	 */
 
 	public function showChangePasswordForm(Request $request)
 	{
@@ -287,6 +336,10 @@ class UserController extends Controller
 		$token = $request->input('token');
 		return view('auth.passwords.reset', ['token' => $token]);
 	}
+
+	/**************************************************************************
+	 * Display a listing of the resource.
+	 */
 
 	public function changePassword(Request $request, $userId)
 	{
@@ -310,7 +363,10 @@ class UserController extends Controller
 		return redirect()->route('login')->with('success', 'Contraseña actualizada con éxito. Inicie sesión con su nueva contraseña.');
 	}
 
-	
+	/**************************************************************************
+	 * Display a listing of the resource.
+	 */
+
 	public function showPasswordForm($id)
 	{
 		// Busca el usuario por ID
@@ -326,6 +382,10 @@ class UserController extends Controller
 		return view('user.index', compact('users', 'selectedUser'))
 			->with('i', (request()->input('page', 1) - 1) * $users->perPage());
 	}
+
+	/**************************************************************************
+	 * Blanqueo de passwords.
+	 */
 
 	public function blanquear_password($user_id, MyController $myController)
 	{
@@ -360,6 +420,10 @@ class UserController extends Controller
 			return response()->json('No se puede blanquear tu propia clave', 403);
 		}
 	}
+
+	/**************************************************************************
+	* Display a listing of the resource.
+	**************************************************************************/
 
 	public function showResetForm(Request $request)
 	{

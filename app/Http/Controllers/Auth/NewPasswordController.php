@@ -62,7 +62,7 @@ class NewPasswordController extends Controller
 
     public function showResetForm(Request $request)
 	{
-		dd($request);
+		#dd($request);
 		$token = $request->query('token');
 		return view('auth.password_reset', ['token' => $token]);
 	}
@@ -103,10 +103,4 @@ class NewPasswordController extends Controller
             return back()->withErrors(['email' => [__($status)]]);
         }
     }
-/*
-
-Hay que ver por qué no está llegando el email que es por lo que falla la validación de la línea 95
-
-*/
-
 }

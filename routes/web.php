@@ -11,6 +11,9 @@ use App\Http\Controllers\OrderShipmentController;
 use App\Http\Controllers\MyController;
 use App\Http\Controllers\PermisoController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+
 
 Route::get('/', function () {
 	#return view('welcome');
@@ -56,6 +59,25 @@ Route::middleware('auth')->group(function () {
 	Route::patch('/users/{id}/deshabilitar', 		[UserController::class, 'deshabilitar_usuario'])->name('users.deshabilitar_usuario');
 	Route::get('/unlock-account/{userId}', 			[UserController::class, 'unlockAccount'])->name('account.unlock');
 });
+
+
+// Ruta para mostrar un mensaje después del registro para que el usuario verifique su correo
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// Ruta para verificar el correo cuando el usuario hace clic en el enlace
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/home'); // Cambia esta ruta según tu aplicación
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// Ruta para reenviar el correo de verificación
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
 
 Route::middleware('auth')->group(function () {
 	Route::get('/permisos', [PermisoController::class, 'index'])->name('permisos.index');

@@ -118,22 +118,16 @@
 												<span class="fas fa-clock"></span>
 											</a>
 
-
-
-
-
-
-
 											<a class="btn btn-sm btn-outline-info" href="javascript:void(0)" title="Blanquear" onclick="blanquear_psw('{{ $user->user_id }}')">
 												<i class="fas fa-key"></i></a>
 											<a class="btn btn-sm btn-outline-danger" title="Eliminar" href="{{ route('users.edit', $user->user_id) }}">
 												<i class="fas fa-trash"></i>
 											</a>
 										</td>
-												<!-- Botón para abrir el formulario de cambiar contraseña -->
+												<!-- Botón para abrir el formulario de cambiar contraseña
 												<a href="{{ route('password.change', $user->user_id) }}" class="btn btn-warning btn-sm">
 													{{ __('Cambiar contraseña') }}
-												</a>
+												</a> -->
 											</form>
 												
 										</td>
