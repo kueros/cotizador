@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Rol;
 use App\Http\Controllers\MyController;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Password;
+
 
 class UserController extends Controller
 {
@@ -200,77 +202,6 @@ class UserController extends Controller
 		return Redirect::route('users.index')
 		->with('success', 'Usuario eliminado correctamente.');
 	}
-	public function showPasswordForm($id)
-	{
-		// Busca el usuario por ID
-		$selectedUser = User::find($id);
-	
-		// Obtiene la lista de todos los usuarios (tal como en la función index)
-		$users = User::withoutTrashed()
-			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
-			->select('users.*', 'roles.nombre as nombre_rol')
-			->paginate();
-	
-		// Devuelve la vista de usuarios con la lista de usuarios y el formulario de cambio de contraseña activo
-		return view('user.index', compact('users', 'selectedUser'))
-			->with('i', (request()->input('page', 1) - 1) * $users->perPage());
-	}
-	
-	
-	public function updatePassword(Request $request, $id)
-	{
-		$request->validate([
-			'password' => 'required|confirmed|min:8',
-		]);
-	
-		// Actualiza la contraseña del usuario
-		$user = User::find($id);
-		$user->password = bcrypt($request->password);
-		$user->save();
-	
-		return redirect()->route('users.index')->with('success', 'Contraseña actualizada correctamente');
-	}
-	
-/* 	public function deshabilitar_usuario($id) {
-		try {
-			$user = User::findOrFail($id);
-			$user->habilitado = false;
-			$user->save();
-			return response()->json(['success' => true]);
-		} catch (\Exception $e) {
-			return response()->json(['error' => $e->getMessage()], 500);
-		}
-	}
- */
-
-
-	public function deshabilitar_usuario(Request $request, $id) {
-		try {
-			$user = User::findOrFail($id);
-			$user->habilitado = $request->input('temporal'); // Valor enviado por AJAX
-			#echo $user->habilitado;
-			$user->save(); // Guardar los cambios en la base de datos
-			return response()->json(['success' => true]);
-		} catch (\Exception $e) {
-			return response()->json(['error' => $e->getMessage()], 500);
-		}
-	}
-
-	public function blanquear_password($user_id)
-	{
-		#echo Auth::user()->user_id;
-		if(Auth::user()->user_id != $user_id) 
-		{
-			// Actualiza la contraseña del usuario
-			$user = User::find($user_id);
-			$user->password = null;
-			$user->save();
-			return response()->json(['success'=> true]);
-		} else {
-	        return response()->json('No se puede blanquear tu propia clave', 403);
-		}
-	}				
-
 
 	public function guardar_opciones(Request $request, $user_id)
 	{
@@ -286,6 +217,158 @@ class UserController extends Controller
 	        return response()->json('No se puede blanquear tu propia clave', 403);
 		}
 	}				
+
+	public function deshabilitar_usuario(Request $request, $id) {
+		try {
+			$user = User::findOrFail($id);
+			$user->habilitado = $request->input('temporal'); // Valor enviado por AJAX
+			#echo $user->habilitado;
+			$user->save(); // Guardar los cambios en la base de datos
+			return response()->json(['success' => true]);
+		} catch (\Exception $e) {
+			return response()->json(['error' => $e->getMessage()], 500);
+		}
+	}
+		
+	public function updatePassword(Request $request, $id)
+	{
+		$request->validate([
+			'password' => 'required|confirmed|min:8',
+		]);
+	
+		// Actualiza la contraseña del usuario
+		$user = User::find($id);
+		$user->password = bcrypt($request->password);
+		$user->save();
+	
+		return redirect()->route('users.index')->with('success', 'Contraseña actualizada correctamente');
+	}
+
+/* 	public function blanquear_password($user_id)
+	{
+		#echo Auth::user()->user_id;
+		if(Auth::user()->user_id != $user_id) 
+		{
+			// Actualiza la contraseña del usuario
+			$user = User::find($user_id);
+			$user->password = null;
+			$user->save();
+			return response()->json(['success'=> true]);
+		} else {
+	        return response()->json('No se puede blanquear tu propia clave', 403);
+		}
+	}				
+ */
+
+	public function unlockAccount(Request $request, $userId)
+	{
+		// Buscar al usuario por ID
+		$user = User::find($userId);
+
+		if (!$user || !$user->bloqueado) {
+			return redirect()->route('login')->withErrors('Cuenta no encontrada o ya está desbloqueada.');
+		}
+
+		// Desbloquear al usuario
+		$user->bloqueado = 0;
+		$user->intentos_login = 0;
+		$user->save();
+
+		// Redirigir a la página para cambiar la contraseña
+		return redirect()->route('password.change', ['userId' => $user->user_id]);
+	}
+
+
+
+
+	public function showChangePasswordForm(Request $request)
+	{
+		echo 'token '.$request;
+		$token = $request->input('token');
+		return view('auth.passwords.reset', ['token' => $token]);
+	}
+
+	public function changePassword(Request $request, $userId)
+	{
+		$request->validate([
+			'password' => [
+				'required',
+				'confirmed',
+				'min:8',
+				'regex:/[a-z]/',      // Al menos una letra minúscula
+				'regex:/[A-Z]/',      // Al menos una letra mayúscula
+				'regex:/[0-9]/',      // Al menos un número
+				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+			],
+		]);
+
+		// Buscar al usuario y actualizar la contraseña
+		$user = User::find($userId);
+		$user->password = Hash::make($request->input('password'));
+		$user->save();
+
+		return redirect()->route('login')->with('success', 'Contraseña actualizada con éxito. Inicie sesión con su nueva contraseña.');
+	}
+
+	
+	public function showPasswordForm($id)
+	{
+		// Busca el usuario por ID
+		$selectedUser = User::find($id);
+	
+		// Obtiene la lista de todos los usuarios (tal como en la función index)
+		$users = User::withoutTrashed()
+			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
+			->select('users.*', 'roles.nombre as nombre_rol')
+			->paginate();
+	
+		// Devuelve la vista de usuarios con la lista de usuarios y el formulario de cambio de contraseña activo
+		return view('user.index', compact('users', 'selectedUser'))
+			->with('i', (request()->input('page', 1) - 1) * $users->perPage());
+	}
+
+	public function blanquear_password($user_id, MyController $myController)
+	{
+		#echo "kdk1 ".$user_id;
+		if(Auth::user()->user_id != $user_id) 
+		{
+			// Actualiza la contraseña del usuario
+			$user = User::find($user_id);
+			if ($user) {
+				// Poner el campo 'password' a null y resetear los intentos de login
+				$user->password = null;
+				$user->intentos_login = 0;
+				$user->bloqueado = 0; // Desbloquea al usuario si estaba bloqueado
+				$user->save();
+				// Generar el token de restablecimiento de contraseña
+				$token = Password::createToken($user);
+				$email = $user->email;
+
+				// Generar la URL para el restablecimiento de contraseña con el token
+				#$resetUrl = route('users.password.reset?token='.$token);
+				#$resetUrl = route('password.reset') . '?token=' . $token;
+				$resetUrl = route('password.reset.form', ['token' => $token, 'email' => $email]);
+				// Enviar correo
+				$subject = "Aviso de blanqueo de contraseña";
+				$body = 'Se ha realizado un blanqueo de su contraseña en Aleph Manager, para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';
+				$to = $user->email;
+				echo "kdk2 ".$resetUrl;
+				$myController->enviar_email($to, $body, $subject);
+				return response()->json(['success' => true, 'message' => 'Contraseña blanqueada y correo enviado con éxito.']);
+			}
+		} else {
+			return response()->json('No se puede blanquear tu propia clave', 403);
+		}
+	}
+
+	public function showResetForm(Request $request)
+	{
+		dd($request);
+		$token = $request->query('token');
+		$email = $request->query('email');
+		return view('auth.password_reset', ['token' => $token],['email' => $email]);
+	}
+
 
 
 }

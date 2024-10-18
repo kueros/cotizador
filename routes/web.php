@@ -37,27 +37,24 @@ Route::middleware('auth')->group(function () {
 });
 //->middleware('custom.csrf')
 Route::middleware('auth')->group(function () {
-	Route::get('/users', [UserController::class, 'index'])->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
-	Route::get('/show/{id}', [UserController::class, 'show'])->name('users.show');
-/* 	Route::get('/admin', function () {
+	Route::get('/users', 							[UserController::class, 'index'])->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
+	Route::get('/show/{id}', 						[UserController::class, 'show'])->name('users.show');
+	/* 	Route::get('/admin', function () {
 		// Solo los usuarios con el rol de 'admin' pueden acceder
 	})->middleware('role:Administrador');
- */	Route::get('/users/create', [UserController::class, 'create'])->name('users.create')->middleware('role:Administrador');
-	Route::post('/users', [UserController::class, 'store'])->name('users.store');
-	Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-	#Route::patch('/users/{user}', [UserController::class, 'update'])->name('users.update');
-	Route::patch('/users/{user}/update', [UserController::class, 'update'])->name('users.update');
-	Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-	Route::post('/users/options', [UserController::class, 'options'])->name('users.options');
-	Route::get('/users/fields', [UserController::class, 'fields'])->name('users.fields');
-// Ruta para mostrar el formulario de cambio de contraseña
-	Route::get('/users/{id}/password', [UserController::class, 'showPasswordForm'])->name('users.showPasswordForm');
-// Ruta para actualizar la contraseña
-	Route::patch('/users/{id}/password', [UserController::class, 'updatePassword'])->name('password.update');
-// Ruta para blanquear la contraseña
-	Route::patch('/users/{id}/blanquear_password', [UserController::class, 'blanquear_password'])->name('users.blanquear_password');
-// Ruta para deshabilitar usuarios
-	Route::patch('/users/{id}/deshabilitar', [UserController::class, 'deshabilitar_usuario'])->name('users.deshabilitar_usuario');
+ 	*/	
+	Route::get('/users/create', 					[UserController::class, 'create'])->		name('users.create')->middleware('role:Administrador');
+	Route::post('/users', 							[UserController::class, 'store'])->name('users.store');
+	Route::get('/users/{user}/edit', 				[UserController::class, 'edit'])->name('users.edit');
+	Route::patch('/users/{user}', 					[UserController::class, 'update'])->name('users.update');
+	#Route::patch('/users/{user}/update', [UserController::class, 'update'])->name('users.update');
+	Route::delete('/users/{user}', 					[UserController::class, 'destroy'])->name('users.destroy');
+	Route::post('/users/options', 					[UserController::class, 'options'])->name('users.options');
+	Route::get('/users/guardar_opciones', 			[UserController::class, 'guardar_opciones'])->name('users.guardar_opciones');
+	
+	Route::patch('/users/{id}/blanquear_password', 	[UserController::class, 'blanquear_password'])->name('users.blanquear_password');
+	Route::patch('/users/{id}/deshabilitar', 		[UserController::class, 'deshabilitar_usuario'])->name('users.deshabilitar_usuario');
+	Route::get('/unlock-account/{userId}', 			[UserController::class, 'unlockAccount'])->name('account.unlock');
 });
 
 Route::middleware('auth')->group(function () {

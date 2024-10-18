@@ -117,18 +117,25 @@
 											<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar temporalmente" onclick="deshabilitar_usuario('{{ $user->user_id}}',2)">
 												<span class="fas fa-clock"></span>
 											</a>
+
+
+
+
+
+
+
 											<a class="btn btn-sm btn-outline-info" href="javascript:void(0)" title="Blanquear" onclick="blanquear_psw('{{ $user->user_id }}')">
 												<i class="fas fa-key"></i></a>
 											<a class="btn btn-sm btn-outline-danger" title="Eliminar" href="{{ route('users.edit', $user->user_id) }}">
 												<i class="fas fa-trash"></i>
 											</a>
 										</td>
-												<!-- Botón para abrir el formulario de cambiar contraseña 
-												<a href="{{ route('users.showPasswordForm', $user->user_id) }}" class="btn btn-warning btn-sm">
+												<!-- Botón para abrir el formulario de cambiar contraseña -->
+												<a href="{{ route('password.change', $user->user_id) }}" class="btn btn-warning btn-sm">
 													{{ __('Cambiar contraseña') }}
 												</a>
 											</form>
-												-->
+												
 										</td>
 									</tr>
 								@endforeach

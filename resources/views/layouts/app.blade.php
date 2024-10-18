@@ -38,7 +38,9 @@
 	</style>
 
 	<div class="min-h-screen bg-gray-100">
-		@include('layouts.navigation')
+		@if(Auth::check())
+			@include('layouts.navigation')
+		@endif
 
 		<!-- Page Heading -->
 		@isset($header)

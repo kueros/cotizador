@@ -14,16 +14,31 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::middleware('guest')->group(function () {
-	Route::get('register', 					[RegisteredUserController::class, 'create'])->name('register');
-	Route::post('register', 				[RegisteredUserController::class, 'store']);
-	Route::get('login', 					[AuthenticatedSessionController::class, 'create'])->name('login');
-	Route::post('login', 					[AuthenticatedSessionController::class, 'store']);
-	Route::get('forgot-password', 			[PasswordResetLinkController::class, 'create'])->name('password.request');
-	Route::post('forgot-password', 			[PasswordResetLinkController::class, 'store'])->name('password.email');
-	Route::post('update-password', 			[PasswordController::class, 'update'])->name('password.update');
-	Route::get('reset-password/{token}', 	[NewPasswordController::class, 'create'])->name('password.reset');
-	Route::post('reset-password', 			[NewPasswordController::class, 'store'])->name('password.store');
+	Route::get('register', 							[RegisteredUserController::class, 'create'])->name('register');
+	Route::post('register', 						[RegisteredUserController::class, 'store']);
+	Route::get('login', 							[AuthenticatedSessionController::class, 'create'])->name('login');
+	Route::post('login', 							[AuthenticatedSessionController::class, 'store']);
+	Route::get('forgot-password', 					[PasswordResetLinkController::class, 'create'])->name('password.request');
+	Route::post('forgot-password', 					[PasswordResetLinkController::class, 'store'])->name('password.email');
+	Route::post('update-password', 					[PasswordController::class, 'update'])->name('password.update');
+	Route::post('reset-password', 					[NewPasswordController::class, 'store'])->name('password.store');
+	#Route::get('reset-password/{token}', 			[NewPasswordController::class, 'create'])->name('password.reset');
+	Route::get('password_change', 					[NewPasswordController::class, 'showResetForm'])->name('password.change');
+	
+	#Route::get('/users/{id}/password', [UserController::class, 'showPasswordForm'])->name('users.showPasswordForm');
+	#	Route::patch('/users/{id}/password', [UserController::class, 'updatePassword'])->name('password.update');
+	/* 	Route::get('/change-password/{userId}', [UserController::class, 'showPasswordForm'])->name('users.showPasswordForm');
+		Route::post('/change-password/{userId}', [UserController::class, 'changePassword'])->name('password.update');
+	
+		Route::get('/usuarios/cambiar_password', 		[UserController::class, 'showResetForm'])->name('password.change');
+		Route::post('/usuarios/cambiar_password', 		[UserController::class, 'resetPassword'])->name('password.reset');
+	*/
+
 });
+
+Route::get('password_reset/{token}/{email}', 		[NewPasswordController::class, 'create'])->name('password.reset.form');
+Route::post('password_reset', 						[NewPasswordController::class, 'password_reset'])->name('resetear_password');	
+
 
 Route::middleware('auth')->group(function () {
 	Route::get('verify-email', 						EmailVerificationPromptController::class)->name('verification.notice');

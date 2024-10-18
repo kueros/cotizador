@@ -8,7 +8,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Rol;
+use Illuminate\Support\Facades\Password;
 
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -88,4 +92,28 @@ class User extends Authenticatable
         $rol = Rol::where('nombre', $rol)->firstOrFail();
         $this->roles()->attach($rol);
     }
+
+    public static function reset(array $credentials, \Closure $callback)
+    {
+        #dd($credentials);
+        // Buscar el usuario por su email y token
+        $user = self::where('token', $credentials['token'])
+                    ->first();
+
+        if (!$user) {
+            return Password::INVALID_USER;
+        }
+
+        // Llamar al callback que actualiza la contraseña
+        $callback($user, $credentials['password']);
+
+        // Generar un nuevo token de seguridad y guardar los cambios
+        $user->forceFill([
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        return Password::PASSWORD_RESET;
+    }
+
+
 }
