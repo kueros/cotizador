@@ -14,7 +14,7 @@ return new class extends Migration
 	public function up(): void
 	{
 		Schema::create('permisos_x_rol', function (Blueprint $table) {
-			$table->integer('permisos_x_rol_id')->primary()->autoIncrement();
+			$table->integer('id')->primary()->autoIncrement();
 			$table->integer('rol_id')->nullable();
 			$table->integer('permiso_id')->nullable();
 			$table->tinyInteger('habilitado')->default(1);
