@@ -1,8 +1,3 @@
-<?php
-use App\Models\Permiso_x_Rol;
-
-?>
-
 <x-app-layout :roles="$roles">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -44,36 +39,31 @@ use App\Models\Permiso_x_Rol;
 												</thead>
 														<?php 
 														#dd($permisosRoles); 
-														#dd($permisos);
+														#dd($permisoRol);
 														#dd($secciones);
 														#dd($roles);
 														?>
 												<tbody>
 													<tr>
-													@foreach ($permisos as $permiso)
-													<?php #var_dump($permiso); ?>
-														@if ($permiso->seccion_id == $seccion->seccion_id) 
-													<?php #var_dump($permiso); ?>
+													@foreach ($permisosRoles as $permisoRol)
+														@if ($permisoRol->seccion_id == $seccion->seccion_id) 
+													<?php var_dump($permisoRol); ?>
 															<!-- Filtra permisos por sección -->
-																<td>{{ $permiso->nombre }}</td>
-																	@foreach ($roles as $rol)
+																<td>{{ $permisoRol->permiso_nombre }}</td>
 																<td>
-																		<?php $checked = "";
-																		$permisoRol = Permiso_x_Rol::where('rol_id', $rol->rol_id)
-																									->where('permiso_id', $permiso->id)
-																									->first();
-																		// Comprobación
-																		if ($permisoRol) {
-																			if ($permisoRol->habilitado == 1) {
-																				$checked = "checked";
-																			} 
-																		}
+																	@foreach ($roles as $rol)
+																		<?php 
+																		$checked = "";
+																		if( $permisoRol->seccion_id == $seccion->seccion_id &&
+																			$permisoRol->rol_id == $rol->rol_id &&
+																			$permisoRol->habilitado == 1 )
+																			{ $checked = "checked"; }
 																		?>
 																	<!-- Checkbox por cada rol y permiso -->
-																	<input type="checkbox" name="permisos[{{ $rol->rol_id }}][{{ $permiso->permiso_id }}]" value="1"
+																	<input type="checkbox" name="permisos[{{ $rol->rol_id }}][{{ $permisoRol->permiso_id }}]" value="1"
 																	<?php echo $checked; ?> >
-																</td>
 																	@endforeach
+																</td>
 															@endif													
 													@endforeach
 													</tr>
