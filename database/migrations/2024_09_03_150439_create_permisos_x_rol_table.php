@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
 
 return new class extends Migration
 {
@@ -12,6 +14,7 @@ return new class extends Migration
 	public function up(): void
 	{
 		Schema::create('permisos_x_rol', function (Blueprint $table) {
+			$table->integer('id')->primary()->autoIncrement();
 			$table->integer('rol_id')->nullable();
 			$table->integer('permiso_id')->nullable();
 			$table->tinyInteger('habilitado')->default(1);

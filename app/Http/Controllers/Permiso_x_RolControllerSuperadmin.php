@@ -16,12 +16,16 @@ class Permiso_x_RolControllerSuperadmin extends Controller
     public function index()
     {
         // Obtener todos los roles con sus permisos
-        $rols = Rol::with('permisos')->get();
+        $roles = Rol::with('permisos')->get();
 
         // Obtener todos los permisos ordenados
         $permisos = Permiso::orderBy('orden', 'asc')->get();
 
-        return view('permiso_x_rol.index', compact('rols', 'permisos'));
+        $permisosRoles = Permiso_x_rol::all();//with(['permiso', 'permiso.seccion', 'rol'])
+            #->where('rol_id', 1) // Ejemplo: Filtro por un rol específico
+            ->get();
+dd($permisosRoles);
+        return view('permiso_x_rol.index', compact('roles', 'permisos', 'permisosRoles'));
     }
 
 

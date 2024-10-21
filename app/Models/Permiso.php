@@ -14,7 +14,7 @@ class Permiso extends Model
 	protected $fillable = [
 		'nombre',
 		'orden',
-		'modulo_id',
+		'seccion_id',
 	];
 
 	public function roles()
@@ -24,8 +24,8 @@ class Permiso extends Model
 			->withPivot('habilitado');
 	}
 
-	public function modulo()
+	public function seccion()
 	{
-		return $this->belongsTo(Modulo::class);
+		return $this->belongsTo(Seccion::class);
 	}
 }
