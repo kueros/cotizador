@@ -439,7 +439,7 @@ class UserController extends Controller
 				$subject = "Aviso de blanqueo de contraseña";
 				$body = 'Se ha realizado un blanqueo de su contraseña en Aleph Manager, para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';
 				$to = $user->email;
-				echo "kdk2 ".$resetUrl;
+				#echo "kdk2 ".$resetUrl;
 				$myController->enviar_email($to, $body, $subject);
 				return response()->json(['success' => true, 'message' => 'Contraseña blanqueada y correo enviado con éxito.']);
 			}
