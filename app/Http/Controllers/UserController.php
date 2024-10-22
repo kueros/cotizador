@@ -11,9 +11,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Rol;
 use App\Http\Controllers\MyController;
+use App\Models\Permiso_x_rol;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Password;
 use illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 
 class UserController extends Controller
@@ -25,13 +27,22 @@ class UserController extends Controller
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index(Request $request): View
+	public function index(Request $request, MyController $myController): View
 	{
+		$permiso_listar_usuarios = $myController->tiene_permiso('Listar usuarios');
+		$permiso_agregar_usuario = $myController->tiene_permiso('Agregar usuario');
+		$permiso_editar_usuario = $myController->tiene_permiso('Editar usuario');
+		$permiso_eliminar_usuario = $myController->tiene_permiso('Eliminar usuario');
+		#dd($permiso_listar_usuarios);
+		if (!$permiso_listar_usuarios) {
+			abort(403, 'No tienes permiso para crear usuarios');
+			return false;
+		}
 		$users = User::withoutTrashed()
 		->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
 		->select('users.*', 'roles.nombre as nombre_rol')
 		->paginate();
-		return view('user.index', compact('users'))
+		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
 
@@ -47,6 +58,7 @@ class UserController extends Controller
 		$user = new User();
 		return view('user.create', compact('user', 'roles'));
 	}
+
 
 	/**************************************************************************
 	*

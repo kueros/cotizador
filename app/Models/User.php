@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Rol;
 use Illuminate\Support\Facades\Password;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Hash;
@@ -78,15 +78,6 @@ class User extends Authenticatable //implements MustVerifyEmail
 
     }
 
-    public function hasPermission($permission)
-    {
-        foreach ($this->roles as $rol) {
-            if ($rol->permissions()->where('nombre', $permission)->exists()) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public function assignRole($rol)
     {

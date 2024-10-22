@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\LogAdministracion;
+use App\Models\Permiso_x_rol;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class MyController extends Controller
 {
@@ -22,6 +25,44 @@ class MyController extends Controller
 		Log::info($message);
 		$log->save();
 		return true;
+	}
+
+	public function tiene_permiso($permiso)
+	{
+		#dd($permiso);
+		$user_id = Auth::user()->user_id;
+		#dd($user_id);
+
+		$rol_id = User::
+			where('users.user_id', '=', $user_id)
+			#->orWhere('nombre', 'like', '%opav%')
+			#->orWhere('nombre', 'like', '%copa%')
+			->first()['rol_id'];
+		#dd($rol_id);
+
+
+		$user_permiso = Permiso_x_rol::leftJoin('permisos', 'permisos.id', '=', 'permisos_x_rol.permiso_id')
+			->where('permisos.nombre', '=', $permiso)
+			#->orWhere('nombre', 'like', '%opav%')
+			#->orWhere('nombre', 'like', '%copa%')
+			->first();
+		#dd($user_permiso->id);
+		$data = DB::table('permisos_x_rol')
+					->leftJoin('permisos', 'permisos.id', '=', 'permisos_x_rol.permiso_id')
+					->leftJoin('roles', 'permisos_x_rol.rol_id', '=', 'roles.rol_id')
+					->leftJoin('users', 'users.rol_id', '=', 'roles.rol_id')
+					->leftJoin('secciones', 'permisos.seccion_id', '=', 'secciones.seccion_id')
+					->where('permisos_x_rol.rol_id', $rol_id)
+					->where('permisos_x_rol.permiso_id', $user_permiso->id)
+					->first();
+		#dd($data);
+		if (!$data) {
+			#abort(403, 'No tienes permiso para crear usuarios');
+			return false;
+		} else {
+			return $data->habilitado;
+		}
+
 	}
 
 	public function enviar_email($to, $content, $subject, $api = false )

@@ -77,10 +77,14 @@
 							<a href="#" class="btn btn-outline-primary float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px; ">
 								<i class="fas fa-file-import"></i> {{ __('Importar Usuarios') }}
 							</a>
+
+							@if ($permiso_agregar_usuario)
 							<a href="{{ route('users.create') }}" class="btn btn-outline-success float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px;">
 								<i class="fas fa-plus"></i> {{ __('Agregar Usuario') }}
 							</a>
-
+							@else
+							<p>No tienes permiso para agregar usuarios.</p>
+							@endif
 
 						</div>
 						<table id="example" class="cell-border" style="width:100%">
@@ -108,9 +112,13 @@
 										<td>{{ $user->habilitado }}</td>
 										<td>{{ $user->bloqueado ? 'Sí' : 'No' }}</td>
 										<td>
+											@if ($permiso_editar_usuario)
 											<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('users.edit', $user->user_id) }}">
 												<i class="fas fa-pencil-alt"></i>
 											</a>
+											@else
+											<p>No tienes permiso para editar usuarios.</p>
+											@endif
 											<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar" onclick="deshabilitar_usuario('{{ $user->user_id}}',0)">
 												<i class="fas fa-lock"></i>
 											</a>
@@ -120,9 +128,13 @@
 
 											<a class="btn btn-sm btn-outline-info" href="javascript:void(0)" title="Blanquear" onclick="blanquear_psw('{{ $user->user_id }}')">
 												<i class="fas fa-key"></i></a>
+											@if ($permiso_eliminar_usuario)
 											<a class="btn btn-sm btn-outline-danger" title="Eliminar" href="{{ route('users.edit', $user->user_id) }}">
 												<i class="fas fa-trash"></i>
 											</a>
+											@else
+											<p>No tienes permiso para eliminar usuarios.</p>
+											@endif
 										</td>
 												<!-- Botón para abrir el formulario de cambiar contraseña
 												<a href="{{ route('password.change', $user->user_id) }}" class="btn btn-warning btn-sm">

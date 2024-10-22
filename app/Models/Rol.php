@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Permiso;
 
 class Rol extends Model
 {
@@ -21,7 +21,6 @@ class Rol extends Model
             ->withTimestamps()
             ->withPivot('habilitado');
     }
-
     public function users()
     {
 		return $this->belongsToMany(User::class, 'roles_x_usuario', 'rol_id', 'user_id');

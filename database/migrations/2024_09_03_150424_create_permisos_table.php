@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -23,7 +24,7 @@ return new class extends Migration
 		DB::table('permisos')->insert([
 			[
 				'id' => 1,
-				'nombre' => 'Acceder al listado de usuarios',
+				'nombre' => 'Listar usuarios',
 				'orden' => 1,
 				'seccion_id' => 1,
 				'created_at' => now(),

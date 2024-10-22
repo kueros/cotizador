@@ -24,51 +24,52 @@ class Permiso_x_RolController extends Controller
 		return view('permiso_x_rol.index', compact('roles', 'permisos', 'permisosRoles', 'secciones'));
 	}
 
-/* 	public function showPermisosPorRol()
+	/* 	public function showPermisosPorRol()
+		{
+			$roles = Rol::with('permisos')->get();
+			$permisos = Permiso::orderBy('seccion_id')->get();
+			$secciones = Seccion::with('permisos')->get();
+
+			return view('permisos_x_rol', compact('roles', 'permisos', 'secciones'));
+		}
+	*/
+	public function updatePermisos(Request $request)
 	{
-		$roles = Rol::with('permisos')->get();
-		$permisos = Permiso::orderBy('seccion_id')->get();
-		$secciones = Seccion::with('permisos')->get();
+		#dd($request);
+		$arrayFormulario = $request->input('id', []);
+		$idsPermitidos = array_keys($arrayFormulario); // Inicia con los IDs del formulario
 
-		return view('permisos_x_rol', compact('roles', 'permisos', 'secciones'));
+		// Paso 1: Recorremos el array recibido
+		foreach ($arrayFormulario as $key => $valor) {
+			if (str_contains($key, 'new_')) {
+				// Extraemos rol_id y permiso_id de la clave del array (cuando es un nuevo registro)
+				[$prefix, $rolId, $permisoId] = explode('_', $key);
+
+				// Creamos el nuevo registro
+				$nuevoRegistro = Permiso_x_Rol::create([
+					'rol_id' => $rolId,
+					'permiso_id' => $permisoId,
+					'habilitado' => 1, // Asignamos habilitado a 1 para los nuevos permisos
+				]);
+
+				// Agregamos el ID recién creado a la lista de IDs permitidos
+				$idsPermitidos[] = $nuevoRegistro->id;
+			} else {
+				// Buscamos en la tabla por el ID existente
+				$registro = Permiso_x_Rol::where('id', $key)->first();
+				if ($registro && $registro->habilitado == 0) {
+					$registro->habilitado = 1;
+					$registro->save();
+				}
+
+				// Aseguramos que el ID también esté en los permitidos
+				$idsPermitidos[] = $key;
+			}
+		}
+
+		// Paso 2: Eliminamos los registros que no están en el array del formulario ni en los nuevos
+		Permiso_x_Rol::whereNotIn('id', $idsPermitidos)->delete();
+
+		return redirect()->back()->with('success', 'Tabla actualizada correctamente.');
 	}
- */
-public function updatePermisos(Request $request)
-{
-    $arrayFormulario = $request->input('id', []);
-    $idsPermitidos = array_keys($arrayFormulario); // Inicia con los IDs del formulario
-
-    // Paso 1: Recorremos el array recibido
-    foreach ($arrayFormulario as $key => $valor) {
-        if (str_contains($key, 'new_')) {
-            // Extraemos rol_id y permiso_id de la clave del array (cuando es un nuevo registro)
-            [$prefix, $rolId, $permisoId] = explode('_', $key);
-
-            // Creamos el nuevo registro
-            $nuevoRegistro = Permiso_x_Rol::create([
-                'rol_id' => $rolId,
-                'permiso_id' => $permisoId,
-                'habilitado' => 1, // Asignamos habilitado a 1 para los nuevos permisos
-            ]);
-
-            // Agregamos el ID recién creado a la lista de IDs permitidos
-            $idsPermitidos[] = $nuevoRegistro->id;
-        } else {
-            // Buscamos en la tabla por el ID existente
-            $registro = Permiso_x_Rol::where('id', $key)->first();
-            if ($registro && $registro->habilitado == 0) {
-                $registro->habilitado = 1;
-                $registro->save();
-            }
-
-            // Aseguramos que el ID también esté en los permitidos
-            $idsPermitidos[] = $key;
-        }
-    }
-
-    // Paso 2: Eliminamos los registros que no están en el array del formulario ni en los nuevos
-    Permiso_x_Rol::whereNotIn('id', $idsPermitidos)->delete();
-
-    return redirect()->back()->with('success', 'Tabla actualizada correctamente.');
-}
 }
