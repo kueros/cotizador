@@ -3,6 +3,7 @@
 	@php
 	$user = Auth::user()->username;
 	$email = Auth::user()->email;
+	$permiso_listar_usuarios = tiene_permiso('list_usr');
 	$permiso_asignar_permisos = tiene_permiso('manage_perm');
 	$permiso_listar_roles = tiene_permiso('list_roles');
 	$permiso_configuraciones_software = tiene_permiso('setup_soft');
@@ -43,9 +44,11 @@
 									Roles
 								</x-dropdown-link>
 								@endif
+								@if ($permiso_listar_usuarios)
 								<x-dropdown-link :href="route('users.index')">
 									Usuarios
 								</x-dropdown-link>
+								@endif
 								<x-dropdown-link :href="route('monitoreo.index')">
 									Monitoreo
 								</x-dropdown-link>
@@ -77,9 +80,11 @@
 									Roles
 								</x-dropdown-link>
 								@endif
+								@if ($permiso_listar_usuarios)
 								<x-dropdown-link :href="route('users.index')">
 									Usuarios
 								</x-dropdown-link>
+								@endif
 								<x-dropdown-link :href="route('monitoreo.index')">
 									Monitoreo
 								</x-dropdown-link>
@@ -112,9 +117,11 @@
 									Roles
 								</x-dropdown-link>
 								@endif
+								@if ($permiso_listar_usuarios)
 								<x-dropdown-link :href="route('users.index')">
 									Usuarios
 								</x-dropdown-link>
+								@endif
 								<x-dropdown-link :href="route('monitoreo.index')">
 									Monitoreo
 								</x-dropdown-link>

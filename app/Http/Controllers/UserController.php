@@ -16,6 +16,8 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Password;
 use illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use App\Models\PasswordHistory;
+use Illuminate\Support\Facades\Hash;
 
 
 class UserController extends Controller
@@ -285,18 +287,48 @@ class UserController extends Controller
 		}
 	}
 		
-	public function updatePassword(Request $request, $id)
+	public function updatePassword(Request $request)
 	{
 		$request->validate([
-			'password' => 'required|confirmed|min:8',
+			'password' => 'required|min:8|confirmed',
 		]);
-	
-		// Actualiza la contraseña del usuario
-		$user = User::find($id);
-		$user->password = bcrypt($request->password);
-		$user->save();
-	
-		return redirect()->route('users.index')->with('success', 'Contraseña actualizada correctamente');
+
+		$user = auth()->user();
+
+		// Verificar que la nueva contraseña no se repita en las últimas 12
+		$previousPasswords = PasswordHistory::where('user_id', $user->id)
+			->orderBy('created_at', 'desc')
+			->take(12)
+			->pluck('password');
+
+		foreach ($previousPasswords as $oldPassword) {
+			if (Hash::check($request->password, $oldPassword)) {
+				return back()->withErrors(['password' => 'La contraseña no puede ser igual a una de las últimas 12.']);
+			}
+		}
+
+		// Contar cuántas contraseñas tiene en el historial
+	    $passwordCount = PasswordHistory::where('user_id', $user->id)->count();
+
+		if ($passwordCount >= 12) {
+			PasswordHistory::where('user_id', $user->id)
+				->orderBy('created_at', 'asc')
+				->first()
+				->delete();
+		}
+		
+		// Actualizar la contraseña del usuario
+		$user->update([
+			'password' => Hash::make($request->password),
+		]);
+
+		// Guardar la nueva contraseña en el historial
+		PasswordHistory::create([
+			'user_id' => $user->id,
+			'password' => $user->password,
+		]);
+
+		return back()->with('status', 'Contraseña actualizada correctamente.');
 	}
 
 	/**************************************************************************
