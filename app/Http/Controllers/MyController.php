@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\LogAdministracion;
-use App\Models\Permiso_x_rol;
+use App\Models\Permiso_x_Rol;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -41,7 +41,7 @@ class MyController extends Controller
 		#dd($rol_id);
 
 
-		$user_permiso = Permiso_x_rol::leftJoin('permisos', 'permisos.id', '=', 'permisos_x_rol.permiso_id')
+		$user_permiso = Permiso_x_Rol::leftJoin('permisos', 'permisos.id', '=', 'permisos_x_rol.permiso_id')
 			->where('permisos.nombre', '=', $permiso)
 			#->orWhere('nombre', 'like', '%opav%')
 			#->orWhere('nombre', 'like', '%copa%')

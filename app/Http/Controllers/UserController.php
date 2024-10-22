@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Rol;
 use App\Http\Controllers\MyController;
-use App\Models\Permiso_x_rol;
+use App\Models\Permiso_x_Rol;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Password;
 use illuminate\Support\Str;

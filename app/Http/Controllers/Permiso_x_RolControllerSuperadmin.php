@@ -21,7 +21,7 @@ class Permiso_x_RolControllerSuperadmin extends Controller
         // Obtener todos los permisos ordenados
         $permisos = Permiso::orderBy('orden', 'asc')->get();
 
-        $permisosRoles = Permiso_x_rol::all();//with(['permiso', 'permiso.seccion', 'rol'])
+        $permisosRoles = Permiso_x_Rol::all();//with(['permiso', 'permiso.seccion', 'rol'])
             #->where('rol_id', 1) // Ejemplo: Filtro por un rol específico
             ->get();
 dd($permisosRoles);
