@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('permisos', function (Blueprint $table) {
             $table->integer('id')->primary();
             $table->string('nombre')->nullable();
+            $table->string('descripcion')->nullable();
             $table->integer('orden')->nullable();  // Cambiado a integer
             $table->integer('seccion_id')->nullable();
             $table->timestamps();
@@ -24,7 +25,8 @@ return new class extends Migration
 		DB::table('permisos')->insert([
 			[
 				'id' => 1,
-				'nombre' => 'Listar usuarios',
+				'nombre' => 'list_usr',
+				'descripcion' => 'Listar Usuarios',
 				'orden' => 1,
 				'seccion_id' => 1,
 				'created_at' => now(),
@@ -32,7 +34,8 @@ return new class extends Migration
 			],
 			[
 				'id' => 2,
-				'nombre' => 'Agregar usuario',
+				'nombre' => 'add_usr',
+				'descripcion' => 'Agregar Usuarios',
 				'orden' => 2,
 				'seccion_id' => 1,
 				'created_at' => now(),
@@ -40,7 +43,8 @@ return new class extends Migration
 			],
 			[
 				'id' => 3,
-				'nombre' => 'Editar usuario',
+				'nombre' => 'edit_usr',
+				'descripcion' => 'Editar Usuarios',
 				'orden' => 3,
 				'seccion_id' => 1,
 				'created_at' => now(),
@@ -48,7 +52,8 @@ return new class extends Migration
 			],
 			[
 				'id' => 4,
-				'nombre' => 'Eliminar usuario',
+				'nombre' => 'del_usr',
+				'descripcion' => 'Eliminar Usuarios',
 				'orden' => 4,
 				'seccion_id' => 1,
 				'created_at' => now(),
@@ -56,7 +61,8 @@ return new class extends Migration
 			],
 			[
 				'id' => 5,
-				'nombre' => 'Administrar campos adicionales para tabla de usuarios',
+				'nombre' => 'enable_usr',
+				'descripcion' => 'Habilitar/deshabilitar Usuarios',
 				'orden' => 5,
 				'seccion_id' => 1,
 				'created_at' => now(),
@@ -64,7 +70,8 @@ return new class extends Migration
 			],
 			[
 				'id' => 6,
-				'nombre' => 'Habilitar / Deshabilitar usuario',
+				'nombre' => 'clean_pass',
+				'descripcion' => 'Blanquear password',
 				'orden' => 6,
 				'seccion_id' => 1,
 				'created_at' => now(),
@@ -72,7 +79,8 @@ return new class extends Migration
 			],
 			[
 				'id' => 7,
-				'nombre' => 'Blanquear contraseña de usuario',
+				'nombre' => 'setup_usr',
+				'descripcion' => 'Cambiar configuraciones de usuarios',
 				'orden' => 7,
 				'seccion_id' => 1,
 				'created_at' => now(),
@@ -80,23 +88,26 @@ return new class extends Migration
 			],
 			[
 				'id' => 8,
-				'nombre' => 'Cambiar configuraciones de usuarios',
-				'orden' => 8,
-				'seccion_id' => 1,
-				'created_at' => now(),
-				'updated_at' => now()
-			],
-			[
-				'id' => 9,
-				'nombre' => 'Asignar Permisos',  // Condición para buscar el permiso
-				'orden' => 9,  // Proporciona un valor por defecto para orden
+				'nombre' => 'manage_perm',
+				'descripcion' => 'Asignar Permisos',
+				'orden' => 8,  // Proporciona un valor por defecto para orden
 				'seccion_id' => 2,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
+				'id' => 9,
+				'nombre' => 'list_roles',
+				'descripcion' => 'Listar Roles',
+				'orden' => 9,  // Proporciona un valor por defecto para orden
+				'seccion_id' => 3,  // Proporciona un valor por defecto para seccion_id
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
 				'id' => 10,
-				'nombre' => 'Acceder al Listado de Roles',  // Condición para buscar el permiso
+				'nombre' => 'add_rol',  // Condición para buscar el permiso
+				'descripcion' => 'Agregar Rol',
 				'orden' => 10,  // Proporciona un valor por defecto para orden
 				'seccion_id' => 3,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
@@ -104,7 +115,8 @@ return new class extends Migration
 			],
 			[
 				'id' => 11,
-				'nombre' => 'Agregar Rol',  // Condición para buscar el permiso
+				'nombre' => 'edit_rol',  // Condición para buscar el permiso
+				'descripcion' => 'Editar Rol',
 				'orden' => 11,  // Proporciona un valor por defecto para orden
 				'seccion_id' => 3,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
@@ -112,7 +124,8 @@ return new class extends Migration
 			],
 			[
 				'id' => 12,
-				'nombre' => 'Editar Rol',  // Condición para buscar el permiso
+				'nombre' => 'del_rol',
+				'descripcion' => 'Eliminar Rol',
 				'orden' => 12,  // Proporciona un valor por defecto para orden
 				'seccion_id' => 3,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
@@ -120,24 +133,18 @@ return new class extends Migration
 			],
 			[
 				'id' => 13,
-				'nombre' => 'Eliminar Rol',  // Condición para buscar el permiso
+				'nombre' => 'setup_soft',
+				'descripcion' => 'Acceder a las configuraciones del software',
 				'orden' => 13,  // Proporciona un valor por defecto para orden
-				'seccion_id' => 3,  // Proporciona un valor por defecto para seccion_id
-				'created_at' => now(),
-				'updated_at' => now()
-			],
-			[
-				'id' => 14,
-				'nombre' => 'Acceder a las configuraciones del software',  // Condición para buscar el permiso
-				'orden' => 14,  // Proporciona un valor por defecto para orden
 				'seccion_id' => 4,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
 				'updated_at' => now()
 			],
 			[
-				'id' => 15,
-				'nombre' => 'Guardar las configuraciones del software',  // Condición para buscar el permiso
-				'orden' => 15,  // Proporciona un valor por defecto para orden
+				'id' => 14,
+				'nombre' => 'save_setup_soft',
+				'descripcion' => 'Guardar las configuraciones del software',
+				'orden' => 14,  // Proporciona un valor por defecto para orden
 				'seccion_id' => 4,  // Proporciona un valor por defecto para seccion_id
 				'created_at' => now(),
 				'updated_at' => now()

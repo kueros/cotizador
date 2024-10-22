@@ -29,20 +29,21 @@ class UserController extends Controller
 	 */
 	public function index(Request $request, MyController $myController): View
 	{
-		$permiso_listar_usuarios = $myController->tiene_permiso('Listar usuarios');
-		$permiso_agregar_usuario = $myController->tiene_permiso('Agregar usuario');
-		$permiso_editar_usuario = $myController->tiene_permiso('Editar usuario');
-		$permiso_eliminar_usuario = $myController->tiene_permiso('Eliminar usuario');
+		$permiso_listar_usuarios = $myController->tiene_permiso('list_usr');
+		$permiso_agregar_usuario = $myController->tiene_permiso('add_usr');
+		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
+		$permiso_eliminar_usuario = $myController->tiene_permiso('del_usr');
+		$permiso_deshabilitar_usuario = $myController->tiene_permiso('enable_usr');
 		#dd($permiso_listar_usuarios);
 		if (!$permiso_listar_usuarios) {
-			abort(403, 'No tienes permiso para crear usuarios');
+			abort(403, '.');
 			return false;
 		}
 		$users = User::withoutTrashed()
 		->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
 		->select('users.*', 'roles.nombre as nombre_rol')
 		->paginate();
-		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario'))
+		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
 

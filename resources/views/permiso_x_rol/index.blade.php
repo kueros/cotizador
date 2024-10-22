@@ -52,7 +52,7 @@ use App\Models\Permiso_x_Rol;
 @foreach ($permisos as $permiso)
 <tr>
     @if ($permiso->seccion_id == $seccion->seccion_id)
-        <td>{{ $permiso->nombre }}</td>
+        <td>{{ $permiso->descripcion }}</td>
         @foreach ($roles as $rol)
         <td>
             <?php

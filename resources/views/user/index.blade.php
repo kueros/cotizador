@@ -82,8 +82,6 @@
 							<a href="{{ route('users.create') }}" class="btn btn-outline-success float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px;">
 								<i class="fas fa-plus"></i> {{ __('Agregar Usuario') }}
 							</a>
-							@else
-							<p>No tienes permiso para agregar usuarios.</p>
 							@endif
 
 						</div>
@@ -116,24 +114,30 @@
 											<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('users.edit', $user->user_id) }}">
 												<i class="fas fa-pencil-alt"></i>
 											</a>
-											@else
-											<p>No tienes permiso para editar usuarios.</p>
 											@endif
+
+											@if ($permiso_deshabilitar_usuario)
 											<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar" onclick="deshabilitar_usuario('{{ $user->user_id}}',0)">
 												<i class="fas fa-lock"></i>
 											</a>
+											@endif
+
+											@if ($permiso_editar_usuario)
 											<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar temporalmente" onclick="deshabilitar_usuario('{{ $user->user_id}}',2)">
 												<span class="fas fa-clock"></span>
 											</a>
+											@endif
 
+											@if ($permiso_editar_usuario)
 											<a class="btn btn-sm btn-outline-info" href="javascript:void(0)" title="Blanquear" onclick="blanquear_psw('{{ $user->user_id }}')">
-												<i class="fas fa-key"></i></a>
+												<i class="fas fa-key"></i>
+											</a>
+											@endif
+
 											@if ($permiso_eliminar_usuario)
 											<a class="btn btn-sm btn-outline-danger" title="Eliminar" href="{{ route('users.edit', $user->user_id) }}">
 												<i class="fas fa-trash"></i>
 											</a>
-											@else
-											<p>No tienes permiso para eliminar usuarios.</p>
 											@endif
 										</td>
 												<!-- Botón para abrir el formulario de cambiar contraseña

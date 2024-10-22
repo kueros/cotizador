@@ -14,6 +14,8 @@ class Permiso_x_rol extends Model
 
 	protected $fillable = [
 		'rol_id',
+		'nombre',
+		'descripcion',
 		'permiso_id',
 		'habilitado',
 	];
