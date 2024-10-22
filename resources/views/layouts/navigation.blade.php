@@ -3,6 +3,9 @@
 	@php
 	$user = Auth::user()->username;
 	$email = Auth::user()->email;
+	$permiso_asignar_permisos = tiene_permiso('manage_perm');
+	$permiso_listar_roles = tiene_permiso('list_roles');
+	$permiso_configuraciones_software = tiene_permiso('setup_soft');
 	@endphp
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 		<div class="flex justify-between h-16">
@@ -30,25 +33,30 @@
 							</x-slot>
 
 							<x-slot name="content">
+								@if ($permiso_asignar_permisos)
 								<x-dropdown-link :href="route('permisos_x_rol.index')">
 									Permisos x Rol
 								</x-dropdown-link>
+								@endif
+								@if ($permiso_listar_roles)
 								<x-dropdown-link :href="route('roles.index')">
 									Roles
 								</x-dropdown-link>
+								@endif
 								<x-dropdown-link :href="route('users.index')">
 									Usuarios
 								</x-dropdown-link>
 								<x-dropdown-link :href="route('monitoreo.index')">
 									Monitoreo
 								</x-dropdown-link>
+								@if ($permiso_configuraciones_software)
 								<x-dropdown-link :href="route('configuracion.index')">
 									Configuración
 								</x-dropdown-link>
+								@endif
 							</x-slot>
 						</x-dropdown>
 					</div>
-
 					<div class="hidden sm:flex sm:items-center sm:ms-12">
 						<x-dropdown align="left" width="48">
 							<x-slot name="trigger">
@@ -59,21 +67,27 @@
 							</x-slot>
 
 							<x-slot name="content">
+								@if ($permiso_asignar_permisos)
 								<x-dropdown-link :href="route('permisos_x_rol.index')">
 									Permisos x Rol
 								</x-dropdown-link>
+								@endif
+								@if ($permiso_listar_roles)
 								<x-dropdown-link :href="route('roles.index')">
 									Roles
 								</x-dropdown-link>
+								@endif
 								<x-dropdown-link :href="route('users.index')">
 									Usuarios
 								</x-dropdown-link>
 								<x-dropdown-link :href="route('monitoreo.index')">
 									Monitoreo
 								</x-dropdown-link>
+								@if ($permiso_configuraciones_software)
 								<x-dropdown-link :href="route('configuracion.index')">
 									Configuración
 								</x-dropdown-link>
+								@endif
 							</x-slot>
 						</x-dropdown>
 					</div>
@@ -88,21 +102,27 @@
 							</x-slot>
 
 							<x-slot name="content">
+								@if ($permiso_asignar_permisos)
 								<x-dropdown-link :href="route('permisos_x_rol.index')">
 									Permisos x Rol
 								</x-dropdown-link>
+								@endif
+								@if ($permiso_listar_roles)
 								<x-dropdown-link :href="route('roles.index')">
 									Roles
 								</x-dropdown-link>
+								@endif
 								<x-dropdown-link :href="route('users.index')">
 									Usuarios
 								</x-dropdown-link>
 								<x-dropdown-link :href="route('monitoreo.index')">
 									Monitoreo
 								</x-dropdown-link>
+								@if ($permiso_configuraciones_software)
 								<x-dropdown-link :href="route('configuracion.index')">
 									Configuración
 								</x-dropdown-link>
+								@endif
 							</x-slot>
 						</x-dropdown>
 					</div>
