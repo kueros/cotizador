@@ -25,7 +25,7 @@ class NewPasswordController extends Controller
      */
     public function create_pass($token, $email)
     {
-		dd($email);
+		#dd($email);
 		return view('auth.create_password', ['token' => $token, 'email' => $email]);    
 	}
 
