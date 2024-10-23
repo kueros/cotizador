@@ -68,6 +68,31 @@ class primer_usuario extends Command
 			'updated_at' => now(),
 		]);
 
+
+		/* 
+		
+		SOLO PARA DESARROLLO!!!
+		
+		*/
+		// Verificar si el rol "Usuario Normal" ya existe EN DESARROLLO, si no, crearlo
+		$rol_usuario_normal = Rol::firstOrCreate(
+			['nombre' => 'Usuario Normal'],
+			[
+				'guard_name' => 'web',
+				'created_at' => now(),
+				'updated_at' => now()
+			]
+		);
+		/* 
+		
+		SOLO PARA DESARROLLO!!!
+		
+		*/
+
+
+
+
+
 		$this->info('Usuario creado exitosamente.');
 		return 0; // Retornar éxito
 	}

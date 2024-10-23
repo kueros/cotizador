@@ -129,8 +129,10 @@ class NewPasswordController extends Controller
 				->delete();
 		}
 		
-		$request->user()->update([
+        $request->user()->update([
             'password' => Hash::make($validated['password']),
+            'bloqueado' => 0,
+            'intentos_login' => 0,
         ]);
 
 		// Guardar la nueva contraseña en el historial
