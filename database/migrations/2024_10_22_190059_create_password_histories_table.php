@@ -13,10 +13,11 @@ return new class extends Migration
 	{
 		Schema::create('password_histories', function (Blueprint $table) {
 			$table->id();
-			$table->foreignId('user_id')->constrained()->onDelete('cascade');
-			$table->string('password'); // Aquí se almacenará el hash de la contraseña
+			$table->unsignedBigInteger('user_id'); // Cambiamos a unsignedBigInteger
+			#$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+			$table->string('password');
 			$table->timestamps();
-		});    
+		}); 
 	}
 
 	/**

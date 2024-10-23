@@ -260,6 +260,10 @@ class UserController extends Controller
 		->with('success', 'Usuario eliminado correctamente.');
 	}
 
+	/**************************************************************************
+	*
+	**************************************************************************/
+
 	public function guardar_opciones(Request $request, $user_id)
 	{
 		#echo Auth::user()->user_id;
@@ -275,6 +279,9 @@ class UserController extends Controller
 		}
 	}				
 
+	/**************************************************************************
+	*
+	**************************************************************************/
 	public function deshabilitar_usuario(Request $request, $id) {
 		try {
 			$user = User::findOrFail($id);
@@ -286,50 +293,7 @@ class UserController extends Controller
 			return response()->json(['error' => $e->getMessage()], 500);
 		}
 	}
-		
-	public function updatePassword(Request $request)
-	{
-		$request->validate([
-			'password' => 'required|min:8|confirmed',
-		]);
 
-		$user = auth()->user();
-
-		// Verificar que la nueva contraseña no se repita en las últimas 12
-		$previousPasswords = PasswordHistory::where('user_id', $user->id)
-			->orderBy('created_at', 'desc')
-			->take(12)
-			->pluck('password');
-
-		foreach ($previousPasswords as $oldPassword) {
-			if (Hash::check($request->password, $oldPassword)) {
-				return back()->withErrors(['password' => 'La contraseña no puede ser igual a una de las últimas 12.']);
-			}
-		}
-
-		// Contar cuántas contraseñas tiene en el historial
-	    $passwordCount = PasswordHistory::where('user_id', $user->id)->count();
-
-		if ($passwordCount >= 12) {
-			PasswordHistory::where('user_id', $user->id)
-				->orderBy('created_at', 'asc')
-				->first()
-				->delete();
-		}
-		
-		// Actualizar la contraseña del usuario
-		$user->update([
-			'password' => Hash::make($request->password),
-		]);
-
-		// Guardar la nueva contraseña en el historial
-		PasswordHistory::create([
-			'user_id' => $user->id,
-			'password' => $user->password,
-		]);
-
-		return back()->with('status', 'Contraseña actualizada correctamente.');
-	}
 
 	/**************************************************************************
 	*
@@ -439,7 +403,7 @@ class UserController extends Controller
 				$subject = "Aviso de blanqueo de contraseña";
 				$body = 'Se ha realizado un blanqueo de su contraseña en Aleph Manager, para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';
 				$to = $user->email;
-				echo "kdk2 ".$resetUrl;
+				#echo "kdk2 ".$resetUrl;
 				$myController->enviar_email($to, $body, $subject);
 				return response()->json(['success' => true, 'message' => 'Contraseña blanqueada y correo enviado con éxito.']);
 			}

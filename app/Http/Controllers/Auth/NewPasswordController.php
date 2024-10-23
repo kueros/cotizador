@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use App\Models\User;
+use App\Models\PasswordHistory;
+use Illuminate\Support\Facades\Auth;
 
 class NewPasswordController extends Controller
 {
@@ -42,29 +44,11 @@ class NewPasswordController extends Controller
      */
 	public function store(Request $request): RedirectResponse
 	{
-		#dd($request->email);
-		// Validar los datos del nuevo usuario
-/* 		$validatedData = $request->validate([
-			'email' => ['required', 'email', 'unique:users,email'], // Asegurar que el email no esté registrado
-/* 			'password' => [
-				'required',
-				'confirmed',
-				#Rules\Password::defaults(), // Aplicar las reglas de contraseña por defecto o personalizadas
-			],
- 		]);
- */		// Buscar el nuevo usuario
+		// Buscar el nuevo usuario
 		$user = User::where('email', $request->email)->first();
 		$user->update([
 			'password' => Hash::make($request->password), // Hasheamos la contraseña
-		]);/* 		$user = User::update([
-			'email' => $request->email,
-			'password' => Hash::make($request->password), // Hashear la contraseña
 		]);
- */		// Enviar la notificación de verificación de correo electrónico
-		#$user->sendEmailVerificationNotification();
-
-		// Redirigir al usuario o mostrar un mensaje de éxito
-		#return redirect()->route('login')->with('success', 'Usuario creado con éxito. Por favor, verifica tu correo electrónico para activar tu cuenta.');
 		return redirect()->route('login');
 	}
 
@@ -101,20 +85,62 @@ class NewPasswordController extends Controller
 				event(new PasswordReset($user));
 			}
 		);
-		#está enviando el email de verificacion a la casilla de yafo y tendría que
-		#enviarlo a la de gmail 1967
-		#dd(Password::PASSWORD_RESET);
+
 		if ($status == Password::PASSWORD_RESET) {
 			// Enviar email de verificación si el usuario no lo ha verificado
 			$user = User::where('email', $request->email)->first();
-			#dd($user);
-			#if (!$user->hasVerifiedEmail()) {
-				$user->sendEmailVerificationNotification();
-				#return redirect()->route('verification.notice')->with('success', 'Contraseña actualizada con éxito. Por favor, verifica tu correo electrónico.');
-			#}
+			$user->sendEmailVerificationNotification();
 			return redirect()->route('login')->with('success', 'Contraseña actualizada con éxito. Inicie sesión con su nueva contraseña.');
 		} else {
 			return back()->withErrors(['email' => [__($status)]]);
 		}
     }
+
+	/**************************************************************************
+	*
+	**************************************************************************/
+	public function updatePassword(Request $request)
+	{
+		#dd($request);
+		$validated = $request->validate([
+			'password' => 'required|min:8|confirmed',
+		]);
+
+		$user_id = Auth::user()->user_id;
+		// Verificar que la nueva contraseña no se repita en las últimas 12
+		$previousPasswords = PasswordHistory::where('user_id', $user_id)
+			->orderBy('created_at', 'desc')
+			->take(12)
+			->pluck('password');
+
+			foreach ($previousPasswords as $oldPassword) {
+			if (Hash::check($request->password, $oldPassword)) {
+				return back()->withErrors(['password' => 'La contraseña no puede ser igual a una de las últimas 12.']);
+			}
+		}
+
+		// Contar cuántas contraseñas tiene en el historial
+	    $passwordCount = PasswordHistory::where('user_id', $user_id)->count();
+
+		if ($passwordCount >= 12) {
+			PasswordHistory::where('user_id', $user_id)
+				->orderBy('created_at', 'asc')
+				->first()
+				->delete();
+		}
+		
+		$request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+		// Guardar la nueva contraseña en el historial
+		PasswordHistory::create([
+			'user_id' => $user_id,
+			'password' => Hash::make($validated['password']),
+		]);
+
+		#return back()->with('status', 'Contraseña actualizada correctamente.');
+		return redirect()->route('login')->with('success', 'Contraseña actualizada correctamente.');
+	}
+
 }
