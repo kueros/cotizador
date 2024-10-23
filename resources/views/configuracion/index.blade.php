@@ -38,7 +38,7 @@
 							?>
 							@foreach ($variables as $variable)
 								@if(Str::startsWith($variable->nombre, 'noti'))
-								<div class="form-group row">
+								<div class="form-group row" style="margin-bottom:1rem;">
 									<div class="col-md-6">
 										<label>
 											<input type="checkbox" id="{{ $variable->nombre }}" name="{{ $variable->nombre }}" value="1" {{ $variable->valor == 1 ? 'checked' : '' }} />
@@ -81,15 +81,15 @@
 							<h4>Configuración del remitente</h4><br>
 							<form id="form_config_remitente" action="{{ route('configuracion.guardar_remitente') }}" method="post"><!-- id="form_remitente" enctype="multipart/form-data" class="form-horizontal"-->
 								@csrf
-								<div class="form-group row">
-									<label class="control-label col-md-4">Email*</label>
-									<div class="col-md-8">
+								<div class="form-group row" style="margin-bottom:1rem;">
+									<label class="control-label col-md-2">Email*</label>
+									<div class="col-md-6">
 										<input type="email" name="from" value="<?= $notificaciones_email_from ?>" required placeholder="info@alephmanager.com">
 									</div>
 								</div>
-								<div class="form-group row">
-									<label class="control-label col-md-4">Nombre*</label>
-									<div class="col-md-8">
+								<div class="form-group row" style="margin-bottom:1rem;">
+									<label class="control-label col-md-2">Nombre*</label>
+									<div class="col-md-6">
 										<input type="text" minlength="3" name="from_name" value="<?= $notificaciones_email_from_name ?>" required placeholder="Aleph Manager">
 									</div>
 								</div>
@@ -103,7 +103,7 @@
 							<div class="alert alert-info" role="alert">
 								Para conocer las configuraciones disponibles de la libreria siga <a class="alert-link" target="_blank" href="#">este enlace</a> y baje hasta la sección con el título "Email Preferences"
 							</div>
-							<div class="form-group row">
+								<div class="form-group row" style="margin-bottom:1rem;">
 								<a class="btn btn-success" onclick="add_parametro()">Agregar parametro</a>
 							</div>
 							<table class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -157,9 +157,10 @@
 							<!-- Contenido de Opciones avanzadas -->
 							<form action="{{ route('configuracion.guardar_estado') }}" method="POST">
 								@csrf
+								<?php #dd($variables); ?>
 								@foreach ($variables as $variable)
 								@if(Str::startsWith($variable->nombre, 'opav'))
-								<div class="form-group row">
+								<div class="form-group row" style="margin-bottom:1rem;">
 									<div class="col-md-6">
 										<label>
 											<input type="checkbox" id="{{ $variable->nombre }}" name="{{ $variable->nombre }}" value="1" {{ $variable->valor == 1 ? 'checked' : '' }} />
@@ -188,7 +189,7 @@
 								@csrf
 								@foreach ($variables as $variable)
 								@if(Str::startsWith($variable->nombre, 'copa'))
-								<div class="form-group row">
+								<div class="form-group row" style="margin-bottom:1rem;">
 									<div class="col-md-6">
 										<label>
 											<input type="checkbox" id="{{ $variable->nombre }}" name="{{ $variable->nombre }}" value="1" {{ $variable->valor == 1 ? 'checked' : '' }} />

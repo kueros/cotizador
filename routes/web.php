@@ -42,10 +42,6 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
 	Route::get('/users', 							[UserController::class, 'index'])->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
 	Route::get('/show/{id}', 						[UserController::class, 'show'])->name('users.show');
-	/* 	Route::get('/admin', function () {
-		// Solo los usuarios con el rol de 'admin' pueden acceder
-	})->middleware('role:Administrador');
- 	*/	
 	Route::get('/users/create', 					[UserController::class, 'create'])->name('users.create');
 	Route::post('/users', 							[UserController::class, 'store'])->name('users.store');
 	Route::get('/users/{user}/edit', 				[UserController::class, 'edit'])->name('users.edit');
