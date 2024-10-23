@@ -22,7 +22,7 @@ Route::middleware('guest')->group(function () {
 	Route::post('forgot-password', 					[PasswordResetLinkController::class, 'store'])->name('password.email');
 	Route::post('update-password', 					[NewPasswordController::class, 'updatePassword'])->name('password.update');
 	Route::post('reset-password', 					[NewPasswordController::class, 'store'])->name('password.store');
-	#Route::get('reset-password/{token}', 			[NewPasswordController::class, 'create'])->name('password.reset');
+	Route::get('reset-password/{token}', 			[NewPasswordController::class, 'create_pass'])->name('password.reset');
 	Route::get('password_change', 					[NewPasswordController::class, 'showResetForm'])->name('password.change');
 	
 	#Route::get('/users/{id}/password', [UserController::class, 'showPasswordForm'])->name('users.showPasswordForm');
@@ -36,9 +36,10 @@ Route::middleware('guest')->group(function () {
 
 });
 ####	updatePassword
-Route::get('reset_pass/{token}/{email}', 			[NewPasswordController::class, 'reset_pass'])->name('reset_pass_form');
-#Route::post('password_reset', 						[NewPasswordController::class, 'password_reset'])->name('resetear_password');	
-Route::post('password_reset', 						[NewPasswordController::class, 'updatePassword'])->name('resetear_password');
+Route::get('blank_pass/{token}/{email}', 			[NewPasswordController::class, 'blank_pass'])->name('blank_pass_form');
+Route::get('reset_pass/{token}/{email}', 			[PasswordResetLinkController::class, 'reset_pass'])->name('reset_pass_form');
+Route::post('blanquear_password', 					[NewPasswordController::class, 'blanquear_password'])->name('blanquear_password');
+Route::post('updatePassword', 						[PasswordResetLinkController::class, 'updatePassword'])->name('resetear_password');
 
 ###
 Route::get('create_pass/{token}/{email}', 			[NewPasswordController::class, 'create_pass'])->name('create_pass_form');

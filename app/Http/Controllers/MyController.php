@@ -98,10 +98,10 @@ class MyController extends Controller
 				$clientIP = \Request::ip();
 				$userAgent = \Request::userAgent();
 				#dd($userAgent);
-				$message = Auth::user()->username." creó el email para ". $to . " con el asunto: ". $subject;
+				$message = /*Auth::user()->username.*/" creó el email para ". $to . " con el asunto: ". $subject;
 				Log::info($message);
 				$log = LogAdministracion::create([
-					'username' => Auth::user()->username,
+					'username' => 'Auth::user()->username',
 					'action' => "users.store",
 					'detalle' => $message,
 					'ip_address' => json_encode($clientIP),

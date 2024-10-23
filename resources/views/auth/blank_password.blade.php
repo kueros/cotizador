@@ -8,7 +8,7 @@
 <?php #dd($email); ?>
 	<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 		<div class="p-12 bg-white shadow sm:rounded-lg">
-			<form method="POST" action="{{ route('resetear_password') }}">
+			<form method="POST" action="{{ route('blanquear_password') }}">
 				@csrf
 
 				<input type="hidden" name="token" value="{{ $token }}">

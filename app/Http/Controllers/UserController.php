@@ -398,7 +398,7 @@ class UserController extends Controller
 				// Generar la URL para el restablecimiento de contraseña con el token
 				#$resetUrl = route('users.password.reset?token='.$token);
 				#$resetUrl = route('password.reset') . '?token=' . $token;
-				$resetUrl = route('reset_pass_form', ['token' => $token, 'email' => $email]);
+				$resetUrl = route('blank_pass_form', ['token' => $token, 'email' => $email]);
 				// Enviar correo
 				$subject = "Aviso de blanqueo de contraseña";
 				$body = 'Se ha realizado un blanqueo de su contraseña en Aleph Manager, para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';

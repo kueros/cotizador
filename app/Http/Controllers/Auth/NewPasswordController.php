@@ -17,26 +17,37 @@ use Illuminate\Support\Facades\Auth;
 
 class NewPasswordController extends Controller
 {
+	/****************************************************************************************************************************************************
+	*
+	****************************************************************************************************************************************************/
     /**
      * Display the password reset view.
      */
     public function create_pass($token, $email)
     {
-		#dd($email);
+		dd($email);
 		return view('auth.create_password', ['token' => $token, 'email' => $email]);    
 	}
 
 
+	/****************************************************************************************************************************************************
+	*
+	****************************************************************************************************************************************************/
 	/**
      * Display the password reset view.
      */
-    public function reset_pass($token, $email)
+    public function blank_pass($token, $email)
     {
 		#dd($email);
-		return view('auth.reset_password', ['token' => $token, 'email' => $email]);    
+		echo $email;
+		#return view('auth.reset_password', ['token' => $token, 'email' => $email]);    
+		return view('auth.blank_password', ['token' => $token, 'email' => $email]);    
 	}
 
 
+	/****************************************************************************************************************************************************
+	*
+	****************************************************************************************************************************************************/
 	/**
      * Handle an incoming new password request.
      *
@@ -52,6 +63,9 @@ class NewPasswordController extends Controller
 		return redirect()->route('login');
 	}
 
+	/****************************************************************************************************************************************************
+	*
+	****************************************************************************************************************************************************/
     public function showResetForm(Request $request)
 	{
 		#dd($request);
@@ -59,6 +73,9 @@ class NewPasswordController extends Controller
 		return view('auth.password_reset', ['token' => $token]);
 	}
 
+	/****************************************************************************************************************************************************
+	*
+	****************************************************************************************************************************************************/
     public function password_reset(Request $request)
     {
 		#dd($request);
@@ -96,17 +113,29 @@ class NewPasswordController extends Controller
 		}
     }
 
-	/**************************************************************************
+	/****************************************************************************************************************************************************
 	*
-	**************************************************************************/
-	public function updatePassword(Request $request)
+	****************************************************************************************************************************************************/
+	public function blanquear_password(Request $request)
 	{
 		#dd($request);
 		$validated = $request->validate([
-			'password' => 'required|min:8|confirmed',
-		]);
+            'password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/[a-z]/',      // Al menos una letra minúscula
+                'regex:/[A-Z]/',      // Al menos una letra mayúscula
+                'regex:/[0-9]/',      // Al menos un número
+                'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+            ],
+            'token' => 'required',		]);
+		if(Auth::user()){
+			$user_id = Auth::user()->user_id;
+		} else {
+			$user_id = User::where('email', $request->email)->first()['user_id'];
+		}
 
-		$user_id = Auth::user()->user_id;
 		// Verificar que la nueva contraseña no se repita en las últimas 12
 		$previousPasswords = PasswordHistory::where('user_id', $user_id)
 			->orderBy('created_at', 'desc')
@@ -129,12 +158,18 @@ class NewPasswordController extends Controller
 				->delete();
 		}
 		
-        $request->user()->update([
+/* 		$request->user()->update([
             'password' => Hash::make($validated['password']),
             'bloqueado' => 0,
             'intentos_login' => 0,
         ]);
+ */
 
+		User::where('email', $request->email)->update([
+            'password' => Hash::make($validated['password']),
+			'bloqueado' => 0,
+			'intentos_login' => 0
+		]);
 		// Guardar la nueva contraseña en el historial
 		PasswordHistory::create([
 			'user_id' => $user_id,

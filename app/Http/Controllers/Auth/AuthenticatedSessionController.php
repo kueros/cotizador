@@ -43,7 +43,15 @@
 			]);
 			$log->save();
 		}
-		return view('auth.login');
+		#return view('auth.login');
+
+		// Verificar si hay un mensaje flash en la sesión (por ejemplo, de restablecimiento de contraseña)
+		$successMessage = session()->get('success', null);
+
+		// Retornar la vista pasando el mensaje si existe
+		return view('auth.login', [
+			'successMessage' => $successMessage
+		]);
 	}
 
 	/**
