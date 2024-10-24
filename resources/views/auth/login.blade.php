@@ -7,6 +7,8 @@
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 
 	<title>YAFO</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
 	<style>
 		body {
 			background-image: url('/build/assets/images/login-background.jpg');
@@ -27,37 +29,43 @@
 
 <body class="font-sans text-gray-900 antialiased">
 
-
-		@if (session('error')) 
-		<div class="alert alert-danger">
-			{{ session('error') }}
-		</div>
-		@endif
-
 	<div class="min-h-screen flex flex-col items-center">
-		<div class="w-full smmax-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm rounded-lg" style=" background-color: rgba(8, 34, 71, 0.82); margin-top: 100px; width: 36rem;">
+		<div class="w-full smmax-w-md mt-6 px-6 py-4 shadow-md overflow-hidden sm rounded-lg" style=" background-color: rgba(8, 34, 71, 0.82); margin-top: 100px; width: 36rem;">
 
 			<!-- Session Status -->
 			<!-- x-auth-session-status class="mb-4" :status="session('status')" / -->
 
 			<form method="POST" action="{{ secure_url('login') }}">
 				@csrf
+
 				<div>
 					<a href="/">
 						<img class="logo-home" src="/build/assets/images/aleph_logo.gif" alt="" title="">
 					</a>
 				</div>
-				<!-- Email Address -->
-
-				@if ($errors->any())
-				<div class="alert alert-danger text-red-500">
-					<ul>
-						@foreach ($errors->all() as $error)
-						<li>{{ $error }}</li>
-						@endforeach
-					</ul>
+				<!-- Manejo de errores -->
+				<div style="margin-top:1rem;">
+					@if ($errors->any())
+					<div class="alert alert-danger">
+						<ul>
+							@foreach ($errors->all() as $error)
+								<li>{{ $error }}</li>
+							@endforeach
+						</ul>
+					</div>
+					@endif
+					@if (session('error')) 
+					<div class="alert alert-danger">
+						{{ session('error') }}
+					</div>
+					@endif
+					@if (session('success'))
+					<div class="alert alert-success" role="alert">
+							{{ session('success') }}
+						</div>
+					@endif
 				</div>
-				@endif
+				<!-- Email Address -->
 				<div>
 					<label for="email" value="__('Email o Username')" class="text-white">
 						<input id="email" class="block mt-1 w-full text-black" type="text" name="email" value="{{ old('email') }}" placeholder="Email o Username" required autofocus autocomplete="username" />

@@ -241,22 +241,29 @@ class UserController extends Controller
 
 	public function destroy($id, MyController $myController): RedirectResponse
 	{
-		// Encuentra el usuario por su ID
-		$user = User::withTrashed()->find($id);
-		// Almacena el nombre de usuario antes de eliminarlo
-		$username = $user->username;
-		// Elimina el usuario
-		$user->delete();
-		$message = Auth::user()->username . " borró el usuario " . $username;
-		Log::info($message);
-		$subject = "Borrado de usuario";
-		$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
-		$to = "omarliberatto@yafoconsultora.com";
-		// Llamar a enviar_email de MyController
-		$myController->enviar_email($to, $body, $subject);
-		Log::info('Correo enviado exitosamente a ' . $to);
-		return Redirect::route('users.index')
-		->with('success', 'Usuario eliminado correctamente.');
+		if(Auth::user()->user_id != $id) 
+		{
+			// Encuentra el usuario por su ID
+			$user = User::withTrashed()->find($id);
+			// Almacena el nombre de usuario antes de eliminarlo
+			$username = $user->username;
+			// Elimina el usuario
+			$user->delete();
+			$message = Auth::user()->username . " borró el usuario " . $username;
+			Log::info($message);
+			$subject = "Borrado de usuario";
+			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
+			$to = "omarliberatto@yafoconsultora.com";
+			// Llamar a enviar_email de MyController
+			$myController->enviar_email($to, $body, $subject);
+			Log::info('Correo enviado exitosamente a ' . $to);
+			return Redirect::route('users.index')
+			->with('success', 'Usuario eliminado correctamente.');
+		} else {
+			return Redirect::route('users.index')
+			->with('error', 'No se puede borrar tu propia cuenta.');
+			#return response()->json('No se puede borrar tu propia cuenta', 403);
+		}
 	}
 
 	/**************************************************************************

@@ -47,6 +47,12 @@ class MyController extends Controller
 			#->orWhere('nombre', 'like', '%copa%')
 			->first();
 		#dd($user_permiso->id);
+		
+		    // Si no se encontró ningún permiso, devuelve false directamente
+		if (!$user_permiso) {
+			return false;
+		}
+		
 		$data = DB::table('permisos_x_rol')
 					->leftJoin('permisos', 'permisos.id', '=', 'permisos_x_rol.permiso_id')
 					->leftJoin('roles', 'permisos_x_rol.rol_id', '=', 'roles.rol_id')

@@ -4,7 +4,16 @@
 				{{ __('Usuarios') }}
 			</h2>
 		</x-slot>
-
+		@php
+		$user = Auth::user()->username;
+		$email = Auth::user()->email;
+		$permiso_agregar_usuarios = tiene_permiso('add_usr');
+		$permiso_editar_usuarios = tiene_permiso('edit_usr');
+		$permiso_deshabilitar_permisos = tiene_permiso('enable_usr');
+		$permiso_blanquear_password = tiene_permiso('clean_pass');
+		$permiso_borrar_usuarios = tiene_permiso('del_usr');
+		$permiso_importar_usuarios = tiene_permiso('import_usr');
+		@endphp
 		<div style="background-image: url('/build/assets/images/dashboard_bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding-top: 3rem; padding-bottom: 3rem;">
 			<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
@@ -69,14 +78,27 @@
 
 				<!-- Tabla de usuarios -->
 				<div class="p-12 sm:p-8 bg-white shadow sm:rounded-lg">
+									<!-- Manejo de errores -->
+					<div style="margin-top:1rem;">
+						@if (session('error')) 
+						<div class="alert alert-danger">
+							{{ session('error') }}
+						</div>
+						@endif
+						@if (session('success'))
+						<div class="alert alert-success" role="alert">
+								{{ session('success') }}
+							</div>
+						@endif
+					</div>
+
 					<div class="table-responsive">
 						<div class="float-left">
-							<a href="#" class="btn btn-outline-info float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px;">
-								<i class="fas fa-list"></i> {{ __('Campos Adicionales') }}
-							</a>
+							@if ($permiso_agregar_usuario)
 							<a href="#" class="btn btn-outline-primary float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px; ">
 								<i class="fas fa-file-import"></i> {{ __('Importar Usuarios') }}
 							</a>
+							@endif
 
 							@if ($permiso_agregar_usuario)
 							<a href="{{ route('users.create') }}" class="btn btn-outline-success float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px;">
@@ -115,11 +137,6 @@
 												<i class="fas fa-pencil-alt"></i>
 											</a>
 											@endif
-
-
-
-
-
 											
 											@if ($permiso_deshabilitar_usuario)
 											<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar" onclick="deshabilitar_usuario('{{ $user->user_id}}',0)">
@@ -127,24 +144,27 @@
 											</a>
 											@endif
 
-											@if ($permiso_editar_usuario)
+											@if ($permiso_deshabilitar_usuario)
 											<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar temporalmente" onclick="deshabilitar_usuario('{{ $user->user_id}}',2)">
 												<span class="fas fa-clock"></span>
 											</a>
 											@endif
 
-											@if ($permiso_editar_usuario)
+											@if ($permiso_blanquear_password)
 											<a class="btn btn-sm btn-outline-info" href="javascript:void(0)" title="Blanquear" onclick="blanquear_psw('{{ $user->user_id }}')">
 												<i class="fas fa-key"></i>
 											</a>
 											@endif
 
 											@if ($permiso_eliminar_usuario)
-											<a class="btn btn-sm btn-outline-danger" title="Eliminar" href="{{ route('users.edit', $user->user_id) }}">
-												<i class="fas fa-trash"></i>
-											</a>
-											@endif
-										</td>
+												<form action="{{ route('users.destroy', $user->user_id) }}" method="POST" style="display:inline;">
+													@csrf
+													@method('DELETE')
+													<button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar este usuario?')">
+														<i class="fas fa-trash"></i>
+													</button>
+												</form>
+											@endif										</td>
 												<!-- Botón para abrir el formulario de cambiar contraseña
 												<a href="{{ route('password.change', $user->user_id) }}" class="btn btn-warning btn-sm">
 													{{ __('Cambiar contraseña') }}
