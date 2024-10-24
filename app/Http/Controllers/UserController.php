@@ -181,9 +181,8 @@ class UserController extends Controller
 	/**
 	 * Update the specified resource in storage.
 	 */
-	public function update(UserRequest $request, User $user, MyController $myController): RedirectResponse
+	public function usersUpdate(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
-		#dd($user);
 		try {
 		$messages = [
 			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
@@ -193,13 +192,12 @@ class UserController extends Controller
 		];
 		// Validar los datos del usuario, ignorando al usuario actual
 		$validatedData = $request->validate([
-			'username' => 'required|string|max:255|unique:users,username,' . $user->user_id,
+			'username' => 'required|string|max:255|unique:users,username,' . $user->user_id . ',user_id',
 			'nombre' => 'required|string|max:255',
 			'apellido' => 'required|string|max:255',
-			'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id,
-			'rol_id' => 'required|exists:roles,id',
+			'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
+			'rol_id' => 'required|exists:roles,rol_id', // Cambiar "id" por el nombre correcto de la columna primaria
 		], $messages);
-
 		// Actualizar el usuario con los datos validados
 		$user->update($validatedData);
 		// Encuentra el usuario por su ID
@@ -224,16 +222,17 @@ class UserController extends Controller
 			dd("1".Auth::user()->username );
 		}
 		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
-	} catch (TokenMismatchException $e) {
-		dd("2".Auth::user()->username );
-		// Si se detecta un error 419, forzamos el redireccionamiento al login
-		return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
-	} catch (\Exception $e) {
-		dd("3".Auth::user()->username );
-		// Si cualquier otro error ocurre, puedes manejarlo aquí o lanzar una excepción genérica
-		return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
-	}
-
+		} catch (ValidationException $e) {
+			// Si ocurre un error de validación, redirigir con los mensajes de error
+			return redirect()->back()->withErrors($e->validator)->withInput();
+		} catch (TokenMismatchException $e) {
+			// Si se detecta un error 419, redirigir al login
+			return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
+		} catch (\Exception $e) {
+			Log::error('Error en la actualización del usuario: '.$e->getMessage());
+			dd('Error: '.$e->getMessage());  // Muestra el mensaje exacto del error
+			return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
+		}
 	}
 
 	/**************************************************************************

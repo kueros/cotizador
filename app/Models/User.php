@@ -24,6 +24,7 @@ class User extends Authenticatable //implements MustVerifyEmail
      *
      * @var array<int, string>
      */
+    protected $primaryKey = 'user_id';
     protected $fillable = [
         'username',
         'nombre',
@@ -40,8 +41,6 @@ class User extends Authenticatable //implements MustVerifyEmail
         'password',
     ];
     
-	
-	protected $primaryKey = 'user_id';
 
 	/**
      * The attributes that should be hidden for serialization.

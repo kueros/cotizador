@@ -116,6 +116,11 @@
 											</a>
 											@endif
 
+
+
+
+
+											
 											@if ($permiso_deshabilitar_usuario)
 											<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar" onclick="deshabilitar_usuario('{{ $user->user_id}}',0)">
 												<i class="fas fa-lock"></i>
