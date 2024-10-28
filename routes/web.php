@@ -53,6 +53,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
 	Route::get('/roles', [RolController::class, 'index'])->name('roles.index');
+	Route::get('/ajax_listado', [RolController::class, 'ajax_listado'])->name('roles.ajax_listado');
 	Route::get('/show/{id}', [RolController::class, 'show'])->name('roles.show');
 	Route::get('/roles/create', [RolController::class, 'create'])->name('roles.create');
 	Route::post('/roles', [RolController::class, 'store'])->name('roles.store');

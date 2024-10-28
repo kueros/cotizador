@@ -23,6 +23,42 @@ class RolController extends Controller
 			->with('i', ($request->input('page', 1) - 1) * $roles->perPage());
 	}
 
+	public function ajax_listado(Request $request): View
+	{
+		/*$roles = Rol::paginate();
+		return view('rol.index', compact('roles'))
+			->with('i', ($request->input('page', 1) - 1) * $roles->perPage());*/
+
+		$roles = Rol::paginate();
+
+		// Realiza las búsquedas, ordenamiento y paginación que DataTables envía en la solicitud.
+		/*if ($request->has('search.value')) {
+			$query->where('columna1', 'like', '%' . $request->input('search.value') . '%');
+		}*/
+		
+		$totalData = $roles->count();
+		
+		// Paginación y ordenamiento
+		$roles->skip($request->input('start'))->take($request->input('length'));
+		
+		/*if ($request->has('order.0.column')) {
+			$columns = ['columna1', 'columna2', 'columna3']; // Ajusta a las columnas reales
+			$orderColumn = $columns[$request->input('order.0.column')];
+			$query->orderBy($orderColumn, $request->input('order.0.dir'));
+		}*/
+		
+		// Obtener los datos con paginación
+		$data = $roles->get();
+	
+		// Respuesta en formato JSON
+		return response()->json([
+			'draw' => $request->input('draw'),
+			'recordsTotal' => $totalData,
+			'recordsFiltered' => $totalData,
+			'data' => $data,
+		]);
+	}
+
 	/**
 	 * Show the form for creating a new resource.
 	 */

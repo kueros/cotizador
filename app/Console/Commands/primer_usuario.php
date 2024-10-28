@@ -35,7 +35,7 @@ class primer_usuario extends Command
         $roles = Rol::all();
         $rol_id = $roles->firstWhere('nombre', 'Administrador')->id;
         // Guardar los datos en la tabla yafo_plaft.users
-        DB::table('yafo_plaft.users')->insert([
+        DB::table('users')->insert([
             'username' => $data['username'],
             'nombre' => $data['nombre'],
             'apellido' => $data['apellido'],

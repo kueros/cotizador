@@ -16,7 +16,13 @@ class MonitoreoController extends Controller
 	 */
     public function index()
     {
-        return view('monitoreo.index');
+		$data = [
+			'breadcumb_deshabilitado' => 'Monitoreo',
+            'breadcumb_habilitado' => ['Inicio' => "" /*base_url('dashboard')*/]
+		];
+		$breadcumb_deshabilitado = 'Monitoreo';
+		$breadcumb_habilitado = ['Inicio' => "" /*base_url('dashboard')*/];
+        return view('monitoreo.index')->with($data);
     }
 
 	/**

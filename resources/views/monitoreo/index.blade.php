@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Monitoreo" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
 			{{ __('Usuarios') }}
@@ -28,7 +28,7 @@
 
 		#log_accesos {
 			padding: 5px;
-			background-image: url('/build/assets/images/log_accesos.png');
+			background-image: url('images/log_accesos.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			background-position: center;
@@ -36,7 +36,7 @@
 
 		#log_administracion {
 			padding: 5px;
-			background-image: url('/build/assets/images/log_acciones.png');
+			background-image: url('images/log_acciones.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			background-position: center;
@@ -44,7 +44,7 @@
 
 		#log_notificaciones {
 			padding: 5px;
-			background-image: url('/build/assets/images/log_notificaciones.png');
+			background-image: url('images/log_notificaciones.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			background-position: center;
@@ -52,7 +52,7 @@
 
 		#log_emails {
 			padding: 5px;
-			background-image: url('/build/assets/images/log_emails.png');
+			background-image: url('images/log_emails.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			background-position: center;

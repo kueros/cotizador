@@ -1,3 +1,4 @@
+@props(['breadcrumbs' => [], 'title' => ''])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -7,14 +8,31 @@
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 
 	<title>{{ config('app.name', 'YAFO') }}</title>
+	<link rel="shortcut icon" type="image/png" href="{{ asset('aleph_theme/img/favicon.png') }}"/>
 
-	<link href="/build/assets/css/bootstrap.min.css" rel="stylesheet">
-	<!-- Fonts -->
-	<link href="/build/assets/css/dataTables.css" rel="stylesheet">
-	<link href="/build/assets/css/exvite.css" rel="stylesheet">
-	<link href="/build/assets/css/jquery-ui.css" rel="Stylesheet">
-	<link href="/build/assets/awesome/css/all.min.css" rel="Stylesheet">
-	<!-- Scripts -->
+	<!--SECCION CSS-->
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/bootstrap/dist/css/bootstrap.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/aleph_theme/css/customv5.css?v2') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/jqueryui/themes/base/jquery-ui.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/font-awesome/css/all.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/font-awesome/css/fontawesome.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/bootstrap-icons/font/bootstrap-icons.min.css') }}">
+	<!--SECCION JS-->
+	<script type="text/javascript" src="{{ asset('build/assets/jquery/jquery.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/jqueryui/jquery-ui.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/form/dist/jquery.form.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/datatables.net/js/dataTables.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/sweet-alert/resources/js/sweetalert.all.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/html2canvas/dist/html2canvas.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/buttons/dataTables.buttons.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/amcharts/plugins/export/libs/jszip/jszip.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/tableexport.jquery.plugin/libs/pdfmake/pdfmake.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/tableexport.jquery.plugin/libs/pdfmake/vfs_fonts.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/buttons/buttons.html5.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/buttons/buttons.print.min.js') }}"></script>
 </head>
 
 <body class="font-sans antialiased">
@@ -33,31 +51,31 @@
 		}
 	</style>
 
+	@include('layouts.partials.header')
+	
+	<header>
+		@include('layouts.partials.navigation')
+		<x-breadcrumb :breadcrumbs="$breadcrumbs" :page="$title" />
+	</header>
+
 	<div class="min-h-screen bg-gray-100">
-		@include('layouts.navigation')
-
-		<!-- Page Heading -->
-		@isset($header)
-		<header class="bg-white shadow">
-			<div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-				{{ $header }}
-			</div>
-		</header>
-		@endisset
-
-		<!-- Page Content -->
-		<main>
-			{{ $slot }}
-		</main>
+	<main class="container">
+		{{ $slot }}
+	</main>
 	</div>
-	<script src="/build/assets/js/jquery-3.7.1.js"></script>
-	<script src="/build/assets/js/dataTables.js"></script>
-	<script src="/build/assets/js/jquery-ui.js"></script>
-	<script src="/build/assets/js/popper.min.js"></script>
-	<script src="/build/assets/js/bootstrap.min.js"></script>
-	<script src="/build/assets/js/cdn.min.js" defer></script>
-	<script src="/build/assets/js/sweetalert.min.js"></script>
-	<script src="/build/assets/js/customv7.js"></script>
+
+	@include('layouts.partials.footer')
+
+	<script type="text/javascript" src="{{ asset('build/assets/jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/assets/jqueryui/jquery-ui.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/assets/datatables.net/js/dataTables.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/assets/datatables.net/js/dataTables.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/buttons/dataTables.buttons.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/assets/buttons/buttons.html5.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/assets/buttons/buttons.print.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/sweet-alert/resources/js/sweetalert.all.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/aleph_theme/js/customv7.js?v='.date('Y-m-d')) }}"></script>
+
 	<script>
 		$(document).ready(function() {
 			//new DataTable('#example');
