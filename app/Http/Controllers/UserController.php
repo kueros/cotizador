@@ -42,8 +42,8 @@ class UserController extends Controller
 			return false;
 		}
 		$variables = Variable::where('nombre', 'reset_password_30_dias')
-			->first(['valor']);
-		return view('configuracion.index', compact('variables'));
+			->first()['valor'];
+			#dd($variables);
 		$users = User::withoutTrashed()
 		->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
 		->select('users.*', 'roles.nombre as nombre_rol')
@@ -306,13 +306,14 @@ class UserController extends Controller
 
 	public function guardar_opciones(Request $request)
 	{
-		#echo($request->password_reset_30_days);
+		#dd($request->password_reset_30_days);
+		$reset_password_30_dias = $request->password_reset_30_days ? 1 : 0;
 		// Encuentra la variable y actualiza su valor
-		#$variable = Variable::where('nombre', 'reset_password_30_dias')->first();
-		#if ($variable) {
-			#$variable->valor = $request->reset_password_30_dias;
-			#$variable->save();
-		#}
+		$variable = Variable::where('nombre', 'reset_password_30_dias')->first();
+		if ($variable) {
+			$variable->valor = $reset_password_30_dias;
+			$variable->save();
+		}
 		#return response()->json(['success' => 'Opciones guardadas correctamente']);
 		return redirect()->route('users.index')->with('success', 'Opciones guardadas correctamente.');
 	}				

@@ -13,7 +13,6 @@
 		$permiso_blanquear_password = tiene_permiso('clean_pass');
 		$permiso_borrar_usuarios = tiene_permiso('del_usr');
 		$permiso_importar_usuarios = tiene_permiso('import_usr');
-		dd($variables);
 		@endphp
 		<div style="background-image: url('/build/assets/images/dashboard_bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding-top: 3rem; padding-bottom: 3rem;">
 			<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -35,7 +34,7 @@
 										<div class="form-group">
 											<label class="control-label p-8">Requerir cambio de contraseña después de 30 días</label>
 											<div style="float:right;">
-												<input type="checkbox" value="1" <?php #if($reset_password){ echo 'checked'; }?> name="reset_password_30_dias" id="reset_password_30_dias">
+												<input type="checkbox" value="1" <?php if($variables){ echo 'checked'; }?> name="reset_password_30_dias" id="reset_password_30_dias">
 											</div>
 										</div>
 									</div>
@@ -223,6 +222,47 @@
 
 
 		<script>
+
+
+
+						$('input[type="checkbox"]').on('change', function() {
+							// Guardo el nombre del checkbox que ha sido clickeado
+							let variableName = $(this).attr('name');
+							// Verifico si está checkeado
+							let isChecked = $(this).is(':checked');
+							// Obtengo el div correspondiente basado en el id del checkbox
+							let targetDiv = $('#div_' + variableName);
+							// Si está checkeado, muestro el formulario
+							if (isChecked) {
+								targetDiv.slideUp(); // Oculto el formulario
+							} else {
+								targetDiv.slideDown(); // Muestro el formulario
+							}
+							// Envío el AJAX para guardar el estado
+							$.ajax({
+								url: '{{ route("users.guardar_opciones") }}',
+								type: 'POST',
+								data: {
+									_token: '{{ csrf_token() }}',
+									[variableName]: isChecked ? 1 : 0
+								},
+								dataType: "JSON",
+								success: function(response) {
+									alert('Estado guardado correctamente');
+									if (variableName == 'notificaciones_email_aleph') {
+										window.location.href = '{{ route("configuracion.index") }}';
+									} else {
+										location.reload(); // Refresca la pantalla
+									}
+								},
+								error: function(error) {
+									alert('Error al guardar el estado', error);
+								}
+							});
+						});
+
+
+
 
 	function deshabilitar_usuario(id, temporal = false) {
 		var texto = temporal 
