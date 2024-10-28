@@ -33,7 +33,7 @@
 									<div class="form-body">
 										<div class="form-group">
 											<label class="control-label p-8">Requerir cambio de contraseña después de 30 días</label>
-											<div style="float:right; margin-right: 25rem;">
+											<div style="float:right;">
 												<input type="checkbox" value="1" <?php #if($reset_password){ echo 'checked'; }?> name="request_change" id="request_change">
 											</div>
 										</div>
@@ -43,32 +43,32 @@
 									<div class="form-body">
 										<div class="form-group">
 											<label class="control-label p-8">Configurar contraseñas</label>
-											<div style="float:right; margin-right: 25rem;">
+											<div style="float:right;">
 												<input type="checkbox" value="1" <?php #if($configurar_claves){ echo 'checked'; }?> name="configurar_claves" id="configurar_claves">
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="row" style="margin-bottom:0.5rem;">
+								<!--div class="row" style="margin-bottom:0.5rem;">
 									<div class="form-body">
 										<div class="form-group">
 											<label class="control-label p-8">Permitir múltiples sesiones</label>
-											<div style="float:right; margin-right: 25rem;">
+											<div style="float:right;">
 												<input type="checkbox" value="1" <?php #if($permitir_multiples_sesiones){ echo 'checked'; }?> name="permitir_multiples_sesiones" id="permitir_multiples_sesiones">
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="row" style="margin-bottom:0.5rem;">
+								</div-->
+								<!--div class="row" style="margin-bottom:0.5rem;">
 								<div class="form-body">
 									<div class="form-group">
 										<label class="control-label p-8">Tiempo de sesión (segundos)</label>
-											<div style="float:right; margin-right: 25rem;">
-											<input class="form-control" name="session_time" type="number" min="60" max="864000" step="1" value=""/><!-- "{{ route('users.blanquear_password', ':id') }}".replace(':id', id) -->
+											<div style="float:right;">
+											<input class="form-control" name="session_time" type="number" min="60" max="864000" step="1" value=""/>< "{{ route('users.blanquear_password', ':id') }}".replace(':id', id) >
 										</div>
 									</div>
 								</div>
-							</div>
+							</div-->
 							<br>
 							<button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-floppy-disk"></span> Guardar opciones</button>
 						</form>

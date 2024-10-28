@@ -14,8 +14,13 @@ use Illuminate\Support\Facades\DB;
 class Permiso_x_RolController extends Controller
 {
 
-	public function index()
+	public function index( MyController $myController)
 	{
+		$permiso_asignar_permisos = $myController->tiene_permiso('manage_perm');
+		if (!$permiso_asignar_permisos) {
+			abort(403, '.');
+			return false;
+		}
 		$secciones = Seccion::get();
 		$permisos = Permiso::orderBy('seccion_id')->get();
 		$roles = Rol::get();
@@ -33,8 +38,13 @@ class Permiso_x_RolController extends Controller
 			return view('permisos_x_rol', compact('roles', 'permisos', 'secciones'));
 		}
 	*/
-	public function updatePermisos(Request $request)
+	public function updatePermisos(Request $request, MyController $myController)
 	{
+		$permiso_asignar_permisos = $myController->tiene_permiso('manage_perm');
+		if (!$permiso_asignar_permisos) {
+			abort(403, '.');
+			return false;
+		}
 		#dd($request);
 		$arrayFormulario = $request->input('id', []);
 		$idsPermitidos = array_keys($arrayFormulario); // Inicia con los IDs del formulario

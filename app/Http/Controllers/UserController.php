@@ -18,6 +18,7 @@ use illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Models\PasswordHistory;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 
 class UserController extends Controller
@@ -36,7 +37,6 @@ class UserController extends Controller
 		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
 		$permiso_eliminar_usuario = $myController->tiene_permiso('del_usr');
 		$permiso_deshabilitar_usuario = $myController->tiene_permiso('enable_usr');
-		#dd($permiso_listar_usuarios);
 		if (!$permiso_listar_usuarios) {
 			abort(403, '.');
 			return false;
@@ -55,8 +55,13 @@ class UserController extends Controller
 	/**
 	 * Show the form for creating a new resource.
 	 */
-	public function create(): View
+	public function create(MyController $myController): View
 	{
+		$permiso_agregar_usuario = $myController->tiene_permiso('add_usr');
+		if (!$permiso_agregar_usuario) {
+			abort(403, '.');
+			return false;
+		}
 		$roles = Rol::all();
 		$user = new User();
 		return view('user.create', compact('user', 'roles'));
@@ -72,6 +77,11 @@ class UserController extends Controller
 	public function store(Request $request, MyController $myController): RedirectResponse
 	{
 		#dd($request);
+		$permiso_agregar_usuario = $myController->tiene_permiso('add_usr');
+		if (!$permiso_agregar_usuario) {
+			abort(403, '.');
+			return false;
+		}
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
 			'username' => 'required|string|max:255',
@@ -167,8 +177,13 @@ class UserController extends Controller
 	/**
 	 * Show the form for editing the specified resource.
 	 */
-	public function edit($id): View
+	public function edit($id, MyController $myController): View
 	{
+		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
+		if (!$permiso_editar_usuario) {
+			abort(403, '.');
+			return false;
+		}
 		$roles = Rol::all();
 		$users = User::find($id);
 		return view('user.edit', compact('users', 'roles'));
@@ -183,6 +198,11 @@ class UserController extends Controller
 	 */
 	public function usersUpdate(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
+		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
+		if (!$permiso_editar_usuario) {
+			abort(403, '.');
+			return false;
+		}
 		try {
 		$messages = [
 			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
@@ -219,7 +239,7 @@ class UserController extends Controller
 		$myController->enviar_email($to, $body, $subject);
 		Log::info('Correo enviado exitosamente a ' . $to);
 		if(Auth::user()->username != "omar"){
-			dd("1".Auth::user()->username );
+			#dd("1".Auth::user()->username );
 		}
 		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
 		} catch (ValidationException $e) {
@@ -241,6 +261,11 @@ class UserController extends Controller
 
 	public function destroy($id, MyController $myController): RedirectResponse
 	{
+		$permiso_borrar_usuario = $myController->tiene_permiso('del_usr');
+		if (!$permiso_borrar_usuario) {
+			abort(403, '.');
+			return false;
+		}
 		if(Auth::user()->user_id != $id) 
 		{
 			// Encuentra el usuario por su ID
@@ -288,7 +313,12 @@ class UserController extends Controller
 	/**************************************************************************
 	*
 	**************************************************************************/
-	public function deshabilitar_usuario(Request $request, $id) {
+	public function deshabilitar_usuario(Request $request, $id, MyController $myController) {
+		$permiso_habilitar_usuario = $myController->tiene_permiso('del_usr');
+		if (!$permiso_habilitar_usuario) {
+			abort(403, '.');
+			return false;
+		}
 		try {
 			$user = User::findOrFail($id);
 			$user->habilitado = $request->input('temporal'); // Valor enviado por AJAX
@@ -305,8 +335,13 @@ class UserController extends Controller
 	*
 	**************************************************************************/
 
-	public function unlockAccount(Request $request, $userId)
+	public function unlockAccount(Request $request, $userId, MyController $myController)
 	{
+		$permiso_desbloquear_usuario = $myController->tiene_permiso('enable_usr');
+		if (!$permiso_desbloquear_usuario) {
+			abort(403, '.');
+			return false;
+		}
 		// Buscar al usuario por ID
 		$user = User::find($userId);
 
@@ -324,65 +359,8 @@ class UserController extends Controller
 	}
 
 	/**************************************************************************
-	 * Display a listing of the resource.
-	 */
-
-	public function showChangePasswordForm(Request $request)
-	{
-		echo 'token '.$request;
-		$token = $request->input('token');
-		return view('auth.passwords.reset', ['token' => $token]);
-	}
-
-	/**************************************************************************
-	 * Display a listing of the resource.
-	 */
-
-	public function changePassword(Request $request, $userId)
-	{
-		$request->validate([
-			'password' => [
-				'required',
-				'confirmed',
-				'min:8',
-				'regex:/[a-z]/',      // Al menos una letra minúscula
-				'regex:/[A-Z]/',      // Al menos una letra mayúscula
-				'regex:/[0-9]/',      // Al menos un número
-				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
-			],
-		]);
-
-		// Buscar al usuario y actualizar la contraseña
-		$user = User::find($userId);
-		$user->password = Hash::make($request->input('password'));
-		$user->save();
-
-		return redirect()->route('login')->with('success', 'Contraseña actualizada con éxito. Inicie sesión con su nueva contraseña.');
-	}
-
-	/**************************************************************************
-	 * Display a listing of the resource.
-	 */
-
-	public function showPasswordForm($id)
-	{
-		// Busca el usuario por ID
-		$selectedUser = User::find($id);
-	
-		// Obtiene la lista de todos los usuarios (tal como en la función index)
-		$users = User::withoutTrashed()
-			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
-			->select('users.*', 'roles.nombre as nombre_rol')
-			->paginate();
-	
-		// Devuelve la vista de usuarios con la lista de usuarios y el formulario de cambio de contraseña activo
-		return view('user.index', compact('users', 'selectedUser'))
-			->with('i', (request()->input('page', 1) - 1) * $users->perPage());
-	}
-
-	/**************************************************************************
-	 * Blanqueo de passwords.
-	 */
+	* Blanqueo de passwords.
+	*/
 
 	public function blanquear_password($user_id, MyController $myController)
 	{
@@ -419,8 +397,93 @@ class UserController extends Controller
 	}
 
 	/**************************************************************************
+	* Set password expiration.
+	*/
+	public function setPasswordExpiration(User $user)
+	{
+		// Define el periodo de expiración, por ejemplo, 90 días
+		$expirationDays = config('auth.password_expiration_days', 90);
+
+		$user->password_expires_at = Carbon::now()->addDays($expirationDays);
+		$user->save();
+	}
+
+
+	/**************************************************************************
+	* Set password expiration.
+	*/
+	public function authenticate(Request $request)
+	{
+		// Realiza la autenticación habitual
+		// ...
+
+		// Verifica si la contraseña ha expirado
+		if ($user->password_expires_at && $user->password_expires_at->isPast()) {
+			return redirect()->route('password.expired');
+		}
+
+		// Continua con el flujo de autenticación
+	}
+	/**************************************************************************
 	* Display a listing of the resource.
-	**************************************************************************/
+	*
+
+	public function showChangePasswordForm(Request $request)
+	{
+		echo 'token '.$request;
+		$token = $request->input('token');
+		return view('auth.passwords.reset', ['token' => $token]);
+	}
+
+	/**************************************************************************
+	 * Display a listing of the resource.
+	 *
+
+	public function changePassword(Request $request, $userId)
+	{
+		$request->validate([
+			'password' => [
+				'required',
+				'confirmed',
+				'min:8',
+				'regex:/[a-z]/',      // Al menos una letra minúscula
+				'regex:/[A-Z]/',      // Al menos una letra mayúscula
+				'regex:/[0-9]/',      // Al menos un número
+				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+			],
+		]);
+
+		// Buscar al usuario y actualizar la contraseña
+		$user = User::find($userId);
+		$user->password = Hash::make($request->input('password'));
+		$user->save();
+
+		return redirect()->route('login')->with('success', 'Contraseña actualizada con éxito. Inicie sesión con su nueva contraseña.');
+	}
+
+	/**************************************************************************
+	 * Display a listing of the resource.
+	 *
+
+	public function showPasswordForm($id)
+	{
+		// Busca el usuario por ID
+		$selectedUser = User::find($id);
+	
+		// Obtiene la lista de todos los usuarios (tal como en la función index)
+		$users = User::withoutTrashed()
+			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
+			->select('users.*', 'roles.nombre as nombre_rol')
+			->paginate();
+	
+		// Devuelve la vista de usuarios con la lista de usuarios y el formulario de cambio de contraseña activo
+		return view('user.index', compact('users', 'selectedUser'))
+			->with('i', (request()->input('page', 1) - 1) * $users->perPage());
+	}
+
+	/**************************************************************************
+	* Display a listing of the resource.
+	**************************************************************************
 
 	public function showResetForm(Request $request)
 	{
@@ -430,6 +493,6 @@ class UserController extends Controller
 		return view('auth.password_reset', ['token' => $token],['email' => $email]);
 	}
 
-
+*/
 
 }

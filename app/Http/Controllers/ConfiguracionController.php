@@ -18,8 +18,13 @@ class ConfiguracionController extends Controller
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index(): View
+	public function index( MyController $myController): View
 	{
+		$permiso_configuraciones_software = $myController->tiene_permiso('setup_soft');
+		if (!$permiso_configuraciones_software) {
+			abort(403, '.');
+			return false;
+		}
 		$variables = Variable::where('nombre', 'like', '%noti%')
 			->orWhere('nombre', 'like', '%opav%')
 			->orWhere('nombre', 'like', '%copa%')
@@ -33,14 +38,24 @@ class ConfiguracionController extends Controller
 	/**
 	 * Muestro la vista de variables.
 	 */
-	public function variables()
+	public function variables( MyController $myController)
 	{
+		$permiso_configuraciones_software = $myController->tiene_permiso('setup_soft');
+		if (!$permiso_configuraciones_software) {
+			abort(403, '.');
+			return false;
+		}
 		$variables = Variable::all();
 		return view('configuracion.variables', compact('variables'));
 	}
 
 	public function guardar_estado(Request $request, MyController $myController)
 	{
+		$permiso_guardar_configuraciones_software = $myController->tiene_permiso('save_setup_soft');
+		if (!$permiso_guardar_configuraciones_software) {
+			abort(403, '.');
+			return false;
+		}
 		try {
 			// Guardo los datos de los estados.
 			foreach ($request->all() as $nombre => $valor) {
@@ -97,6 +112,11 @@ class ConfiguracionController extends Controller
 
 	public function guardar_remitente(Request $request, MyController $myController)
 	{
+		$permiso_guardar_configuraciones_software = $myController->tiene_permiso('save_setup_soft');
+		if (!$permiso_guardar_configuraciones_software) {
+			abort(403, '.');
+			return false;
+		}
 		$message = "Guardar remitente recibido. " . json_encode($request->all());
 		$users = User::find(Auth::user()->user_id);
 		Log::info($message);
@@ -126,8 +146,13 @@ class ConfiguracionController extends Controller
 		return; // redirect()->route('configuracion');
 	}
 
-	public function add_parametro_email(Request $request)
+	public function add_parametro_email(Request $request, MyController $myController)
 	{
+		$permiso_guardar_configuraciones_software = $myController->tiene_permiso('save_setup_soft');
+		if (!$permiso_guardar_configuraciones_software) {
+			abort(403, '.');
+			return false;
+		}
 
 		$parametro = trim($_POST['parametro']);
 		$valor = trim($_POST['valor']);
@@ -158,8 +183,13 @@ class ConfiguracionController extends Controller
 		return redirect('/configuracion');
 	}
 
-	public function ajax_delete_parametro_email()
+	public function ajax_delete_parametro_email(MyController $myController)
 	{
+		$permiso_guardar_configuraciones_software = $myController->tiene_permiso('save_setup_soft');
+		if (!$permiso_guardar_configuraciones_software) {
+			abort(403, '.');
+			return false;
+		}
 
 		$parametro = trim($_POST['parametro']);
 
