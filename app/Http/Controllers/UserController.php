@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\PasswordHistory;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
-
+use App\Models\Variable;
 
 class UserController extends Controller
 {
@@ -41,11 +41,14 @@ class UserController extends Controller
 			abort(403, '.');
 			return false;
 		}
+		$variables = Variable::where('nombre', 'reset_password_30_dias')
+			->first(['valor']);
+		return view('configuracion.index', compact('variables'));
 		$users = User::withoutTrashed()
 		->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
 		->select('users.*', 'roles.nombre as nombre_rol')
 		->paginate();
-		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario'))
+		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario', 'variables'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
 
@@ -101,6 +104,8 @@ class UserController extends Controller
 		if ($existingUser) {
 			// Restaurar el usuario si está soft deleted
 			$existingUser->restore();
+			$existingUser->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
+			$existingUser->save();
 
 			// Actualizar los datos del usuario restaurado con los nuevos valores
 			$existingUser->update($validatedData);
@@ -122,7 +127,11 @@ class UserController extends Controller
 		} else {
 
 			// Si no existe un usuario soft deleted, crear uno nuevo
+			#$validatedData['ultima_fecha_restablecimiento'] = Carbon::now(); // Añadir fecha actual
+			#dd($validatedData);
 			$user = User::create($validatedData);
+			$user->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
+			$user->save();
 
 			$clientIP = \Request::ip();
 			$userAgent = \Request::userAgent();
@@ -295,19 +304,26 @@ class UserController extends Controller
 	*
 	**************************************************************************/
 
-	public function guardar_opciones(Request $request, $user_id)
+	public function guardar_opciones(Request $request)
 	{
-		#echo Auth::user()->user_id;
-		if(Auth::user()->user_id != $user_id) 
-		{
-			// Actualiza la contraseña del usuario
-			$user = User::find($user_id);
-			$user->password = null;
-			$user->save();
-			return response()->json(['success'=> true]);
-		} else {
-			return response()->json('No se puede blanquear tu propia clave', 403);
-		}
+		#echo($request->password_reset_30_days);
+		// Encuentra la variable y actualiza su valor
+		#$variable = Variable::where('nombre', 'reset_password_30_dias')->first();
+		#if ($variable) {
+			#$variable->valor = $request->reset_password_30_dias;
+			#$variable->save();
+		#}
+		#return response()->json(['success' => 'Opciones guardadas correctamente']);
+		return redirect()->route('users.index')->with('success', 'Opciones guardadas correctamente.');
+	}				
+
+	/**************************************************************************
+	*
+	**************************************************************************/
+
+	public function mostrar_opciones(Request $request)
+	{
+		echo($request);
 	}				
 
 	/**************************************************************************

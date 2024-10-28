@@ -13,6 +13,7 @@
 		$permiso_blanquear_password = tiene_permiso('clean_pass');
 		$permiso_borrar_usuarios = tiene_permiso('del_usr');
 		$permiso_importar_usuarios = tiene_permiso('import_usr');
+		dd($variables);
 		@endphp
 		<div style="background-image: url('/build/assets/images/dashboard_bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding-top: 3rem; padding-bottom: 3rem;">
 			<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -27,14 +28,14 @@
 					</button>
 					<div x-show="open2" class=" p-12 border-t border-gray-200">
 						<!-- Contenido de Opciones avanzadas -->
-						<form action="{{ route('users.guardar_opciones', ':id') }}".replace(':id', id) method="POST">
+						<form action="{{ route('users.guardar_opciones') }}" method="POST">
 							@csrf
 								<div class="row" style="margin-bottom:0.5rem;">
 									<div class="form-body">
 										<div class="form-group">
 											<label class="control-label p-8">Requerir cambio de contraseña después de 30 días</label>
 											<div style="float:right;">
-												<input type="checkbox" value="1" <?php #if($reset_password){ echo 'checked'; }?> name="request_change" id="request_change">
+												<input type="checkbox" value="1" <?php #if($reset_password){ echo 'checked'; }?> name="reset_password_30_dias" id="reset_password_30_dias">
 											</div>
 										</div>
 									</div>
