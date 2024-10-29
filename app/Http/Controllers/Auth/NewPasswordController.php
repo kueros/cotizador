@@ -70,7 +70,8 @@ class NewPasswordController extends Controller
 			'token' => 'required',		]);
 			$user = DB::table('users')
 						->where('email', $request->email)
-						->update(['password' =>  Hash::make($validatedData['password'])]);
+						->update([	'password' =>  Hash::make($validatedData['password']),
+									'ultima_fecha_restablecimiento' => now()]);
 
 			return redirect()->route('login')->with('success', 'Contraseña actualizada con éxito. Inicie sesión con su nueva contraseña.');
 	}
@@ -179,7 +180,8 @@ class NewPasswordController extends Controller
 		User::where('email', $request->email)->update([
             'password' => Hash::make($validated['password']),
 			'bloqueado' => 0,
-			'intentos_login' => 0
+			'intentos_login' => 0,
+			'ultima_fecha_restablecimiento' => now()
 		]);
 		// Guardar la nueva contraseña en el historial
 		PasswordHistory::create([

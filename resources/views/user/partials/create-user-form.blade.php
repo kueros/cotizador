@@ -14,12 +14,6 @@
 		@csrf
 
 		<div>
-			<x-input-label for="username" :value="__('Nombre de Usuario')" />
-			<x-text-input id="username" value="{{ old('username', $user->username) }}" name="username" type="text" class="mt-1 block w-full" placeholder="Nombre de Usuario" />
-			<x-input-error :messages="$errors->get('username')" class="mt-2" />
-		</div>
-
-		<div>
 			<x-input-label for="nombre" :value="__('Nombre')" />
 			<x-text-input id="nombre" value="{{ old('nombre', $user->nombre) }}" name="nombre" type="text" class="mt-1 block w-full" placeholder="Nombre" />
 			<x-input-error :messages="$errors->get('nombre')" class="mt-2" />
@@ -29,6 +23,12 @@
 			<x-input-label for="apellido" :value="__('Apellido')" />
 			<x-text-input id="apellido" value="{{ old('apellido', $user->apellido) }}" name="apellido" type="text" class="mt-1 block w-full" placeholder="Apellido" />
 			<x-input-error :messages="$errors->get('apellido')" class="mt-2" />
+		</div>
+
+		<div>
+			<x-input-label for="username" :value="__('Nombre de Usuario')" />
+			<x-text-input id="username" value="{{ old('username', $user->username) }}" name="username" type="text" class="mt-1 block w-full" placeholder="Nombre de Usuario" />
+			<x-input-error :messages="$errors->get('username')" class="mt-2" />
 		</div>
 
 		<div>

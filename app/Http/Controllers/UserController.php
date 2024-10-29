@@ -209,6 +209,7 @@ class UserController extends Controller
 	 */
 	public function usersUpdate(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
+		#dd($request);
 		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
 		if (!$permiso_editar_usuario) {
 			abort(403, '.');
@@ -229,29 +230,46 @@ class UserController extends Controller
 			'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
 			'rol_id' => 'required|exists:roles,rol_id', // Cambiar "id" por el nombre correcto de la columna primaria
 		], $messages);
-		// Actualizar el usuario con los datos validados
-		$user->update($validatedData);
 		// Encuentra el usuario por su ID
 		$user = User::find($user->user_id);
-
+#dd($user);
+#dd($validatedData);
 		// Si el usuario no existe, redirige con un mensaje de error
 		if (!$user) {
 			return redirect('/users')->with('error', 'El usuario no existe.');
 		}
 
-		// Almacena el nombre de usuario antes de modificarlo
+		// Almacena el usuario antes de modificarlo
 		$username = $user->username;
 		$message = Auth::user()->username . " actualizó el usuario " . $username;
 		Log::info($message);
+
 		$subject = "Actualización de usuario";
-		$body = "Usuario " . $username . " actualizado correctamente por " . Auth::user()->username;
-		$to = "omarliberatto@yafoconsultora.com";
+		$body = "El usuario " . $username . " correspondiente a ". $user->nombre ." ". $user->apellido ." fue actualizado por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+
+		#dd($user->email." - ".$validatedData['email']);
+		if ($user->email != $validatedData['email']) {
+			$to = $user->email.",".$validatedData['email'];
+			$body = "El email del usuario ". $user->nombre ." ". $user->apellido ." fue actualizado de ".$user->email." a ".$validatedData['email']." por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+		} else {
+			$to = $user->email;
+		}
+
 		// Llamar a enviar_email de MyController
 		$myController->enviar_email($to, $body, $subject);
+
+
+
 		Log::info('Correo enviado exitosamente a ' . $to);
 		if(Auth::user()->username != "omar"){
 			#dd("1".Auth::user()->username );
 		}
+
+		// Actualizar el usuario con los datos validados
+		$user->update($validatedData);
+
+
+
 		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
 		} catch (ValidationException $e) {
 			// Si ocurre un error de validación, redirigir con los mensajes de error

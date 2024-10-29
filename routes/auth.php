@@ -38,13 +38,11 @@ Route::middleware('guest')->group(function () {
 ####	updatePassword
 Route::get('blank_pass/{token}/{email}', 			[NewPasswordController::class, 'blank_pass'])->name('blank_pass_form');
 Route::get('reset_pass/{token}/{email}', 			[PasswordResetLinkController::class, 'reset_pass'])->name('reset_pass_form');
+Route::get('create_pass/{token}/{email}', 			[NewPasswordController::class, 'create_pass'])->name('create_pass_form');
+
 Route::post('blanquear_password', 					[NewPasswordController::class, 'blanquear_password'])->name('blanquear_password');
 Route::post('updatePassword', 						[PasswordResetLinkController::class, 'updatePassword'])->name('resetear_password');
-
-###
-Route::get('create_pass/{token}/{email}', 			[NewPasswordController::class, 'create_pass'])->name('create_pass_form');
 Route::post('/password_create', 					[NewPasswordController::class, 'store'])->name('crear_password');
-###
 
 
 

@@ -37,6 +37,18 @@
 		</div>
 
 		<div>
+			<x-input-label for="username" :value="__('Username')" />
+			<x-text-input id="username" value="{{ $users->username }}" name="username" type="text" class="mt-1 block w-full" autocomplete="username" />
+			<x-input-error :messages="$errors->get('username')" class="mt-2" />
+		</div>
+
+		<div>
+			<x-input-label for="email" :value="__('Email')" />
+			<x-text-input id="email" value="{{ $users->email }}" name="email" type="email" class="mt-1 block w-full" autocomplete="Email" />
+			<x-input-error :messages="$errors->get('email')" class="mt-2" />
+		</div>
+
+		<div>
 			<x-input-label for="rol_id" :value="__('Rol')" />
 			<select id="rol_id" name="rol_id" class="mt-1 block w-full">
 				<option value="0" {{ old('rol_id', $users->rol_id) === null ? 'selected' : '' }}>
@@ -65,8 +77,6 @@
 			</div>
 			<!-- Campo oculto para enviar el valor de "bloqueado" -->
 			<input type="hidden" name="habilitado" value="{{ $users->habilitado }}">
-			<input type="hidden" name="username" value="{{ $users->username }}">
-			<input type="hidden" name="email" value="{{ $users->email }}">
 			<x-input-error :messages="$errors->get('habilitado')" class="mt-2" />
 		</div>
 		<div style="display: none;">
