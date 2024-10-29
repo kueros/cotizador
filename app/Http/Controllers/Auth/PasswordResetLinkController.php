@@ -93,7 +93,7 @@ class PasswordResetLinkController extends Controller
 				'regex:/[a-z]/',      // Al menos una letra minúscula
 				'regex:/[A-Z]/',      // Al menos una letra mayúscula
 				'regex:/[0-9]/',      // Al menos un número
-				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+				'regex:/[@$!%*?&#.]/', // Al menos un carácter especial
 			],
 			'token' => 'required',		]);
 		#dd($request->email);

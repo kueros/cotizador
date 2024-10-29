@@ -65,7 +65,7 @@ class NewPasswordController extends Controller
 				'regex:/[a-z]/',      // Al menos una letra minúscula
 				'regex:/[A-Z]/',      // Al menos una letra mayúscula
 				'regex:/[0-9]/',      // Al menos un número
-				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+				'regex:/[@$!%*?&#.]/', // Al menos un carácter especial
 			],
 			'token' => 'required',		]);
 			$user = DB::table('users')
@@ -100,7 +100,7 @@ class NewPasswordController extends Controller
 				'regex:/[a-z]/',      // Al menos una letra minúscula
 				'regex:/[A-Z]/',      // Al menos una letra mayúscula
 				'regex:/[0-9]/',      // Al menos un número
-				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+				'regex:/[@$!%*?&#.]/', // Al menos un carácter especial
 			],
 			'token' => 'required',		]);
 
@@ -139,7 +139,7 @@ class NewPasswordController extends Controller
                 'regex:/[a-z]/',      // Al menos una letra minúscula
                 'regex:/[A-Z]/',      // Al menos una letra mayúscula
                 'regex:/[0-9]/',      // Al menos un número
-                'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+                'regex:/[@$!%*?&#.]/', // Al menos un carácter especial
             ],
             'token' => 'required',		]);
 		if(Auth::user()){

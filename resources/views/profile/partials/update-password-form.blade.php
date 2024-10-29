@@ -23,7 +23,7 @@
 <script>
     document.getElementById('password').addEventListener('input', function () {
         const password = this.value;
-        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.])[A-Za-z\d@$!%*?&#.]{8,}$/;
         if (!regex.test(password)) {
             this.setCustomValidity('La contraseña debe tener al menos 8 caracteres, con 1 número, 1 mayúscula, 1 minúscula y 1 carácter especial.');
         } else {
