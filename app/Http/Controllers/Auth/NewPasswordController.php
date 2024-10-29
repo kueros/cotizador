@@ -14,6 +14,8 @@ use Illuminate\View\View;
 use App\Models\User;
 use App\Models\PasswordHistory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 
 class NewPasswordController extends Controller
 {
@@ -55,12 +57,22 @@ class NewPasswordController extends Controller
      */
 	public function store(Request $request): RedirectResponse
 	{
-		// Buscar el nuevo usuario
-		$user = User::where('email', $request->email)->first();
-		$user->update([
-			'password' => Hash::make($request->password), // Hasheamos la contraseña
-		]);
-		return redirect()->route('login');
+        $validatedData = $request->validate([
+			'password' => [
+				'required',
+				'confirmed',
+				'min:8',
+				'regex:/[a-z]/',      // Al menos una letra minúscula
+				'regex:/[A-Z]/',      // Al menos una letra mayúscula
+				'regex:/[0-9]/',      // Al menos un número
+				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+			],
+			'token' => 'required',		]);
+			$user = DB::table('users')
+						->where('email', $request->email)
+						->update(['password' =>  Hash::make($validatedData['password'])]);
+
+			return redirect()->route('login')->with('success', 'Contraseña actualizada con éxito. Inicie sesión con su nueva contraseña.');
 	}
 
 	/****************************************************************************************************************************************************
@@ -80,17 +92,16 @@ class NewPasswordController extends Controller
     {
 		#dd($request);
         $request->validate([
-            'password' => [
-                'required',
-                'confirmed',
-                'min:8',
-                'regex:/[a-z]/',      // Al menos una letra minúscula
-                'regex:/[A-Z]/',      // Al menos una letra mayúscula
-                'regex:/[0-9]/',      // Al menos un número
-                'regex:/[@$!%*?&#]/', // Al menos un carácter especial
-            ],
-            'token' => 'required',
-        ]);
+			'password' => [
+				'required',
+				'confirmed',
+				'min:8',
+				'regex:/[a-z]/',      // Al menos una letra minúscula
+				'regex:/[A-Z]/',      // Al menos una letra mayúscula
+				'regex:/[0-9]/',      // Al menos un número
+				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+			],
+			'token' => 'required',		]);
 
 		$status = Password::reset(
 			$request->only('email', 'password', 'password_confirmation', 'token'),

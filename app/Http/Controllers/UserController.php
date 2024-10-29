@@ -41,14 +41,16 @@ class UserController extends Controller
 			abort(403, '.');
 			return false;
 		}
-		$variables = Variable::where('nombre', 'reset_password_30_dias')
+		$reset_password_30_dias = Variable::where('nombre', 'reset_password_30_dias')
+			->first()['valor'];
+		$configurar_claves = Variable::where('nombre', 'configurar_claves')
 			->first()['valor'];
 			#dd($variables);
 		$users = User::withoutTrashed()
 		->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
 		->select('users.*', 'roles.nombre as nombre_rol')
 		->paginate();
-		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario', 'variables'))
+		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario', 'reset_password_30_dias', 'configurar_claves'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
 
@@ -306,15 +308,14 @@ class UserController extends Controller
 
 	public function guardar_opciones(Request $request)
 	{
-		#dd($request->password_reset_30_days);
-		$reset_password_30_dias = $request->password_reset_30_days ? 1 : 0;
-		// Encuentra la variable y actualiza su valor
-		$variable = Variable::where('nombre', 'reset_password_30_dias')->first();
-		if ($variable) {
-			$variable->valor = $reset_password_30_dias;
-			$variable->save();
-		}
-		#return response()->json(['success' => 'Opciones guardadas correctamente']);
+		$reset_password_30_dias = $request->reset_password_30_dias ? 1 : 0;
+		$configurar_claves = $request->configurar_claves ? 1 : 0;
+			Variable::where('nombre', 'reset_password_30_dias')->update([
+				'valor' => $reset_password_30_dias
+			]);
+			Variable::where('nombre', 'configurar_claves')->update([
+				'valor' => $configurar_claves
+			]);
 		return redirect()->route('users.index')->with('success', 'Opciones guardadas correctamente.');
 	}				
 

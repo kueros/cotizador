@@ -13,6 +13,7 @@
 		$permiso_blanquear_password = tiene_permiso('clean_pass');
 		$permiso_borrar_usuarios = tiene_permiso('del_usr');
 		$permiso_importar_usuarios = tiene_permiso('import_usr');
+		#dd($configurar_claves);
 		@endphp
 		<div style="background-image: url('/build/assets/images/dashboard_bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding-top: 3rem; padding-bottom: 3rem;">
 			<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -34,7 +35,7 @@
 										<div class="form-group">
 											<label class="control-label p-8">Requerir cambio de contraseña después de 30 días</label>
 											<div style="float:right;">
-												<input type="checkbox" value="1" <?php if($variables){ echo 'checked'; }?> name="reset_password_30_dias" id="reset_password_30_dias">
+												<input type="checkbox" value="1" <?php if($reset_password_30_dias){ echo 'checked'; }?> name="reset_password_30_dias" id="reset_password_30_dias">
 											</div>
 										</div>
 									</div>
@@ -44,7 +45,7 @@
 										<div class="form-group">
 											<label class="control-label p-8">Configurar contraseñas</label>
 											<div style="float:right;">
-												<input type="checkbox" value="1" <?php #if($configurar_claves){ echo 'checked'; }?> name="configurar_claves" id="configurar_claves">
+												<input type="checkbox" value="1" <?php if($configurar_claves){ echo 'checked'; }?> name="configurar_claves" id="configurar_claves">
 											</div>
 										</div>
 									</div>

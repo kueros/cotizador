@@ -56,12 +56,12 @@ class PasswordResetLinkController extends Controller
 				$resetUrl = route('reset_pass_form', ['token' => $token, 'email' => $email]);
 				// Enviar correo
 				$subject = "Aviso de restablecimiento de contraseña";
-                $body = 'Está recibiendo este mail porque Ud. solicitó un restablecimiento de contraseña.para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';
+                $body = 'Está recibiendo este mail porque Ud. solicitó un restablecimiento de contraseña o porque esta expiró, para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';
 				$to = $user->email;
 				#echo "kdk2 ".$resetUrl;
 				$myController->enviar_email($to, $body, $subject);
 				#return response()->json(['success' => true, 'message' => 'Contraseña blanqueada y correo enviado con éxito.']);
-                return redirect()->route('login')->with('success', 'Contraseña actualizada con éxito. Inicie sesión con su nueva contraseña.');
+                return redirect()->route('login')->with('success', 'Contraseña blanqueada y correo enviado con éxito.');
 
 			}
     }
@@ -86,16 +86,16 @@ class PasswordResetLinkController extends Controller
 	{
 		#dd($request);
 		$validated = $request->validate([
-            'password' => [
-                'required',
-                'confirmed',
-                'min:8',
-                'regex:/[a-z]/',      // Al menos una letra minúscula
-                'regex:/[A-Z]/',      // Al menos una letra mayúscula
-                'regex:/[0-9]/',      // Al menos un número
-                'regex:/[@$!%*?&#]/', // Al menos un carácter especial
-            ],
-            'token' => 'required',		]);
+			'password' => [
+				'required',
+				'confirmed',
+				'min:8',
+				'regex:/[a-z]/',      // Al menos una letra minúscula
+				'regex:/[A-Z]/',      // Al menos una letra mayúscula
+				'regex:/[0-9]/',      // Al menos un número
+				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+			],
+			'token' => 'required',		]);
 		#dd($request->email);
 		if(Auth::user()){
 			$user_id = Auth::user()->user_id;
@@ -129,7 +129,8 @@ class PasswordResetLinkController extends Controller
 		User::where('email', $request->email)->update([
             'password' => Hash::make($validated['password']),
 			'bloqueado' => 0,
-			'intentos_login' => 0
+			'intentos_login' => 0,
+			'ultima_fecha_restablecimiento' => now()
 		]);
 
 		// Guardar la nueva contraseña en el historial

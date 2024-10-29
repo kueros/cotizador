@@ -3,7 +3,7 @@
 	namespace App\Http\Controllers\Auth;
 
 	use App\Http\Controllers\Controller;
-	use App\Models\User;
+	use App\Http\Controllers\MyController;
 	use App\Http\Requests\Auth\LoginRequest;
 	use Illuminate\Http\RedirectResponse;
 	use Illuminate\Http\Request;
@@ -12,7 +12,9 @@
 	use Illuminate\Support\Facades\Log;
 	use App\Models\LogAcceso;
 	use App\Models\LogAdministracion;
-	use App\Http\Controllers\MyController;
+	use App\Models\User;
+	use App\Models\Variable;
+	use Illuminate\Support\Facades\Password;
 
 	/*
 		Log::emergency($message);
@@ -77,6 +79,24 @@
 				$loginField => $request->input('email'),
 				'password' => $request->input('password'),
 			];
+			$reset_password_30_dias = Variable::where('nombre', 'reset_password_30_dias')
+				->first()['valor'];
+			if($reset_password_30_dias){
+
+
+				$fecha_actual = time();
+				$ultima_fecha_restablecimiento = strtotime($user->ultima_fecha_restablecimiento);
+				if($ultima_fecha_restablecimiento && ($fecha_actual - $ultima_fecha_restablecimiento) > 2592000){
+					$token = Password::createToken($user);
+					$email = $user->email;
+					$link = route('reset_pass_form', ['token' => $token, 'email' => $email]);
+					#dd($link);
+					return redirect()->route('login')
+						->withErrors(['email' => 'Su clave ha expirado, debe actualizarla para seguir usando la cuenta, para continuar y cambiar la contraseña haga click en "Olvidé mi contraseña"'])
+						->withInput($request->only('email'));
+
+				}
+			}
 
 			if (Auth::attempt($credentials)) {
 				$request->session()->regenerate();
@@ -96,18 +116,16 @@
 					'ip_address' => $_SERVER['REMOTE_ADDR'],
 					'user_agent' => $_SERVER['HTTP_USER_AGENT'],
 				]);
-
+				
 				return redirect()->intended(route('dashboard', absolute: false));
 			} else {
 				// Incrementar el número de intentos fallidos
 				if ($user) {
 					$user->intentos_login += 1;
-
 					// Bloquear la cuenta si hay 3 intentos fallidos
 					if ($user->intentos_login >= 3) {
 						$user->bloqueado = 1;
 					}
-
 					$user->save();
 				}
 

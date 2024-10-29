@@ -94,7 +94,7 @@
 				<div class="flex items-center justify-between mt-4">
 					<!-- Forgot Password Link -->
 					<a class="underline text-sm text-white hover:text-gray-200" href="{{ route('password.request') }}">
-						{{ __('¿Olvidaste tu contraseña?') }}
+						{{ __('Olvidé mi contraseña') }}
 					</a>
 
 
