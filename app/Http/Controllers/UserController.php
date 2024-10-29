@@ -217,8 +217,8 @@ class UserController extends Controller
 		}
 		try {
 		$messages = [
-			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
-			'email.unique' => 'El correo electrónico ya está registrado por otro usuario.',
+			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario2.',
+			'email.unique' => 'El correo electrónico ya está registrado por otro usuario1.',
 			'rol_id.required' => 'El rol es obligatorio.',
 			'rol_id.exists' => 'El rol seleccionado no es válido.',
 		];
@@ -232,8 +232,8 @@ class UserController extends Controller
 		], $messages);
 		// Encuentra el usuario por su ID
 		$user = User::find($user->user_id);
-#dd($user);
-#dd($validatedData);
+		#dd($user);
+		#dd($validatedData);
 		// Si el usuario no existe, redirige con un mensaje de error
 		if (!$user) {
 			return redirect('/users')->with('error', 'El usuario no existe.');
@@ -279,7 +279,7 @@ class UserController extends Controller
 			return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
 		} catch (\Exception $e) {
 			Log::error('Error en la actualización del usuario: '.$e->getMessage());
-			dd('Error: '.$e->getMessage());  // Muestra el mensaje exacto del error
+			#dd('Error: '.$e->getMessage());  // Muestra el mensaje exacto del error
 			return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
 		}
 	}
