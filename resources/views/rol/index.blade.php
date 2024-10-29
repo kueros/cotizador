@@ -54,7 +54,7 @@
 									<form action="{{ route('roles.destroy', $rol->rol_id) }}" method="POST">
 											@csrf
 											@method('DELETE')
-											<button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+											<button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Está seguro de querer borrar?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
 										</form>
 									@endif
 								@endif

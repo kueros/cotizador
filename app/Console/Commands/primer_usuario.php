@@ -49,7 +49,7 @@ class primer_usuario extends Command
 
 		
 		// Insertar el usuario en la tabla
-		DB::table('yafo_plaft.users')->insert([
+		DB::table('users')->insert([
 			'username' => $data['username'],
 			'nombre' => $data['nombre'],
 			'apellido' => $data['apellido'],
@@ -61,7 +61,7 @@ class primer_usuario extends Command
 		]);
 
 		// crear el rol_x_usuario
-		DB::table('yafo_plaft.roles_x_usuario')->insert([
+		DB::table('roles_x_usuario')->insert([
 			'user_id' => 1,
 			'rol_id' => $rol_administrador->rol_id,  // Asignar el ID del rol "Administrador"
 			'created_at' => now(),
