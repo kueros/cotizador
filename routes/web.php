@@ -117,6 +117,8 @@ Route::middleware('auth')->group(function () {
 	Route::get('/monitoreo/log_administracion', [MonitoreoController::class, 'log_administracion'])->name('monitoreo.log_administracion');
 	Route::get('/monitoreo/log_notificaciones', [MonitoreoController::class, 'log_notificaciones'])->name('monitoreo.log_notificaciones');
 	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
+	Route::get('/monitoreo/ajax_log_acceso', [MonitoreoController::class, 'ajax_log_acceso'])->name('monitoreo.ajax_log_acceso');
+	Route::get('/monitoreo/ajax_log_administracion', [MonitoreoController::class, 'ajax_log_administracion'])->name('monitoreo.ajax_log_administracion');
 });
 
 Route::middleware('auth')->group(

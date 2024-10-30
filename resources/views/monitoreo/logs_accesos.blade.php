@@ -1,4 +1,4 @@
-<x-app-layout title="Log accesos" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard'], ['title' => 'Monitoreo', 'url' => 'monitoreo']]">
+<x-app-layout title="Log accesos" :breadcrumbs="[['title' => 'Inicio', 'url' => route('dashboard')], ['title' => 'Monitoreo', 'url' => route('monitoreo.index')]]">
 
 	<style>
 		/* #log-acciones-table{
@@ -24,17 +24,17 @@
 		jQuery(document).ready(function($){
 			table = $('#log-acciones-table').DataTable({
 				"ajax": {
-					url : "{{ url('panel/ajax_listado_acciones_usuarios') }}",
+					url : "{{ url('monitoreo/ajax_log_acceso') }}",
 					type : 'GET'
 				},
 				"order": [[ 3, "desc" ]],
 				"ordering": false,
 				bAutoWidth: false, 
 				aoColumns : [
+					{ sWidth: '5%' },
 					{ sWidth: '10%' },
-					{ sWidth: '20%' },
-					{ sWidth: '45%' },
-					{ sWidth: '15%' },
+					{ sWidth: '10%' },
+					{ sWidth: '30%' },
 					{ sWidth: '10%' }
 				],
 				language: traduccion_datatable,
@@ -50,7 +50,7 @@
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
 					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
-					$('.buttons-print').html('<span class="glyphicon glyphicon-print" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
+					$('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
 				}
 			});
 		});
@@ -70,9 +70,9 @@
 				<table id="log-acciones-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
 					<thead>
 						<th>ID</th>
-						<th>Usuario</th>
-						<th>Detalle</th>
+						<th>Email</th>
 						<th>Fecha</th>
+						<th>Agente</th>
 						<th>IP</th>
 					</thead>
 					<tbody>
