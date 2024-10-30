@@ -36,19 +36,6 @@ class primer_usuario extends Command
 
         // Aplicar hash al password
         $data['password'] = Hash::make($data['password']);
-        $roles = Rol::all();
-        $rol_id = $roles->firstWhere('nombre', 'Administrador')->id;
-        // Guardar los datos en la tabla yafo_plaft.users
-        DB::table('users')->insert([
-            'username' => $data['username'],
-            'nombre' => $data['nombre'],
-            'apellido' => $data['apellido'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-			'rol_id' => $rol_id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
 
 		// Verificar si el rol "Administrador" ya existe, si no, crearlo
 		$rol_administrador = Rol::firstOrCreate(
@@ -59,10 +46,9 @@ class primer_usuario extends Command
 				'updated_at' => now()
 			]
 		);
-
 		
 		// Insertar el usuario en la tabla
-		DB::table('yafo_plaft.users')->insert([
+		DB::table('users')->insert([
 			'username' => $data['username'],
 			'nombre' => $data['nombre'],
 			'apellido' => $data['apellido'],
@@ -74,7 +60,7 @@ class primer_usuario extends Command
 		]);
 
 		// crear el rol_x_usuario
-		DB::table('yafo_plaft.roles_x_usuario')->insert([
+		DB::table('roles_x_usuario')->insert([
 			'user_id' => 1,
 			'rol_id' => $rol_administrador->rol_id,  // Asignar el ID del rol "Administrador"
 			'created_at' => now(),

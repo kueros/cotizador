@@ -103,9 +103,12 @@
 					url : "{{ url('roles/ajax_delete') }}"+"/"+id,
 					type: "POST",
 					dataType: "JSON",
+					headers: {
+						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+					},
 					success: function(data)
 					{
-						swal("Aviso", "Rol eliminado con éxito.", "success");
+						swal.fire("Aviso", "Rol eliminado con éxito.", "success");
 
 						$('#modal_form').modal('hide');
 						reload_table();

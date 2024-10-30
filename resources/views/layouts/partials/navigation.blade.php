@@ -74,26 +74,6 @@
             <ul class="nav navbar-nav me-auto nav-bar-1">
                 <li><a class="nav-link main-item" id="boton-inicio" href="">Inicio</a></li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">configuracion
-                        <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item hover-aleph-buttons" href="">Áreas</a></li>
-                        <li><a class="dropdown-item hover-aleph-buttons" href="">Categorías</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">analisis
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item hover-aleph-buttons" href="">arbol_dependencia</a></li>
-                        <li><a class="dropdown-item hover-aleph-buttons" href="">base_eventos_ro</a></li>
-                        <li><a class="dropdown-item hover-aleph-buttons" href="">base_incidentes</a></li>
-                        <li><a class="dropdown-item hover-aleph-buttons" href="">Vulnerability Management <span title="Inteligencia Artificial" class="ciber_sec_icon">IA</span></a></li>
-                        <li><a class="dropdown-item hover-aleph-buttons" href="">historico</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">administración
                         <span class="caret"></span>
                     </a>

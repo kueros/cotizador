@@ -33,11 +33,11 @@ class RolController extends Controller
 		$roles = Rol::all();
 		$data = array();
         foreach($roles as $r) {
-            $accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol('."'".$r->id.
+            $accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol('."'".$r->rol_id.
 				"'".')"><i class="bi bi-pencil"></i></a>';
 
             if($r->id != 1){
-                $accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_rol('."'".$r->id.
+                $accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_rol('."'".$r->rol_id.
 					"'".')"><i class="bi bi-trash"></i></a>';
             }
 
@@ -61,6 +61,28 @@ class RolController extends Controller
 
         $data = Rol::find($id);
 		return response()->json($data);
+    }
+
+	public function ajax_delete($id, MyController $myController){
+        $permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
+		if (!$permiso_eliminar_roles) {
+			abort(403, '.');
+			return false;
+		}
+		$rol = Rol::find($id);
+		// Almacena el nombre de rol antes de eliminarlo
+		$nombre = $rol->nombre;
+		// Elimina el rol
+		$rol->delete();
+		$message = Auth::user()->username . " borró el rol " . $nombre;
+		Log::info($message);
+		$subject = "Borrado de rol";
+		$body = "Rol " . $nombre . " borrado correctamente por " . Auth::user()->username;
+		$to = "omarliberatto@yafoconsultora.com";
+		// Llamar a enviar_email de MyController
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
+		return response()->json(["status"=>true]);
     }
 
 	/**
@@ -185,4 +207,8 @@ class RolController extends Controller
 		return Redirect::route('roles.index')
 			->with('success', 'Rol deleted successfully');
 	}
+
+	/*public function opciones_submit(){
+        
+    }*/
 }
