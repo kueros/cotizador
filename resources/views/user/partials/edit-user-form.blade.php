@@ -8,16 +8,21 @@
 			{{ __('Edición de usuarios.') }}
 		</p>
 	</header>
-
-	<form method="post" action="{{ route('users.update', $users->id) }}" class="mt-6 space-y-6">
+<?php #dd($roles); ?>
+	<form method="post" action="{{ route('users.update', $users->user_id) }}" class="mt-6 space-y-6">
 		@csrf
 		@method('patch')
+		<?php #dd(route('users.update', $users->user_id)); ?>
 
-		<div>
-			<x-input-label for="username" :value="__('Nombre de Usuario')" />
-			<x-text-input id="username" value="{{ $users->username }}" name="username" type="text" class="mt-1 block w-full" autocomplete="username" />
-			<x-input-error :messages="$errors->get('username')" class="mt-2" />
-		</div>
+		@if ($errors->any())
+			<div class="alert alert-danger">
+				<ul>
+					@foreach ($errors->all() as $error)
+						<li>{{ $error }}</li>
+					@endforeach
+				</ul>
+			</div>
+		@endif
 
 		<div>
 			<x-input-label for="nombre" :value="__('Nombre')" />
@@ -32,23 +37,18 @@
 		</div>
 
 		<div>
-			<x-input-label for="email" :value="__('Email')" />
-			<x-text-input id="email" value="{{ $users->email }}" name="email" type="text" class="mt-1 block w-full" autocomplete="email" />
-			<x-input-error :messages="$errors->get('email')" class="mt-2" />
-		</div>
-
-		<div>
 			<x-input-label for="rol_id" :value="__('Rol')" />
-			
 			<select id="rol_id" name="rol_id" class="mt-1 block w-full">
+				<option value="0" {{ old('rol_id', $users->rol_id) === null ? 'selected' : '' }}>
+					{{ __('Elija un Rol') }}
+				</option>
 				@foreach($roles as $rol)
-					<option value="{{ $rol->id }}" {{ $users->rol_id == $rol->id ? 'selected' : '' }}>
-						{{ $rol->nombre }}
-					</option>
+				<option value="{{ $rol->rol_id }}" {{ old('rol_id', $users->rol_id) == $rol->rol_id ? 'selected' : '' }}>
+					{{ $rol->nombre }}
+				</option>
 				@endforeach
 			</select>
-
-			<x-input-error :messages="$errors->updatePassword->get('rol_id')" class="mt-2" />
+			<x-input-error :messages="$errors->get('rol_id')" class="mt-2" />
 		</div>
 
 		<div>
@@ -65,6 +65,8 @@
 			</div>
 			<!-- Campo oculto para enviar el valor de "bloqueado" -->
 			<input type="hidden" name="habilitado" value="{{ $users->habilitado }}">
+			<input type="hidden" name="username" value="{{ $users->username }}">
+			<input type="hidden" name="email" value="{{ $users->email }}">
 			<x-input-error :messages="$errors->get('habilitado')" class="mt-2" />
 		</div>
 		<div style="display: none;">

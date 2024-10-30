@@ -16,8 +16,13 @@ class RolController extends Controller
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index(Request $request): View
+	public function index(Request $request, MyController $myController): View
 	{
+		$permiso_listar_roles = $myController->tiene_permiso('list_roles');
+		if (!$permiso_listar_roles) {
+			abort(403, '.');
+			return false;
+		}
 		$roles = Rol::paginate();
 		return view('rol.index', compact('roles'))
 			->with('i', ($request->input('page', 1) - 1) * $roles->perPage());
@@ -61,8 +66,13 @@ class RolController extends Controller
 	/**
 	 * Show the form for creating a new resource.
 	 */
-	public function create(): View
+	public function create( MyController $myController): View
 	{
+		$permiso_agregar_roles = $myController->tiene_permiso('add_rol');
+		if (!$permiso_agregar_roles) {
+			abort(403, '.');
+			return false;
+		}
 		$roles = new Rol();
 		return view('rol.create', compact('roles'));
 	}
@@ -72,6 +82,11 @@ class RolController extends Controller
 	 */
 	public function store(Request $request, MyController $myController): RedirectResponse
 	{
+		$permiso_agregar_roles = $myController->tiene_permiso('add_rol');
+		if (!$permiso_agregar_roles) {
+			abort(403, '.');
+			return false;
+		}
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
 			'nombre' => 'required|string|max:255|unique:roles,nombre',
@@ -105,8 +120,13 @@ class RolController extends Controller
 	/**
 	 * Show the form for editing the specified resource.
 	 */
-	public function edit($id): View
+	public function edit($id, MyController $myController): View
 	{
+		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
+		if (!$permiso_editar_roles) {
+			abort(403, '.');
+			return false;
+		}
 		$roles = Rol::find($id);
 		return view('rol.edit', compact('roles'));
 	}
@@ -116,6 +136,11 @@ class RolController extends Controller
 	 */
 	public function update(Request $request, Rol $rol, MyController $myController): RedirectResponse
 	{
+		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
+		if (!$permiso_editar_roles) {
+			abort(403, '.');
+			return false;
+		}
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
 			'nombre' => 'required|string|max:255|unique:roles,nombre',
@@ -139,6 +164,11 @@ class RolController extends Controller
 
 	public function destroy($id, MyController $myController): RedirectResponse
 	{
+		$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
+		if (!$permiso_eliminar_roles) {
+			abort(403, '.');
+			return false;
+		}
 		$rol = Rol::find($id);
 		// Almacena el nombre de rol antes de eliminarlo
 		$nombre = $rol->nombre;

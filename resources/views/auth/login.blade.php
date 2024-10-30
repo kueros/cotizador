@@ -313,58 +313,6 @@
 		</div>
 		@endif
 
-	<!--<div class="min-h-screen flex flex-col items-center">
-		<div class="w-full smmax-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm rounded-lg" style=" background-color: rgba(8, 34, 71, 0.82); margin-top: 100px; width: 36rem;">
-
-
-			<form method="POST" action="{{ 'login' }}">
-				@csrf
-				<div>
-					<a href="/">
-						<img class="logo-home" src="/build/assets/images/aleph_logo.gif" alt="" title="">
-					</a>
-				</div>
-				
-				@if ($errors->any())
-				<div class="alert alert-danger text-red-500">
-					<ul>
-						@foreach ($errors->all() as $error)
-						<li>{{ $error }}</li>
-						@endforeach
-					</ul>
-				</div>
-				@endif
-				<div>
-					<label for="email" value="__('Email')" class="text-white">
-						<input id="email" class="block mt-1 w-full text-black" type="email" name="email" value="" placeholder="Email" required autofocus autocomplete="username" />
-						<input-error messages="$errors->get('email')" class="mt-2" />
-				</div>
-
-				<div class="mt-4">
-					<label for="password" value="__('Password')" class="text-white">
-
-						<input id="password" class="block mt-1 w-full text-black" type="password" name="password" required autocomplete="current-password" />
-
-						<input-error messages="$errors->get('password')" class="mt-2" />
-				</div>
-
-				<div class="block mt-4">
-					<label for="remember_me" class="inline-flex items-center">
-						<input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus ring-indigo-500" name="remember">
-						<span class="ms-2 text-sm text-white">Recordarme</span>
-					</label>
-				</div>
-
-				<div class="flex items-center justify-end mt-4">
-
-					<button class="btn btn-success btn-lg ms-3 text-white">
-						Entrar
-					</button>
-				</div>
-			</form>
-		</div>
-	</div>-->
-
 
 	<div class="container">
 		<div class="row">

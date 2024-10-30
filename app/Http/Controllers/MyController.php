@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\LogAdministracion;
+use App\Models\Permiso_x_Rol;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class MyController extends Controller
 {
@@ -22,6 +25,50 @@ class MyController extends Controller
 		Log::info($message);
 		$log->save();
 		return true;
+	}
+
+	public function tiene_permiso($permiso)
+	{
+		#dd($permiso);
+		$user_id = Auth::user()->user_id;
+		#dd($user_id);
+
+		$rol_id = User::
+			where('users.user_id', '=', $user_id)
+			#->orWhere('nombre', 'like', '%opav%')
+			#->orWhere('nombre', 'like', '%copa%')
+			->first()['rol_id'];
+		#dd($rol_id);
+
+
+		$user_permiso = Permiso_x_Rol::leftJoin('permisos', 'permisos.id', '=', 'permisos_x_rol.permiso_id')
+			->where('permisos.nombre', '=', $permiso)
+			#->orWhere('nombre', 'like', '%opav%')
+			#->orWhere('nombre', 'like', '%copa%')
+			->first();
+		#dd($user_permiso->id);
+		
+		    // Si no se encontró ningún permiso, devuelve false directamente
+		if (!$user_permiso) {
+			return false;
+		}
+		
+		$data = DB::table('permisos_x_rol')
+					->leftJoin('permisos', 'permisos.id', '=', 'permisos_x_rol.permiso_id')
+					->leftJoin('roles', 'permisos_x_rol.rol_id', '=', 'roles.rol_id')
+					->leftJoin('users', 'users.rol_id', '=', 'roles.rol_id')
+					->leftJoin('secciones', 'permisos.seccion_id', '=', 'secciones.seccion_id')
+					->where('permisos_x_rol.rol_id', $rol_id)
+					->where('permisos_x_rol.permiso_id', $user_permiso->id)
+					->first();
+		#dd($data);
+		if (!$data) {
+			#abort(403, 'No tienes permiso para crear usuarios');
+			return false;
+		} else {
+			return $data->habilitado;
+		}
+
 	}
 
 	public function enviar_email($to, $content, $subject, $api = false )
@@ -57,10 +104,10 @@ class MyController extends Controller
 				$clientIP = \Request::ip();
 				$userAgent = \Request::userAgent();
 				#dd($userAgent);
-				$message = Auth::user()->username." creó el email para ". $to . " con el asunto: ". $subject;
+				$message = /*Auth::user()->username.*/" creó el email para ". $to . " con el asunto: ". $subject;
 				Log::info($message);
 				$log = LogAdministracion::create([
-					'username' => Auth::user()->username,
+					'username' => 'Auth::user()->username',
 					'action' => "users.store",
 					'detalle' => $message,
 					'ip_address' => json_encode($clientIP),
@@ -677,7 +724,7 @@ class MyController extends Controller
 				return false;
 				die();
 			} else {
-				echo "Ocurrió un error interno, recargue la página e intente nuevamente, si este error persiste contáctese con soporte@alephmanager.com";
+				echo "1Ocurrió un error interno, recargue la página e intente nuevamente, si este error persiste contáctese con soporte@alephmanager.com";
 				return false;
 				die();
 			}

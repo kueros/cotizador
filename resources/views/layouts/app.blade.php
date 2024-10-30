@@ -49,19 +49,24 @@
 			margin-top: 10px;
 			margin-bottom: 10px;
 		}
+        .error403{
+            font-size: 3rem;
+        }
 	</style>
 
 	@include('layouts.partials.header')
 	
 	<header>
-		@include('layouts.partials.navigation')
-		<x-breadcrumb :breadcrumbs="$breadcrumbs" :page="$title" />
+		@if(Auth::check())
+			@include('layouts.partials.navigation')
+			<x-breadcrumb :breadcrumbs="$breadcrumbs" :page="$title" />
+		@endif
 	</header>
 
 	<div class="min-h-screen bg-gray-100">
-	<main class="container">
-		{{ $slot }}
-	</main>
+		<main class="container">
+			{{ $slot }}
+		</main>
 	</div>
 
 	@include('layouts.partials.footer')
@@ -88,6 +93,8 @@
 			new DataTable('#example', {
 				order: [[4, 'desc']]
 			});
+
+			new DataTable('#permisos');
 
 			$('.dropdown-submenu a.test').on("click", function(e) {
 				$(this).next('ul').toggle();
@@ -126,6 +133,7 @@
 					return false;
 				}
 			});
+
 
 
 		});

@@ -4,6 +4,14 @@
 			{{ __('Roles') }}
 		</h2>
 	</x-slot>
+	<!-- Primary Navigation Menu -->
+	@php
+	$user = Auth::user()->username;
+	$email = Auth::user()->email;
+	$permiso_agregar_roles = tiene_permiso('add_rol');
+	$permiso_editar_roles = tiene_permiso('edit_rol');
+	$permiso_eliminar_roles = tiene_permiso('del_rol');
+	@endphp
 
 	<script type="text/javascript">
 		var table;

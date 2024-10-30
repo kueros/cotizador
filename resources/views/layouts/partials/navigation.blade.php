@@ -54,6 +54,14 @@
         transition: none;
     }
 </style>
+    @php
+        $user = Auth::user()->username;
+        $email = Auth::user()->email;
+        $permiso_listar_usuarios = tiene_permiso('list_usr');
+        $permiso_asignar_permisos = tiene_permiso('manage_perm');
+        $permiso_listar_roles = tiene_permiso('list_roles');
+        $permiso_configuraciones_software = tiene_permiso('setup_soft');
+	@endphp
 <nav class="navbar navbar-expand-lg navbar-dark" id="manager-menu">
     <div class="container-fluid">
         <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#aleph-navbar">

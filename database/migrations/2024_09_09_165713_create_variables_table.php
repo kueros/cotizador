@@ -20,7 +20,7 @@ return new class extends Migration
 			$table->timestamps();
 		});
 
-		// Insertar un registro de rol "Administrador" al ejecutar la migración
+		// Insertar registros de variables por default al ejecutar la migración
 		DB::table('variables')->insert([
 			[
 				'id' => 3,
@@ -65,7 +65,7 @@ return new class extends Migration
 			[
 				'id' => 11,
 				'nombre' => 'notificaciones_locales',
-				'nombre_menu' => '',
+				'nombre_menu' => 'Utilizar notificacines locales',
 				'valor' => '1',
 				'created_at' => now(),
 				'updated_at' => now()
@@ -73,7 +73,7 @@ return new class extends Migration
 			[
 				'id' => 12,
 				'nombre' => 'notificaciones_email',
-				'nombre_menu' => '',
+				'nombre_menu' => 'Utilizar notificaciones por email',
 				'valor' => '1',
 				'created_at' => now(),
 				'updated_at' => now()
@@ -81,7 +81,7 @@ return new class extends Migration
 			[
 				'id' => 13,
 				'nombre' => '_notificaciones_email_aleph',
-				'nombre_menu' => '',
+				'nombre_menu' => 'Utilizar servicio de envío de email de Aleph Manager',
 				'valor' => '0',
 				'created_at' => now(),
 				'updated_at' => now()
@@ -105,7 +105,7 @@ return new class extends Migration
 			[
 				'id' => 20,
 				'nombre' => 'opav_habilitar_modo_debug',
-				'nombre_menu' => '',
+				'nombre_menu' => 'Habilitar modo debug',
 				'valor' => '1',
 				'created_at' => now(),
 				'updated_at' => now()
@@ -113,7 +113,7 @@ return new class extends Migration
 			[
 				'id' => 73,
 				'nombre' => 'copa_background_home_custom',
-				'nombre_menu' => '',
+				'nombre_menu' => 'Utilizar imagen home default',
 				'valor' => '0',
 				'created_at' => now(),
 				'updated_at' => now()
@@ -129,7 +129,7 @@ return new class extends Migration
 			[
 				'id' => 75,
 				'nombre' => 'copa_background_login_custom',
-				'nombre_menu' => '',
+				'nombre_menu' => 'Utilizar imagen login default',
 				'valor' => '1',
 				'created_at' => now(),
 				'updated_at' => now()
@@ -145,7 +145,7 @@ return new class extends Migration
 			[
 				'id' => 97,
 				'nombre' => 'opav_habilitar_ia_ciberseguridad',
-				'nombre_menu' => '',
+				'nombre_menu' => 'Habilitar IA en módulo de ciberseguridad',
 				'valor' => '0',
 				'created_at' => now(),
 				'updated_at' => now()
@@ -153,7 +153,7 @@ return new class extends Migration
 			[
 				'id' => 98,
 				'nombre' => 'opav_open_ai_api_key',
-				'nombre_menu' => '',
+				'nombre_menu' => 'OpenAI API Token',
 				'valor' => '0',
 				'created_at' => now(),
 				'updated_at' => now()
@@ -161,7 +161,7 @@ return new class extends Migration
 			[
 				'id' => 126,
 				'nombre' => 'copa_aleph_estilo_logotipo_default',
-				'nombre_menu' => '',
+				'nombre_menu' => 'Utilizar logotipo de Aleph Manager default',
 				'valor' => '1',
 				'created_at' => now(),
 				'updated_at' => now()
@@ -169,7 +169,7 @@ return new class extends Migration
 			[
 				'id' => 127,
 				'nombre' => 'copa_aleph_estilo_color_barra_menu',
-				'nombre_menu' => '',
+				'nombre_menu' => 'Utilizar color de barra del menú default',
 				'valor' => '1',
 				'created_at' => now(),
 				'updated_at' => now()
@@ -216,7 +216,7 @@ return new class extends Migration
 			],
 			[
 				'id' => 160,
-				'nombre' => 'notificaciones_email_config',
+				'nombre' => '_notificaciones_email_config',
 				'nombre_menu' => '',
 				'valor' => '[]',
 				'created_at' => now(),

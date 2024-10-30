@@ -7,8 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Rol;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
-class User extends Authenticatable
+class User extends Authenticatable //implements MustVerifyEmail
 {
     use HasFactory, Notifiable, SoftDeletes;
 
@@ -17,6 +24,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $primaryKey = 'user_id';
     protected $fillable = [
         'username',
         'nombre',
@@ -32,8 +40,9 @@ class User extends Authenticatable
         'ultimo_login',
         'password',
     ];
+    
 
-    /**
+	/**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
@@ -55,4 +64,47 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function roles()
+    {
+		return $this->belongsToMany(Rol::class, 'roles_x_usuario', 'user_id', 'rol_id');
+    }
+
+    public function hasRole($rol): bool
+    {
+		#dd($this->roles);
+        return $this->roles()->where('nombre', $rol)->exists();
+		#return $this->roles->contains('nombre', $rol);
+
+    }
+
+
+    public function assignRole($rol)
+    {
+        $rol = Rol::where('nombre', $rol)->firstOrFail();
+        $this->roles()->attach($rol);
+    }
+
+    public static function reset(array $credentials, \Closure $callback)
+    {
+        #dd($credentials);
+        // Buscar el usuario por su email y token
+        $user = self::where('token', $credentials['token'])
+                    ->first();
+
+        if (!$user) {
+            return Password::INVALID_USER;
+        }
+
+        // Llamar al callback que actualiza la contraseña
+        $callback($user, $credentials['password']);
+
+        // Generar un nuevo token de seguridad y guardar los cambios
+        $user->forceFill([
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        return Password::PASSWORD_RESET;
+    }
+
+
 }

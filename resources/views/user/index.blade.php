@@ -4,6 +4,16 @@
 			{{ __('Usuarios') }}
 		</h2>
 	</x-slot>
+	@php
+		$user = Auth::user()->username;
+		$email = Auth::user()->email;
+		$permiso_agregar_usuarios = tiene_permiso('add_usr');
+		$permiso_editar_usuarios = tiene_permiso('edit_usr');
+		$permiso_deshabilitar_permisos = tiene_permiso('enable_usr');
+		$permiso_blanquear_password = tiene_permiso('clean_pass');
+		$permiso_borrar_usuarios = tiene_permiso('del_usr');
+		$permiso_importar_usuarios = tiene_permiso('import_usr');
+	@endphp
 	<script type="text/javascript">
 		
 
@@ -63,6 +73,81 @@
 			});*/
 		});
 
+		function deshabilitar_usuario(id, temporal = false) {
+			var texto = temporal 
+				? "¿Está seguro de que desea deshabilitar el usuario de forma temporal?" 
+				: "¿Está seguro de que desea deshabilitar el usuario?";
+			swal({
+				title: texto,
+				icon: "warning",
+				buttons: true,
+				dangerMode: true,
+			}).then((confirmacion) => {
+				if (confirmacion) {
+					show_loading(); // Función personalizada que muestra un loader
+					$.ajax({ headers: {
+									'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+								},
+						url: "{{ route('users.deshabilitar_usuario', ':id') }}".replace(':id', id),
+						type: "PATCH",
+						data: {temporal: temporal},
+						dataType: "JSON",
+						success: function(data) {
+							swal({
+								title: "Aviso",
+								text: "Usuario deshabilitado con éxito.",
+								icon: "success"
+							}).then(() => {
+								// Recargar la tabla DataTables al cerrar el modal de éxito
+								location.reload();
+							});
+							hide_loading(); // Función personalizada que oculta el loader
+						},
+						error: function (jqXHR, textStatus, errorThrown) {
+							show_ajax_error_message(jqXHR, textStatus, errorThrown);
+						}
+					});
+				}
+			});
+		}
+
+		function blanquear_psw(id)
+		{
+			swal({
+				title: "¿Desea blanquear la contraseña del usuario?",
+				icon: "warning",
+				buttons: true,
+				dangerMode: true,
+			}).then((confirmacion) => {
+				if (confirmacion) {
+					show_loading();
+					$.ajax({ 
+						headers: {
+									'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+								},
+						url: "{{ route('users.blanquear_password', ':id') }}".replace(':id', id),
+						type: "PATCH",
+						dataType: "JSON",
+						success: function(data) {
+							swal({
+								title: "Aviso",
+								text: "Contraseña blanqueada con éxito.",
+								icon: "success"
+							}).then(() => {
+								// Recargar la tabla DataTables al cerrar el modal de éxito
+								location.reload();
+							});
+							hide_loading(); // Función personalizada que oculta el loader
+						},
+						error: function (jqXHR, textStatus, errorThrown)
+						{
+							show_ajax_error_message(jqXHR, textStatus, errorThrown);
+						}
+					});
+				}
+			});
+		}
+
 	</script>
 
 	<div class="container-full-width">
@@ -92,8 +177,13 @@
 								</div>
 							</div>
 						</div>
-
-						
+						@endif
+						@if (session('success'))
+						<div class="alert alert-success" role="alert">
+								{{ session('success') }}
+							</div>
+						@endif
+					</div>
 						<br>
 						<button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-floppy-disk"></span> Guardar opciones</button>
 					</form>
