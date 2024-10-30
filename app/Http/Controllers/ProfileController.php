@@ -17,7 +17,7 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => Auth::user(),
         ]);
     }
 
@@ -26,6 +26,7 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        dd($request);
         $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {

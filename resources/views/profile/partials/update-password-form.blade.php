@@ -1,34 +1,48 @@
-<x-app-layout>
+<section>
+    <header>
+        <h2 class="text-lg font-medium text-gray-900">
+            {{ __('Update Password') }}
+        </h2>
 
-@section('content')
-<div class="container">
-    <h2>Cambiar Contraseña</h2>
-    <form action="{{ route('password.update', ['userId' => $userId]) }}" method="POST">
+        <p class="mt-1 text-sm text-gray-600">
+            {{ __('Ensure your account is using a long, random password to stay secure.') }}
+        </p>
+    </header>
+
+    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
         @csrf
-        <div class="form-group">
-            <label for="password">Nueva Contraseña</label>
-            <input type="password" id="password" name="password" class="form-control" required>
-            <small class="form-text text-muted">Debe contener al menos 8 caracteres, incluyendo 1 número, 1 letra mayúscula, 1 letra minúscula y 1 carácter especial.</small>
+        @method('put')
+
+        <div>
+            <x-input-label for="update_password_current_password" :value="__('Current Password')" />
+            <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
+            <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
         </div>
 
-        <div class="form-group">
-            <label for="password_confirmation">Confirmar Contraseña</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" required>
+        <div>
+            <x-input-label for="update_password_password" :value="__('New Password')" />
+            <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+            <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
         </div>
 
-        <button type="submit" class="btn btn-primary">Actualizar Contraseña</button>
+        <div>
+            <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
+            <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+            <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
+        </div>
+
+        <div class="flex items-center gap-4">
+            <x-primary-button>{{ __('Save') }}</x-primary-button>
+
+            @if (session('status') === 'password-updated')
+                <p
+                    x-data="{ show: true }"
+                    x-show="show"
+                    x-transition
+                    x-init="setTimeout(() => show = false, 2000)"
+                    class="text-sm text-gray-600"
+                >{{ __('Saved.') }}</p>
+            @endif
+        </div>
     </form>
-</div>
-
-<script>
-    document.getElementById('password').addEventListener('input', function () {
-        const password = this.value;
-        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
-        if (!regex.test(password)) {
-            this.setCustomValidity('La contraseña debe tener al menos 8 caracteres, con 1 número, 1 mayúscula, 1 minúscula y 1 carácter especial.');
-        } else {
-            this.setCustomValidity('');
-        }
-    });
-</script>
-</x-app-layout>
+</section>
