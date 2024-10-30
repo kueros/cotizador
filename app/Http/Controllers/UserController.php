@@ -20,6 +20,7 @@ use App\Models\PasswordHistory;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\Models\Variable;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -47,9 +48,9 @@ class UserController extends Controller
 			->first()['valor'];
 			#dd($variables);
 		$users = User::withoutTrashed()
-		->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
-		->select('users.*', 'roles.nombre as nombre_rol')
-		->paginate();
+			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
+			->select('users.*', 'roles.nombre as nombre_rol')
+			->paginate();
 		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario', 'reset_password_30_dias', 'configurar_claves'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
@@ -87,20 +88,31 @@ class UserController extends Controller
 			abort(403, '.');
 			return false;
 		}
-		// Validar los datos del usuario
 		$validatedData = $request->validate([
-			'username' => 'required|string|max:255',
+			'username' => [
+				'required',
+				'string',
+				'max:255',
+				Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
+			],
 			'nombre' => 'required|string|max:255',
 			'apellido' => 'required|string|max:255',
-			'email' => 'required|string|email|max:255',
+			'email' => [
+				'required',
+				'string',
+				'email',
+				'max:255',
+				Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
+			],
 			'rol_id' => 'required|exists:roles,rol_id',
 			'habilitado' => 'required|boolean',
 		]);
-
 		// Verificar si el usuario con el mismo username o email está soft deleted
 		$existingUser = User::onlyTrashed()
-			->where('username', $validatedData['username'])
-			->orWhere('email', $validatedData['email'])
+			->where(function ($query) use ($validatedData) {
+				$query->where('username', $validatedData['username'])
+					->orWhere('email', $validatedData['email']);
+			})
 			->first();
 		#dd($existingUser);
 		if ($existingUser) {
@@ -217,8 +229,8 @@ class UserController extends Controller
 		}
 		try {
 		$messages = [
-			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario2.',
-			'email.unique' => 'El correo electrónico ya está registrado por otro usuario1.',
+			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
+			'email.unique' => 'El correo electrónico ya está registrado por otro usuario.',
 			'rol_id.required' => 'El rol es obligatorio.',
 			'rol_id.exists' => 'El rol seleccionado no es válido.',
 		];
@@ -255,10 +267,15 @@ class UserController extends Controller
 			$to = $user->email;
 		}
 
+		if ($user->username != $validatedData['username']) {
+			$to = $validatedData['email'];
+			$body = "El username del usuario ". $user->nombre ." ". $user->apellido ." fue actualizado de ".$user->username." a ".$validatedData['username']." por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+		} else {
+			$to = $user->email;
+		}
+
 		// Llamar a enviar_email de MyController
 		$myController->enviar_email($to, $body, $subject);
-
-
 
 		Log::info('Correo enviado exitosamente a ' . $to);
 		if(Auth::user()->username != "omar"){
@@ -349,20 +366,50 @@ class UserController extends Controller
 	/**************************************************************************
 	*
 	**************************************************************************/
-	public function deshabilitar_usuario(Request $request, $id, MyController $myController) {
-		$permiso_habilitar_usuario = $myController->tiene_permiso('del_usr');
-		if (!$permiso_habilitar_usuario) {
-			abort(403, '.');
-			return false;
+	public function deshabilitar_usuario(Request $request, $user_id, MyController $myController) {
+		if(Auth::user()->user_id != $user_id) {
+			$permiso_habilitar_usuario = $myController->tiene_permiso('del_usr');
+			if (!$permiso_habilitar_usuario) {
+				abort(403, '.');
+				return false;
+			}
+			try {
+				$user = User::findOrFail($user_id);
+				#echo "sinhab ".$user->habilitado;
+				$user->habilitado = ( $user->habilitado != 1 ) ? 1 : 0;
+				# $request->input('temporal'); // Valor enviado por AJAX
+				#echo $user->habilitado;
+				$user->save(); // Guardar los cambios en la base de datos
+				return response()->json(['success' => true]);
+			} catch (\Exception $e) {
+				return response()->json(['error' => $e->getMessage()], 500);
+			}
+		} else {
+			return response()->json('No se puede deshabilitar tu propio usuario.', 403);
 		}
-		try {
-			$user = User::findOrFail($id);
-			$user->habilitado = $request->input('temporal'); // Valor enviado por AJAX
-			#echo $user->habilitado;
-			$user->save(); // Guardar los cambios en la base de datos
-			return response()->json(['success' => true]);
-		} catch (\Exception $e) {
-			return response()->json(['error' => $e->getMessage()], 500);
+	}
+
+	/**************************************************************************
+	*
+	**************************************************************************/
+	public function deshabilitar_usuario_temporal(Request $request, $user_id, MyController $myController) {
+		if(Auth::user()->user_id != $user_id) {
+			$permiso_habilitar_usuario = $myController->tiene_permiso('del_usr');
+			if (!$permiso_habilitar_usuario) {
+				abort(403, '.');
+				return false;
+			}
+			try {
+				$user = User::findOrFail($user_id);
+				#echo "hab ".$user->habilitado;
+				$user->habilitado = ( $user->habilitado != 2 ) ? 2 : 0;
+				$user->save(); // Guardar los cambios en la base de datos
+				return response()->json(['success' => true]);
+			} catch (\Exception $e) {
+				return response()->json(['error' => $e->getMessage()], 500);
+			}
+		} else {
+			return response()->json('No se puede deshabilitar tu propio usuario.', 403);
 		}
 	}
 

@@ -8,8 +8,10 @@
 			{{ __('Edición de roles.') }}
 		</p>
 	</header>
-
-	<form method="post" action="{{ route('roles.update', $roles->id) }}" class="mt-6 space-y-6">
+@php 
+#dd($roles);
+@endphp
+	<form method="post" action="{{ route('roles.update', $roles->rol_id) }}" class="mt-6 space-y-6">
 		@csrf
 		@method('patch')
 

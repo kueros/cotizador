@@ -62,6 +62,10 @@ class PasswordResetLinkController extends Controller
 				$myController->enviar_email($to, $body, $subject);
 				#return response()->json(['success' => true, 'message' => 'Contraseña blanqueada y correo enviado con éxito.']);
                 return redirect()->route('login')->with('success', 'Contraseña blanqueada y correo enviado con éxito.');
+			} else {
+				return redirect()->route('password.email')
+				->withErrors(['email' => 'Email incorrecto.'])
+				->withInput($request->only('email'));
 
 			}
     }

@@ -73,7 +73,7 @@ class NewPasswordController extends Controller
 						->update([	'password' =>  Hash::make($validatedData['password']),
 									'ultima_fecha_restablecimiento' => now()]);
 
-			return redirect()->route('login')->with('success', 'Contraseña actualizada con éxito. Inicie sesión con su nueva contraseña.');
+			return redirect()->route('login')->with('success', 'Contraseña creada con éxito. Inicie sesión con su nueva contraseña.');
 	}
 
 	/****************************************************************************************************************************************************
