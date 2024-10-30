@@ -10,21 +10,7 @@
 		var save_method;
 
 		jQuery(document).ready(function($){
-			$('#roles-table').DataTable({dom: 'Bfrtip',
-				buttons: [
-					{"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Roles'},
-					{"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Roles'},
-					{"extend": 'excel', "text":'Export',"className": 'btn btn-success', title: 'Roles'},
-					{"extend": 'print', "text":'Export',"className": 'btn btn-secondary', title: 'Roles'}
-				],
-				initComplete: function () {
-					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
-					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
-					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
-					$('.buttons-print').html('<span class="glyphicon glyphicon-print" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
-				}
-			})
-			/*table = $('#roles-table').DataTable({
+			table = $('#roles-table').DataTable({
 				"ajax": {
 					url : "{{ url('roles/ajax_listado') }}",
 					type : 'GET'
@@ -41,30 +27,11 @@
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
 					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
-					$('.buttons-print').html('<span class="glyphicon glyphicon-print" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
+					$('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
 				}
 			});
-
-			$select_categorias = $('#categoria');
-			$.ajax({
-				url: "{{ url('categoria/ajax_dropdown') }}"
-				, "type": "POST"
-				, data:{length:'',start:0}
-				, dataType: 'JSON'
-				, success: function (data) {
-					//clear the current content of the select
-					$select_categorias.html('');
-					//iterate over the data and append a select option
-					$.each(data.categorias, function (key, val) {
-						$select_categorias.append('<option value="' + val.id + '">' + val.nombre + '</option>');
-					})
-				}
-				, error: function () {
-					$select_categorias.html('<option id="-1">Ninguna disponible</option>');
-				}
-			});*/
 		});
-/*
+
 		function reload_table()
 		{
 			table.ajax.reload(null,false);
@@ -79,6 +46,8 @@
 			$('#modal_form').modal('show');
 			$('.modal-title').text('Agregar roles');
 			$('#accion').val('add');
+			$('#form').attr('action', "{{ url('roles') }}");
+    		$('#method').val('POST');
 		}
 
 		function edit_rol(id)
@@ -107,6 +76,8 @@
 
 					$('#modal_form').modal('show');
 					$('.modal-title').text('Editar rol');
+					$('#form').attr('action', "{{ url('roles') }}" + "/" + id);
+            		$('#method').val('PUT');
 				},
 				error: function (jqXHR, textStatus, errorThrown)
 				{
@@ -138,7 +109,7 @@
 				});
 
 			}
-		}*/
+		}
 	</script>
 
 	<!--LISTADO-->
@@ -147,51 +118,52 @@
 		<div class="row">
 			<div class="col-md-12">
 				<h2>Roles</h2>
-				<a data-toggle="collapse" data-target="#opciones-roles"><div class="colapsable-aleph"><span class="glyphicon glyphicon-chevron-right"></span> Opciones</div></a>
-				<div id="opciones-roles" class="collapse">
-					<form action="{{ url('roles/opciones_submit') }}" method="post">
-						<div class="row">
-							<div class="form-body">
-								<div class="form-group">
-									<label class="control-label col-md-3">Utilizar ID de grupo para asociar al rol en integración de login</label>
-									<div class="col-md-9">
-										<input type="checkbox" value="1"  name="utilizar_id_grupo" id="utilizar_id_grupo">
-										<span class="help-block"></span>
+				
+				<div class="accordion" id="accordionOpcionRoles">
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="headingOne">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+								data-bs-target="#opciones-roles" aria-expanded="true" aria-controls="collapseOne">
+								Opciones
+							</button>
+						</h2>
+						<div id="opciones-roles" class="accordion-collapse collapse" aria-labelledby="headingOne" 
+							data-bs-parent="#accordionOpcionRoles">
+							<div class="accordion-body">
+								
+							<form action="{{ url('roles/opciones_submit') }}" method="post">
+								<div class="row">
+									<div class="form-body">
+										<div class="mb-3 row">
+											<label class="col-form-label col-md-3">Utilizar ID de grupo para asociar al rol en integración de login</label>
+											<div class="col-md-9">
+												<input type="checkbox" value="1"  name="utilizar_id_grupo" id="utilizar_id_grupo">
+												<span class="help-block"></span>
+											</div>
+										</div>
 									</div>
 								</div>
+								<br>
+								<button type="submit" class="btn btn-success"><span class="bi bi-save">
+									</span> Guardar opciones</button>
+							</form>
+							<hr>
 							</div>
 						</div>
-						<br>
-						<button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-floppy-disk"></span> Guardar opciones</button>
-					</form>
-					<hr>
+					</div>
 				</div>
+				
 				<br>
-				<button id="agregar" class="btn btn-success" onclick="add_rol()"><i class="glyphicon glyphicon-plus"></i> Agregar rol</button>
+				<button id="agregar" class="btn btn-success" onclick="add_rol()"><i class="bi bi-plus"></i> Agregar rol</button>
 				<br>
 				<br>
 				<table id="roles-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
 					<thead>
 						<th>Nombre</th>
-						<th style="width:125px;">Acción</th>
+						<th style="width:20%;">Acción</th>
 					</thead>
 					<tbody>
-						@foreach ($roles as $rol)
-							<tr>
-								<td>{{ $rol->nombre }}</td>
-								<td>
-									<form action="{{ route('roles.destroy', $rol->id) }}" method="POST">
-										<a class="btn btn-sm btn-success" href="{{ route('roles.edit', $rol->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Editar') }}</a>
-										@csrf
-										@method('DELETE')
-										<button type="submit" class="btn btn-danger btn-sm" 
-											onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;">
-											<i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
-									</form>
-								</td>
-							</tr>
-						@endforeach
-					</tbody>
+                	</tbody>
 				</table>
 				
 			</div>
@@ -199,5 +171,37 @@
 
 	</div>
 
+
+	<div class="modal fade" id="modal_form" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Formulario roles</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
+                	@csrf
+					<input name="_method" type="hidden" id="method">
+					<div class="modal-body form">					
+						<input type="hidden" value="" name="id"/>
+						<input name="accion" id="accion" class="form-control" type="hidden">
+						<div class="form-body">
+							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">Nombre</label>
+								<div class="col-md-9">
+									<input name="nombre" maxlength="255" placeholder="Nombre del rol" class="form-control" type="text">
+									<span class="help-block"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" class="btn btn-primary">Guardar</button>
+						<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 
 </x-app-layout>

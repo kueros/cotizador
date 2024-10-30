@@ -23,41 +23,40 @@ class RolController extends Controller
 			->with('i', ($request->input('page', 1) - 1) * $roles->perPage());
 	}
 
-	public function ajax_listado(Request $request): View
+	public function ajax_listado(Request $request)
 	{
-		/*$roles = Rol::paginate();
-		return view('rol.index', compact('roles'))
-			->with('i', ($request->input('page', 1) - 1) * $roles->perPage());*/
+		$roles = Rol::all();
+		$data = array();
+        foreach($roles as $r) {
+            $accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol('."'".$r->id.
+				"'".')"><i class="bi bi-pencil"></i></a>';
 
-		$roles = Rol::paginate();
+            if($r->id != 1){
+                $accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_rol('."'".$r->id.
+					"'".')"><i class="bi bi-trash"></i></a>';
+            }
 
-		// Realiza las búsquedas, ordenamiento y paginación que DataTables envía en la solicitud.
-		/*if ($request->has('search.value')) {
-			$query->where('columna1', 'like', '%' . $request->input('search.value') . '%');
-		}*/
-		
-		$totalData = $roles->count();
-		
-		// Paginación y ordenamiento
-		$roles->skip($request->input('start'))->take($request->input('length'));
-		
-		/*if ($request->has('order.0.column')) {
-			$columns = ['columna1', 'columna2', 'columna3']; // Ajusta a las columnas reales
-			$orderColumn = $columns[$request->input('order.0.column')];
-			$query->orderBy($orderColumn, $request->input('order.0.dir'));
-		}*/
-		
-		// Obtener los datos con paginación
-		$data = $roles->get();
-	
-		// Respuesta en formato JSON
-		return response()->json([
-			'draw' => $request->input('draw'),
-			'recordsTotal' => $totalData,
-			'recordsFiltered' => $totalData,
-			'data' => $data,
-		]);
+            $data[] = array(
+                $r->nombre,
+                $accion
+            );
+        }
+
+        $output = array(
+            "recordsTotal" => $roles->count(),
+            "recordsFiltered" => $roles->count(),
+            "data" => $data
+        );
+
+		return response()->json($output);
+
 	}
+
+	public function ajax_edit($id){
+
+        $data = Rol::find($id);
+		return response()->json($data);
+    }
 
 	/**
 	 * Show the form for creating a new resource.

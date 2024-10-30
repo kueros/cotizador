@@ -53,15 +53,17 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
 	Route::get('/roles', [RolController::class, 'index'])->name('roles.index');
-	Route::get('/ajax_listado', [RolController::class, 'ajax_listado'])->name('roles.ajax_listado');
 	Route::get('/show/{id}', [RolController::class, 'show'])->name('roles.show');
 	Route::get('/roles/create', [RolController::class, 'create'])->name('roles.create');
 	Route::post('/roles', [RolController::class, 'store'])->name('roles.store');
 	Route::get('/roles/{rol}/edit', [RolController::class, 'edit'])->name('roles.edit');
-	Route::patch('/roles/{rol}', [RolController::class, 'update'])->name('roles.update');
+	Route::put('/roles/{rol}', [RolController::class, 'update'])->name('roles.update');
 	Route::delete('/roles/{rol}', [RolController::class, 'destroy'])->name('roles.destroy');
 	Route::post('/roles/options', [RolController::class, 'options'])->name('roles.options');
 	Route::get('/roles/fields', [RolController::class, 'fields'])->name('roles.fields');
+	Route::get('/roles/ajax_listado', [RolController::class, 'ajax_listado'])->name('roles.ajax_listado');
+	Route::get('/roles/ajax_edit/{id}', [RolController::class, 'ajax_edit'])->name('roles.ajax_edit');
+	Route::post('/roles/ajax_delete/{id}', [RolController::class, 'ajax_delete'])->name('roles.ajax_delete');
 });
 require __DIR__ . '/auth.php';
 
