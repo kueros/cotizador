@@ -49,33 +49,34 @@ use App\Models\Permiso_x_Rol;
 														#dd($roles);
 														?>
 												<tbody>
-@foreach ($permisos as $permiso)
-<tr>
-    @if ($permiso->seccion_id == $seccion->seccion_id)
-        <td>{{ $permiso->descripcion }}</td>
-        @foreach ($roles as $rol)
-        <td>
-            <?php
-            $checked = "";
-            $permisoRol = Permiso_x_Rol::where('rol_id', $rol->rol_id)
-                                        ->where('permiso_id', $permiso->id)
-                                        ->first();
-            ?>
-            <!-- Comprobación de si $permisoRol existe -->
-            @if ($permisoRol)
-                @if ($permisoRol->habilitado == 1)
-                    <?php $checked = "checked"; ?>
-                @endif
-                <input type="checkbox" name="id[{{$permisoRol->id}}]" value="1" {{ $checked }}>
-            @else
-                <!-- Si no existe el registro, checkbox desmarcado -->
-                <input type="checkbox" name="id[new_{{$rol->rol_id}}_{{$permiso->id}}]" value="1">
-            @endif
-        </td>
-        @endforeach
-    @endif
-</tr>
-@endforeach												</tbody>
+													@foreach ($permisos as $permiso)
+													<tr>
+														@if ($permiso->seccion_id == $seccion->seccion_id)
+															<td>{{ $permiso->descripcion }}</td>
+															@foreach ($roles as $rol)
+															<td>
+																<?php
+																$checked = "";
+																$permisoRol = Permiso_x_Rol::where('rol_id', $rol->rol_id)
+																							->where('permiso_id', $permiso->id)
+																							->first();
+																?>
+																<!-- Comprobación de si $permisoRol existe -->
+																@if ($permisoRol)
+																	@if ($permisoRol->habilitado == 1)
+																		<?php $checked = "checked"; ?>
+																	@endif
+																	<input type="checkbox" name="id[{{$permisoRol->id}}]" value="1" {{ $checked }}>
+																@else
+																	<!-- Si no existe el registro, checkbox desmarcado -->
+																	<input type="checkbox" name="id[new_{{$rol->rol_id}}_{{$permiso->id}}]" value="1">
+																@endif
+															</td>
+															@endforeach
+														@endif
+													</tr>
+													@endforeach	
+											</tbody>
 											</table>
 										</div>
 									</div>

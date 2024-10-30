@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h2>Cambiar Contraseña</h2>
-    <form action="{{ route('password.update', ['userId' => $userId]) }}" method="POST">
+    <form action="{{ route('password.update', ['userId' => $user_Id]) }}" method="POST">
         @csrf
         <div class="form-group">
             <label for="password">Nueva Contraseña</label>
