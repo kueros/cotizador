@@ -20,6 +20,7 @@ use App\Models\PasswordHistory;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\Models\Variable;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -47,9 +48,9 @@ class UserController extends Controller
 			->first()['valor'];
 			#dd($variables);
 		$users = User::withoutTrashed()
-		->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
-		->select('users.*', 'roles.nombre as nombre_rol')
-		->paginate();
+			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
+			->select('users.*', 'roles.nombre as nombre_rol')
+			->paginate();
 		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario', 'reset_password_30_dias', 'configurar_claves'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
@@ -87,20 +88,31 @@ class UserController extends Controller
 			abort(403, '.');
 			return false;
 		}
-		// Validar los datos del usuario
 		$validatedData = $request->validate([
-			'username' => 'required|string|max:255',
+			'username' => [
+				'required',
+				'string',
+				'max:255',
+				Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
+			],
 			'nombre' => 'required|string|max:255',
 			'apellido' => 'required|string|max:255',
-			'email' => 'required|string|email|max:255',
+			'email' => [
+				'required',
+				'string',
+				'email',
+				'max:255',
+				Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
+			],
 			'rol_id' => 'required|exists:roles,rol_id',
 			'habilitado' => 'required|boolean',
 		]);
-
 		// Verificar si el usuario con el mismo username o email está soft deleted
 		$existingUser = User::onlyTrashed()
-			->where('username', $validatedData['username'])
-			->orWhere('email', $validatedData['email'])
+			->where(function ($query) use ($validatedData) {
+				$query->where('username', $validatedData['username'])
+					->orWhere('email', $validatedData['email']);
+			})
 			->first();
 		#dd($existingUser);
 		if ($existingUser) {
@@ -209,6 +221,7 @@ class UserController extends Controller
 	 */
 	public function usersUpdate(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
+		#dd($request);
 		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
 		if (!$permiso_editar_usuario) {
 			abort(403, '.');
@@ -229,29 +242,51 @@ class UserController extends Controller
 			'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
 			'rol_id' => 'required|exists:roles,rol_id', // Cambiar "id" por el nombre correcto de la columna primaria
 		], $messages);
-		// Actualizar el usuario con los datos validados
-		$user->update($validatedData);
 		// Encuentra el usuario por su ID
 		$user = User::find($user->user_id);
-
+		#dd($user);
+		#dd($validatedData);
 		// Si el usuario no existe, redirige con un mensaje de error
 		if (!$user) {
 			return redirect('/users')->with('error', 'El usuario no existe.');
 		}
 
-		// Almacena el nombre de usuario antes de modificarlo
+		// Almacena el usuario antes de modificarlo
 		$username = $user->username;
 		$message = Auth::user()->username . " actualizó el usuario " . $username;
 		Log::info($message);
+
 		$subject = "Actualización de usuario";
-		$body = "Usuario " . $username . " actualizado correctamente por " . Auth::user()->username;
-		$to = "omarliberatto@yafoconsultora.com";
+		$body = "El usuario " . $username . " correspondiente a ". $user->nombre ." ". $user->apellido ." fue actualizado por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+
+		#dd($user->email." - ".$validatedData['email']);
+		if ($user->email != $validatedData['email']) {
+			$to = $user->email.",".$validatedData['email'];
+			$body = "El email del usuario ". $user->nombre ." ". $user->apellido ." fue actualizado de ".$user->email." a ".$validatedData['email']." por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+		} else {
+			$to = $user->email;
+		}
+
+		if ($user->username != $validatedData['username']) {
+			$to = $validatedData['email'];
+			$body = "El username del usuario ". $user->nombre ." ". $user->apellido ." fue actualizado de ".$user->username." a ".$validatedData['username']." por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+		} else {
+			$to = $user->email;
+		}
+
 		// Llamar a enviar_email de MyController
 		$myController->enviar_email($to, $body, $subject);
+
 		Log::info('Correo enviado exitosamente a ' . $to);
 		if(Auth::user()->username != "omar"){
 			#dd("1".Auth::user()->username );
 		}
+
+		// Actualizar el usuario con los datos validados
+		$user->update($validatedData);
+
+
+
 		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
 		} catch (ValidationException $e) {
 			// Si ocurre un error de validación, redirigir con los mensajes de error
@@ -261,7 +296,7 @@ class UserController extends Controller
 			return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
 		} catch (\Exception $e) {
 			Log::error('Error en la actualización del usuario: '.$e->getMessage());
-			dd('Error: '.$e->getMessage());  // Muestra el mensaje exacto del error
+			#dd('Error: '.$e->getMessage());  // Muestra el mensaje exacto del error
 			return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
 		}
 	}
@@ -331,20 +366,50 @@ class UserController extends Controller
 	/**************************************************************************
 	*
 	**************************************************************************/
-	public function deshabilitar_usuario(Request $request, $id, MyController $myController) {
-		$permiso_habilitar_usuario = $myController->tiene_permiso('del_usr');
-		if (!$permiso_habilitar_usuario) {
-			abort(403, '.');
-			return false;
+	public function deshabilitar_usuario(Request $request, $user_id, MyController $myController) {
+		if(Auth::user()->user_id != $user_id) {
+			$permiso_habilitar_usuario = $myController->tiene_permiso('del_usr');
+			if (!$permiso_habilitar_usuario) {
+				abort(403, '.');
+				return false;
+			}
+			try {
+				$user = User::findOrFail($user_id);
+				#echo "sinhab ".$user->habilitado;
+				$user->habilitado = ( $user->habilitado != 1 ) ? 1 : 0;
+				# $request->input('temporal'); // Valor enviado por AJAX
+				#echo $user->habilitado;
+				$user->save(); // Guardar los cambios en la base de datos
+				return response()->json(['success' => true]);
+			} catch (\Exception $e) {
+				return response()->json(['error' => $e->getMessage()], 500);
+			}
+		} else {
+			return response()->json('No se puede deshabilitar tu propio usuario.', 403);
 		}
-		try {
-			$user = User::findOrFail($id);
-			$user->habilitado = $request->input('temporal'); // Valor enviado por AJAX
-			#echo $user->habilitado;
-			$user->save(); // Guardar los cambios en la base de datos
-			return response()->json(['success' => true]);
-		} catch (\Exception $e) {
-			return response()->json(['error' => $e->getMessage()], 500);
+	}
+
+	/**************************************************************************
+	*
+	**************************************************************************/
+	public function deshabilitar_usuario_temporal(Request $request, $user_id, MyController $myController) {
+		if(Auth::user()->user_id != $user_id) {
+			$permiso_habilitar_usuario = $myController->tiene_permiso('del_usr');
+			if (!$permiso_habilitar_usuario) {
+				abort(403, '.');
+				return false;
+			}
+			try {
+				$user = User::findOrFail($user_id);
+				#echo "hab ".$user->habilitado;
+				$user->habilitado = ( $user->habilitado != 2 ) ? 2 : 0;
+				$user->save(); // Guardar los cambios en la base de datos
+				return response()->json(['success' => true]);
+			} catch (\Exception $e) {
+				return response()->json(['error' => $e->getMessage()], 500);
+			}
+		} else {
+			return response()->json('No se puede deshabilitar tu propio usuario.', 403);
 		}
 	}
 
@@ -467,7 +532,7 @@ class UserController extends Controller
 				'regex:/[a-z]/',      // Al menos una letra minúscula
 				'regex:/[A-Z]/',      // Al menos una letra mayúscula
 				'regex:/[0-9]/',      // Al menos un número
-				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+				'regex:/[@$!%*?&#.]/', // Al menos un carácter especial
 			],
 		]);
 

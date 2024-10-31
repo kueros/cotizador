@@ -65,14 +65,15 @@ class NewPasswordController extends Controller
 				'regex:/[a-z]/',      // Al menos una letra minúscula
 				'regex:/[A-Z]/',      // Al menos una letra mayúscula
 				'regex:/[0-9]/',      // Al menos un número
-				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+				'regex:/[@$!%*?&#.]/', // Al menos un carácter especial
 			],
 			'token' => 'required',		]);
 			$user = DB::table('users')
 						->where('email', $request->email)
-						->update(['password' =>  Hash::make($validatedData['password'])]);
+						->update([	'password' =>  Hash::make($validatedData['password']),
+									'ultima_fecha_restablecimiento' => now()]);
 
-			return redirect()->route('login')->with('success', 'Contraseña actualizada con éxito. Inicie sesión con su nueva contraseña.');
+			return redirect()->route('login')->with('success', 'Contraseña creada con éxito. Inicie sesión con su nueva contraseña.');
 	}
 
 	/****************************************************************************************************************************************************
@@ -99,7 +100,7 @@ class NewPasswordController extends Controller
 				'regex:/[a-z]/',      // Al menos una letra minúscula
 				'regex:/[A-Z]/',      // Al menos una letra mayúscula
 				'regex:/[0-9]/',      // Al menos un número
-				'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+				'regex:/[@$!%*?&#.]/', // Al menos un carácter especial
 			],
 			'token' => 'required',		]);
 
@@ -138,7 +139,7 @@ class NewPasswordController extends Controller
                 'regex:/[a-z]/',      // Al menos una letra minúscula
                 'regex:/[A-Z]/',      // Al menos una letra mayúscula
                 'regex:/[0-9]/',      // Al menos un número
-                'regex:/[@$!%*?&#]/', // Al menos un carácter especial
+                'regex:/[@$!%*?&#.]/', // Al menos un carácter especial
             ],
             'token' => 'required',		]);
 		if(Auth::user()){
@@ -179,7 +180,8 @@ class NewPasswordController extends Controller
 		User::where('email', $request->email)->update([
             'password' => Hash::make($validated['password']),
 			'bloqueado' => 0,
-			'intentos_login' => 0
+			'intentos_login' => 0,
+			'ultima_fecha_restablecimiento' => now()
 		]);
 		// Guardar la nueva contraseña en el historial
 		PasswordHistory::create([

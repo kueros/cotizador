@@ -123,7 +123,16 @@
 							</thead>
 							<tbody>
 								@foreach ($users as $user)
-								<?php if ($user->habilitado == 2 || $user->habilitado == 0){ $user->habilitado = 'No'; } else { $user->habilitado = 'Si'; } ?>
+								<?php 
+								$candadito = "";
+									if ($user->habilitado != 1){ 
+										$user->habilitado = 'No'; 
+										$candadito = "<i class='fas fa-lock'></i>";
+									} else { 
+										$user->habilitado = 'Si';  
+										$candadito = "<i class='fas fa-lock-open'></i>";
+									}
+								?>
 									<tr>
 										<td>{{ $user->nombre }}</td>
 										<td>{{ $user->apellido }}</td>
@@ -141,7 +150,7 @@
 											
 											@if ($permiso_deshabilitar_usuario)
 											<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar" onclick="deshabilitar_usuario('{{ $user->user_id}}',0)">
-												<i class="fas fa-lock"></i>
+												<?php echo $candadito; ?>
 											</a>
 											@endif
 
@@ -269,6 +278,11 @@
 		var texto = temporal 
 			? "¿Está seguro de que desea deshabilitar el usuario de forma temporal?" 
 			: "¿Está seguro de que desea deshabilitar el usuario?";
+ 		if (temporal) {
+			url = "{{ route('users.deshabilitar_usuario_temporal', ':id') }}";
+		} else {
+			url = "{{ route('users.deshabilitar_usuario', ':id') }}";
+		}
 		swal({
 			title: texto,
 			icon: "warning",
@@ -280,7 +294,7 @@
 				$.ajax({ headers: {
 								'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 							},
-					url: "{{ route('users.deshabilitar_usuario', ':id') }}".replace(':id', id),
+					url: url.replace(':id', id),
 					type: "PATCH",
 					data: {temporal: temporal},
 					dataType: "JSON",
