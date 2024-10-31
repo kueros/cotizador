@@ -77,6 +77,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 
 Route::middleware('auth')->group(function () {
 	Route::get('/permisos', [PermisoController::class, 'index'])->name('permisos.index');
+	Route::get('/permisosOrden', [PermisoController::class, 'permisosOrden'])->name('permisos.permisosOrden');
 	Route::get('/show/{id}', [PermisoController::class, 'show'])->name('permisos.show');
 	Route::get('/permisos/create', [PermisoController::class, 'create'])->name('permisos.create');
 	Route::post('/permisos', [PermisoController::class, 'store'])->name('permisos.store');
@@ -87,7 +88,7 @@ Route::middleware('auth')->group(function () {
 	Route::get('/permisos/fields', [PermisoController::class, 'fields'])->name('permisos.fields');
     Route::post('/permisos/update-order', [PermisoController::class, 'updateOrder'])->name('permisos.updateOrder');
 
-	Route::get('/permisos', [PermisoController::class, 'index'])->name('permisos.index');
+	#Route::get('/permisos', [PermisoController::class, 'index'])->name('permisos.index');
 	Route::post('/permisos/reordenar', [PermisoController::class, 'reordenar'])->name('permisos.reordenar');
 });
 

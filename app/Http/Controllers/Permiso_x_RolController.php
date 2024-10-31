@@ -29,15 +29,6 @@ class Permiso_x_RolController extends Controller
 		return view('permiso_x_rol.index', compact('roles', 'permisos', 'permisosRoles', 'secciones'));
 	}
 
-	/* 	public function showPermisosPorRol()
-		{
-			$roles = Rol::with('permisos')->get();
-			$permisos = Permiso::orderBy('seccion_id')->get();
-			$secciones = Seccion::with('permisos')->get();
-
-			return view('permisos_x_rol', compact('roles', 'permisos', 'secciones'));
-		}
-	*/
 	public function updatePermisos(Request $request, MyController $myController)
 	{
 		$permiso_asignar_permisos = $myController->tiene_permiso('manage_perm');
