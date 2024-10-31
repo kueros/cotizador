@@ -19,7 +19,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\PasswordHistory;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
-
+use App\Models\Variable;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -41,11 +42,16 @@ class UserController extends Controller
 			abort(403, '.');
 			return false;
 		}
+		$reset_password_30_dias = Variable::where('nombre', 'reset_password_30_dias')
+			->first()['valor'];
+		$configurar_claves = Variable::where('nombre', 'configurar_claves')
+			->first()['valor'];
+			#dd($variables);
 		$users = User::withoutTrashed()
-		->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
-		->select('users.*', 'roles.nombre as nombre_rol')
-		->paginate();
-		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario'))
+			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
+			->select('users.*', 'roles.nombre as nombre_rol')
+			->paginate();
+		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario', 'reset_password_30_dias', 'configurar_claves'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
 
