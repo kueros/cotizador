@@ -14,9 +14,27 @@
 		@method('patch')
 
 		<div>
+			<x-input-label for="id" :value="__('ID')" />
+			<x-text-input id="id" value="{{ $permiso->id }}" name="id" type="text" class="mt-1 block w-full" autocomplete="id" />
+			<x-input-error :messages="$errors->get('id')" class="mt-2" />
+		</div>
+
+		<div>
 			<x-input-label for="nombre" :value="__('Nombre')" />
 			<x-text-input id="nombre" value="{{ $permiso->nombre }}" name="nombre" type="text" class="mt-1 block w-full" autocomplete="nombre" />
 			<x-input-error :messages="$errors->get('nombre')" class="mt-2" />
+		</div>
+
+		<div>
+			<x-input-label for="descripcion" :value="__('Descripción')" />
+			<x-text-input id="descripcion" value="{{ $permiso->nombre }}" name="descripcion" type="text" class="mt-1 block w-full" autocomplete="descripcion" />
+			<x-input-error :messages="$errors->get('descripcion')" class="mt-2" />
+		</div>
+
+		<div>
+			<x-input-label for="orden" :value="__('Orden')" />
+			<x-text-input id="orden" value="{{ $permiso->orden }}" name="orden" type="text" class="mt-1 block w-full" autocomplete="orden" />
+			<x-input-error :messages="$errors->get('orden')" class="mt-2" />
 		</div>
 
 

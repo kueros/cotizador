@@ -14,9 +14,9 @@ use App\Models\Permiso_x_Rol;
 		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 			<div class="p-12 sm:p-8 bg-white shadow sm:rounded-lg">
 				<div>
-					<!-- Formulario para guardar permisos -->
-					<form action="{{ route('permisos_x_rol.update') }}" method="POST">
-						@csrf
+					<a href="{{ route('permisos.create') }}" class="btn btn-outline-success float-right" data-placement="left" style="border-radius:20px!important;margin-right:5px;" >
+						<i class="fas fa-plus"></i> {{ __('Agregar Usuario') }}
+					</a>
 						
 						@foreach ($secciones as $seccion)
 							<!-- Acordeón por sección -->
@@ -70,7 +70,8 @@ use App\Models\Permiso_x_Rol;
 																	</form>
 																</form>
 																	
-															</td>														@endif
+															</td>
+														@endif
 													</tr>
 													@endforeach
 												</tbody>
@@ -81,9 +82,6 @@ use App\Models\Permiso_x_Rol;
 							</div>
 						@endforeach
 
-						<!-- Botón para guardar cambios -->
-						<button type="submit" class="btn btn-primary mt-4">Guardar cambios</button>
-					</form>
 				</div>
 			</div>
 		</div>
