@@ -39,6 +39,7 @@ use App\Models\Permiso_x_Rol;
 														<th>Nombre</th>
 														<th>Descripción</th>
 														<th>Orden</th>
+														<th>Acciones</th>
 													</tr>
 												</thead>
 														<?php 
@@ -55,7 +56,21 @@ use App\Models\Permiso_x_Rol;
 															<td>{{ $permiso->nombre }}</td>
 															<td>{{ $permiso->descripcion }}</td>
 															<td>{{ $permiso->orden }}</td>
-														@endif
+															<td>
+																<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('permisos.edit', $permiso->id) }}">
+																	<i class="fas fa-pencil-alt"></i>
+																</a>
+																
+																	<form action="{{ route('permisos.destroy', $permiso->id) }}" method="POST" style="display:inline;">
+																		@csrf
+																		@method('DELETE')
+																		<button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar este usuario?')">
+																			<i class="fas fa-trash"></i>
+																		</button>
+																	</form>
+																</form>
+																	
+															</td>														@endif
 													</tr>
 													@endforeach
 												</tbody>
