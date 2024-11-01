@@ -94,6 +94,7 @@
                     </a>
                     <ul class="dropdown-menu" tabindex="5003" style="overflow: hidden; outline: none;">
                         <form action="{{ route('logout') }}" method="post" style="display: inline;">
+                            @csrf
                             <button type="submit" class="hover-aleph-buttons btn btn-link" style="padding: 0; border: none;">
                                 <i class="bi bi-box-arrow-in-right"></i> Cerrar sesión
                             </button>
