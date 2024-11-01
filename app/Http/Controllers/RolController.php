@@ -103,7 +103,7 @@ class RolController extends Controller
 	 */
 	public function update(Request $request, Rol $rol, MyController $myController): RedirectResponse
 	{
-		echo "mierda";
+		#dd($request);
 		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
 		if (!$permiso_editar_roles) {
 			abort(403, '.');
@@ -113,7 +113,9 @@ class RolController extends Controller
 		$validatedData = $request->validate([
 			'nombre' => 'required|string|max:255|unique:roles,nombre',
 		]);
+		#dd($validatedData);
 		$rol->update($validatedData);
+		dd($rol);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;

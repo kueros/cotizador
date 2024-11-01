@@ -27,7 +27,7 @@
 
 		<div>
 			<x-input-label for="descripcion" :value="__('Descripción')" />
-			<x-text-input id="descripcion" value="{{ $permiso->nombre }}" name="descripcion" type="text" class="mt-1 block w-full" autocomplete="descripcion" />
+			<x-text-input id="descripcion" value="{{ $permiso->descripcion }}" name="descripcion" type="text" class="mt-1 block w-full" autocomplete="descripcion" />
 			<x-input-error :messages="$errors->get('descripcion')" class="mt-2" />
 		</div>
 

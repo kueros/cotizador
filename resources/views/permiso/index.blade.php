@@ -1,8 +1,3 @@
-<?php
-use App\Models\Permiso_x_Rol;
-
-?>
-
 <x-app-layout :roles="$roles">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -15,7 +10,7 @@ use App\Models\Permiso_x_Rol;
 			<div class="p-12 sm:p-8 bg-white shadow sm:rounded-lg">
 				<div>
 					<a href="{{ route('permisos.create') }}" class="btn btn-outline-success float-right" data-placement="left" style="border-radius:20px!important;margin-right:5px;" >
-						<i class="fas fa-plus"></i> {{ __('Agregar Usuario') }}
+						<i class="fas fa-plus"></i> {{ __('Agregar Permiso') }}
 					</a>
 						
 						@foreach ($secciones as $seccion)

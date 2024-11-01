@@ -93,10 +93,23 @@ class UserController extends Controller
 				'required',
 				'string',
 				'max:255',
+				'regex:/^[a-zA-Z0-9._-]+$/', // Permitir solo letras, números, puntos, guiones y guiones bajos
 				Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
 			],
-			'nombre' => 'required|string|max:255',
-			'apellido' => 'required|string|max:255',
+			'nombre' => [
+				'required',
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+			],
+			'apellido' => [
+				'required',
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+			],
 			'email' => [
 				'required',
 				'string',
@@ -106,6 +119,10 @@ class UserController extends Controller
 			],
 			'rol_id' => 'required|exists:roles,rol_id',
 			'habilitado' => 'required|boolean',
+		], [
+			'username.regex' => 'El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos.',
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+			'apellido.regex' => 'El apellido solo puede contener letras y espacios.',
 		]);
 		// Verificar si el usuario con el mismo username o email está soft deleted
 		$existingUser = User::onlyTrashed()
@@ -375,10 +392,7 @@ class UserController extends Controller
 			}
 			try {
 				$user = User::findOrFail($user_id);
-				#echo "sinhab ".$user->habilitado;
 				$user->habilitado = ( $user->habilitado != 1 ) ? 1 : 0;
-				# $request->input('temporal'); // Valor enviado por AJAX
-				#echo $user->habilitado;
 				$user->save(); // Guardar los cambios en la base de datos
 				return response()->json(['success' => true]);
 			} catch (\Exception $e) {

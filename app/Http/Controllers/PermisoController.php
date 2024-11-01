@@ -17,21 +17,13 @@ use Illuminate\Support\Facades\DB;
 class PermisoController extends Controller
 {
 
+	public $myController;
+
 	public function __construct(MyController $myController)
 	{
 		$this->myController = $myController;
 	}
 
-
-	/**
-	 * Display a listing of the resource.
-	 */
-/*     public function index(Request $request): View
-	{
-		$permisos = Permiso::paginate();
-		return view('permiso.index', compact('permisos'))
-			->with('i', ($request->input('page', 1) - 1) * $permisos->perPage());
-	} */
 
 	public function index()
 	{
@@ -48,21 +40,6 @@ class PermisoController extends Controller
 		return view('permiso.index', compact('roles', 'permisos', 'secciones'));
 
 		#return view('permiso.index', compact('permisos'));
-	}
-
-	public function index2( MyController $myController)
-	{
-		$permiso_asignar_permisos = $myController->tiene_permiso('manage_perm');
-		if (!$permiso_asignar_permisos) {
-			abort(403, '.');
-			return false;
-		}
-		$secciones = Seccion::get();
-		$permisos = Permiso::orderBy('seccion_id')->get();
-		$roles = Rol::get();
-		$permisosRoles = Permiso_x_Rol::get();
-
-		return view('permiso_x_rol.index', compact('roles', 'permisos', 'permisosRoles', 'secciones'));
 	}
 
 
@@ -96,37 +73,89 @@ class PermisoController extends Controller
 	public function create(): View
 	{
 		$permisos = new Permiso();
-		return view('permiso.create', compact('permisos'));
+		$permisoUltimoId = Permiso::orderBy('id', 'desc')->first()['id'];
+		#dd($permisoUltimoId);
+		$secciones = Seccion::get();
+		return view('permiso.create', compact('permisos', 'secciones', 'permisoUltimoId'));
 	}
 
-	/**
-	 * Store a newly created resource in storage.
-	 */
-	public function store(Request $request, MyController $myController): RedirectResponse
-	{
-		// Validar los datos del usuario
-		$validatedData = $request->validate([
-			'nombre' => 'required|string|max:255|unique:permisos,nombre',
-			'registra_log' => 'required|integer',
-			'orden' => 'required|integer|unique:permisos,orden',
-		]);
-		Permiso::create($validatedData);
-		$clientIP = \Request::ip();
-		$userAgent = \Request::userAgent();
-		$username = Auth::user()->username;
-		$action = "permisos.store";
-		$message = $username . " creó el permiso " . $_POST['nombre'];
-		#$myController->loguear($clientIP, $userAgent, $username, $action, $message);
-		$subject = "Creación de permiso";
-		$body = "Permiso " . $_POST['nombre'] . " creado correctamente por " . Auth::user()->username;
-		$to = Auth::user()->email;
-		// Llamar a enviar_email de MyController
-		$myController->enviar_email($to, $body, $subject);
-		Log::info('Correo enviado exitosamente a ' . $to);
-		return Redirect::route('permisos.index')
-			->with('success', 'Permiso created successfully.');
-	}
+public function store(Request $request, MyController $myController): RedirectResponse
+{
+    // Validar los datos del permiso
+    $messages = [
+        'id' => 'Ese ID ya está utilizado en otro permiso',
+        'nombre' => 'Ese nombre de permiso ya está utilizado',
+        'descripcion' => 'Esa descripción de permiso ya está utilizada',
+        'orden' => 'Ese orden de permiso ya está utilizado',
+    ];
 
+    $validatedData = $request->validate([
+        'id' => 'required|int|unique:permisos,id',
+        'nombre' => 'required|string|max:255|unique:permisos,nombre',
+        'descripcion' => 'required|string|max:255',
+        'orden' => 'required|int',
+        'seccion_id' => 'required|int',
+    ], $messages);
+
+    // Crear el permiso en la base de datos
+    $permiso = Permiso::create($validatedData);
+
+    // Lógica para actualizar el archivo PermisosSeeder.php
+    $this->updatePermisosSeeder();
+
+    // Enviar correo y otros procesos adicionales
+    $clientIP = \Request::ip();
+    $userAgent = \Request::userAgent();
+    $username = Auth::user()->username;
+    $action = "permisos.store";
+    $message = $username . " creó el permiso " . $_POST['nombre'];
+    $subject = "Creación de permiso";
+    $body = "Permiso " . $_POST['nombre'] . " creado correctamente por " . Auth::user()->username;
+    $to = Auth::user()->email;
+    $myController->enviar_email($to, $body, $subject);
+    Log::info('Correo enviado exitosamente a ' . $to);
+
+    return Redirect::route('permisos.index')
+        ->with('success', 'Permiso created successfully.');
+}
+
+private function updatePermisosSeeder()
+{
+    // Obtener todos los permisos actuales
+    $permisos = Permiso::all();
+
+    // Generar el contenido del archivo de seed
+    $seedContent = "<?php\n\n";
+    $seedContent .= "namespace Database\\Seeders;\n\n";
+    $seedContent .= "use Illuminate\\Database\\Seeder;\n";
+    $seedContent .= "use Illuminate\\Support\\Facades\\DB;\n\n";
+    $seedContent .= "class PermisosSeeder extends Seeder\n";
+    $seedContent .= "{\n";
+    $seedContent .= "    public function run()\n";
+    $seedContent .= "    {\n";
+    $seedContent .= "        DB::table('permisos')->truncate();\n\n";
+    $seedContent .= "        DB::table('permisos')->insert([\n";
+
+    foreach ($permisos as $permiso) {
+        $seedContent .= "            [\n";
+        $seedContent .= "                'id' => {$permiso->id},\n";
+        $seedContent .= "                'nombre' => '{$permiso->nombre}',\n";
+        $seedContent .= "                'descripcion' => '{$permiso->descripcion}',\n";
+        $seedContent .= "                'orden' => {$permiso->orden},\n";
+        $seedContent .= "                'seccion_id' => {$permiso->seccion_id},\n";
+        $seedContent .= "                'created_at' => '{$permiso->created_at}',\n";
+        $seedContent .= "                'updated_at' => '{$permiso->updated_at}',\n";
+        $seedContent .= "            ],\n";
+    }
+
+    $seedContent .= "        ]);\n";
+    $seedContent .= "    }\n";
+    $seedContent .= "}\n";
+
+    // Guardar el contenido en PermisosSeeder.php
+    $filePath = database_path('seeders/PermisosSeeder.php');
+    file_put_contents($filePath, $seedContent);
+}
 	/**
 	 * Display the specified resource.
 	 */
@@ -150,17 +179,27 @@ class PermisoController extends Controller
 	 */
 	public function update(Request $request, Permiso $permiso, MyController $myController): RedirectResponse
 	{
-		// Validar los datos del usuario
+		#dd($request);
+ 		$messages = [
+			'id' => 'Ese ID ya está utilizado en otro permiso',
+			'nombre' => 'Ese nombre de permiso ya está utilizado',
+			'descripcion' => 'Ese nombre de permiso ya está utilizado',
+			'orden' => 'Ese nombre de permiso ya está utilizado',
+		];
+		// Validar los datos del permiso, ignorando al permiso actual
 		$validatedData = $request->validate([
-			'nombre' => 'required|string|max:255|unique:roles,nombre',
-		]);
+			'id' => 'required|int|unique:permisos,id,' . $permiso->id . ',id',
+			'nombre' => 'required|string|max:255|unique:permisos,nombre,' . $permiso->nombre . ',nombre',
+			'descripcion' => 'required|string|max:255',
+			'orden' => 'required|int',
+		], $messages);
+
 		$permiso->update($validatedData);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
 		$action = "permisos.update";
 		$message = $username . " actualizó el permiso " . $_POST['nombre'];
-		#$myController->loguear($clientIP, $userAgent, $username, $action, $message);
 		$subject = "Actualización de permiso";
 		$body = "Permiso " . $_POST['nombre'] . " actualizado correctamente por " . Auth::user()->username;
 		$to = Auth::user()->email;
