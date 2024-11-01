@@ -135,8 +135,8 @@ class RolController extends Controller
 	 */
 	public function show($id): View
 	{
-		$role = Rol::find($id);
-		return view('rol.show', compact('role'));
+		$rol = Rol::find($id);
+		return view('rol.show', compact('rol'));
 	}
 
 	/**
@@ -144,12 +144,14 @@ class RolController extends Controller
 	 */
 	public function edit($id, MyController $myController): View
 	{
+		#dd($id);
 		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
 		if (!$permiso_editar_roles) {
 			abort(403, '.');
 			return false;
 		}
 		$roles = Rol::find($id);
+		#dd($roles);
 		return view('rol.edit', compact('roles'));
 	}
 
@@ -158,6 +160,7 @@ class RolController extends Controller
 	 */
 	public function update(Request $request, Rol $rol, MyController $myController): RedirectResponse
 	{
+		echo "mierda";
 		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
 		if (!$permiso_editar_roles) {
 			abort(403, '.');

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
 use App\Models\Permiso;
+use App\Models\Seccion;
+use App\Models\Rol;
 use Illuminate\Support\Facades\DB;
 
 class PermisoController extends Controller
@@ -33,12 +35,46 @@ class PermisoController extends Controller
 
 	public function index()
 	{
+		#$permisos = DB::table('permisos')
+		#	->orderBy('seccion_id')
+		#	->orderBy('orden')
+		#	->get();
+		$secciones = Seccion::get();
+		$permisos = Permiso::orderBy('seccion_id')->get();
+		$roles = Rol::get();
+		#$permisosRoles = Permiso_x_Rol::get();
+		#dd($roles);
+
+		return view('permiso.index', compact('roles', 'permisos', 'secciones'));
+
+		#return view('permiso.index', compact('permisos'));
+	}
+
+	public function index2( MyController $myController)
+	{
+		$permiso_asignar_permisos = $myController->tiene_permiso('manage_perm');
+		if (!$permiso_asignar_permisos) {
+			abort(403, '.');
+			return false;
+		}
+		$secciones = Seccion::get();
+		$permisos = Permiso::orderBy('seccion_id')->get();
+		$roles = Rol::get();
+		$permisosRoles = Permiso_x_Rol::get();
+
+		return view('permiso_x_rol.index', compact('roles', 'permisos', 'permisosRoles', 'secciones'));
+	}
+
+
+	public function permisosOrden()
+	{
+		dd("kdk");
 		$permisos = DB::table('permisos')
 			->orderBy('seccion_id')
 			->orderBy('orden')
 			->get();
 
-		return view('permiso.index', compact('permisos'));
+		return view('permiso.permisosOrden', compact('permisos'));
 	}
 
 	public function reordenar(Request $request)

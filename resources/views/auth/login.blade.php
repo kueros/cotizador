@@ -349,5 +349,19 @@
 	</div>
 
 </body>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/build/assets/js/jquery-ui.js"></script>
+	<script>
+		function show_password(elemento){
+
+			var x = document.getElementById("password");
+
+			if($(elemento).prop('checked')){
+				x.type = "text";
+			}else{
+				x.type = "password";
+			}
+		}
+	</script>
 
 </html>

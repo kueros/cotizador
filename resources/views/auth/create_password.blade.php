@@ -29,6 +29,7 @@
                     <x-input-label for="password_confirmation" value="{{ __('Confirmar Contraseña') }}" />
                     <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-3/4" required minlength="8" maxlength="20" />
                     <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                    <span id="show_password" class="ms-2 text-sm text-black"><input type="checkbox" value="1" onchange="show_password(this)" /> Mostrar contraseña</span>
                 </div>
 
                 <!-- Botón para enviar -->

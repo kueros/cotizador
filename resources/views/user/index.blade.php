@@ -36,45 +36,6 @@
 			});
 		});
 
-		$('input[type="checkbox"]').on('change', function() {
-			// Guardo el nombre del checkbox que ha sido clickeado
-			let variableName = $(this).attr('name');
-			// Verifico si está checkeado
-			let isChecked = $(this).is(':checked');
-			// Obtengo el div correspondiente basado en el id del checkbox
-			let targetDiv = $('#div_' + variableName);
-			// Si está checkeado, muestro el formulario
-			if (isChecked) {
-				targetDiv.slideUp(); // Oculto el formulario
-			} else {
-				targetDiv.slideDown(); // Muestro el formulario
-			}
-			// Envío el AJAX para guardar el estado
-			$.ajax({
-				url: '{{ route("users.guardar_opciones") }}',
-				type: 'POST',
-				data: {
-					_token: '{{ csrf_token() }}',
-					[variableName]: isChecked ? 1 : 0
-				},
-				headers: {
-					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-				},
-				dataType: "JSON",
-				success: function(response) {
-					alert('Estado guardado correctamente');
-					if (variableName == 'notificaciones_email_aleph') {
-						window.location.href = '{{ route("configuracion.index") }}';
-					} else {
-						location.reload(); // Refresca la pantalla
-					}
-				},
-				error: function(error) {
-					alert('Error al guardar el estado', error);
-				}
-			});
-		});
-
 		function limpiar_campos_requeridos(form_id){
 			/*$($('#'+form_id).prop('elements')).each(function(){
 				if($(this).prop("required") && !$(this).prop("disabled")){
@@ -297,31 +258,6 @@
 						</div>
 					</div>
 				</div>
-				
-				<!--<div class="accordion" id="accordionFiltrosUsuarios">
-					<div class="accordion-item">
-						<h2 class="accordion-header" id="headingOne">
-							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-								data-bs-target="#filtros-usuarios" aria-expanded="true" aria-controls="collapseOne">
-								Filtros
-							</button>
-						</h2>
-						<div id="filtros-usuarios" class="accordion-collapse collapse" aria-labelledby="headingOne" 
-							data-bs-parent="#accordionFiltrosUsuarios">
-							<div class="accordion-body">
-								<div class="form-group">
-									<label class="control-label">Filtro de usuarios</label>
-									<select class="form-control" name="filtrar_usuarios" id="filtrar_usuarios" onchange="filtrar_usuarios()" style="width:200px;">
-										<option value="0" selected="">Solo habilitados</option>
-										<option value="1">Todos</option>
-										<option value="2">Eliminados</option>
-									</select>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>-->
-
 				<br>
 
 				<!-- Tabla de usuarios -->

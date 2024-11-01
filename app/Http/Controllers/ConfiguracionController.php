@@ -84,6 +84,25 @@ class ConfiguracionController extends Controller
 			$subject = "Guardar estado";
 			$body = "Usuario " . $username . " ha guardado los estados correctamente.";
 			$to = "omarliberatto@yafoconsultora.com";
+
+
+
+
+
+
+
+
+
+
+			/*
+			
+			
+			
+			VER EL $TO QUE ESTÁ HARDCODEADOOOOOOOOOOOOOOOOOOO
+			
+			
+			
+			*/
 			$myController->enviar_email($to, $body, $subject);
 			$log->save();
 			session()->flash('success', 'Estado guardado correctamente');

@@ -50,7 +50,7 @@ return new class extends Migration
 				'id' => 9,
 				'nombre' => 'reset_password_30_dias',
 				'nombre_menu' => '',
-				'valor' => '0',
+				'valor' => 0,
 				'created_at' => now(),
 				'updated_at' => now()
 			],
@@ -221,11 +221,19 @@ return new class extends Migration
 				'valor' => '[]',
 				'created_at' => now(),
 				'updated_at' => now()
+			],
+			[
+				'id' => 161,
+				'nombre' => 'configurar_claves',
+				'nombre_menu' => '',
+				'valor' => 0,
+				'created_at' => now(),
+				'updated_at' => now()
 			]
 		]);
 	}
 
-	/**
+	/** 
 	 * Reverse the migrations.
 	 */
 	public function down(): void

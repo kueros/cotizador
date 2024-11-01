@@ -49,6 +49,7 @@
 			margin-top: 10px;
 			margin-bottom: 10px;
 		}
+
         .error403{
             font-size: 3rem;
         }
@@ -140,6 +141,23 @@
             }, 5000);
 
 		});
+
+		function show_password(elemento){
+
+            var x = document.getElementById("password");
+            if($(elemento).prop('checked')){
+                x.type = "text";
+            }else{
+                x.type = "password";
+            }
+
+            var x = document.getElementById("password_confirmation");
+            if($(elemento).prop('checked')){
+                x.type = "text";
+            }else{
+                x.type = "password";
+            }
+		}
 	</script>
 </body>
 
