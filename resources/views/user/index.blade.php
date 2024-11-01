@@ -79,7 +79,7 @@
 			roles_usuario = new Array();
 
 			$.ajax({
-				url : "<?php echo base_url('usuarios/ajax_edit/')?>/" + id,
+				url : "/" + id,
 				type: "GET",
 				dataType: "JSON",
 				success: function(data)

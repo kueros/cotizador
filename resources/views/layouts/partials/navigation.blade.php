@@ -87,13 +87,14 @@
                 </li>
             </ul>
             <ul id="user-menu-desktop" class="nav navbar-nav nav-bar-2" style="min-width: 188px;">
+                
                 <li class="nav-item user-button dropdown">
                     <a data-bs-toggle="dropdown" class="nav-link dropdown-toggle" href="#" aria-expanded="true">
-                        <span class="username"><strong> Prueba</strong> </span><span style="font-size: 12px;" class="glyphicon glyphicon-user"></span><span class="caret"></span>
+                        <span class="username"><strong> {{ Auth::user()->name . " " .  }}</strong> </span><span style="font-size: 12px;" class="glyphicon glyphicon-user"></span><span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" tabindex="5003" style="overflow: hidden; outline: none;">
                         
-                        <li><a class="dropdown-item hover-aleph-buttons" href=""><span class="glyphicon glyphicon-log-in"></span>cerrar_sesion</a></li>
+                        <li><a class="dropdown-item hover-aleph-buttons" href="{{route('logout')}}"><span class="glyphicon glyphicon-log-in"></span>cerrar_sesion</a></li>
                     </ul>
                 </li>
             </ul>
