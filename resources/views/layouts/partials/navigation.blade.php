@@ -90,11 +90,14 @@
                 
                 <li class="nav-item user-button dropdown">
                     <a data-bs-toggle="dropdown" class="nav-link dropdown-toggle" href="#" aria-expanded="true">
-                        <span class="username"><strong> {{ Auth::user()->name . " " .  }}</strong> </span><span style="font-size: 12px;" class="glyphicon glyphicon-user"></span><span class="caret"></span>
+                        <span class="username"><strong> {{ Auth::user()->name }}</strong> </span><span style="font-size: 12px;" class="bi bi-person"></span><span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" tabindex="5003" style="overflow: hidden; outline: none;">
-                        
-                        <li><a class="dropdown-item hover-aleph-buttons" href="{{route('logout')}}"><span class="glyphicon glyphicon-log-in"></span>cerrar_sesion</a></li>
+                        <form action="{{ route('logout') }}" method="post" style="display: inline;">
+                            <button type="submit" class="hover-aleph-buttons btn btn-link" style="padding: 0; border: none;">
+                                <i class="bi bi-box-arrow-in-right"></i> Cerrar sesión
+                            </button>
+                        </form>
                     </ul>
                 </li>
             </ul>
