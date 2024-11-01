@@ -90,7 +90,7 @@
                 
                 <li class="nav-item user-button dropdown">
                     <a data-bs-toggle="dropdown" class="nav-link dropdown-toggle" href="#" aria-expanded="true">
-                        <span class="username"><strong> {{ Auth::user()->name }}</strong> </span><span style="font-size: 12px;" class="bi bi-person"></span><span class="caret"></span>
+                        <span class="username"><strong> {{ Auth::user()->nombre }}</strong> </span><span style="font-size: 12px;" class="bi bi-person"></span><span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" tabindex="5003" style="overflow: hidden; outline: none;">
                         <form action="{{ route('logout') }}" method="post" style="display: inline;">
