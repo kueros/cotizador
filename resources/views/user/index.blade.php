@@ -67,7 +67,7 @@
 
 		function edit_usuario(id)
 		{
-			save_method = 'update';
+			/*save_method = 'update';
 			limpiar_campos_requeridos('form');
 			$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
@@ -93,18 +93,7 @@
 					$('[name=enabled]').val(data.enabled);
 					$('[name=habilita_api]').val(data.habilita_api);
 
-					<?php
-					foreach($campos_usuarios as $campo){
-						if($campo->nombre_campo == 'password'){
-							continue;
-						}
-						if($campo->campo_base == 0){
-							?>
-							$('[name=<?=$campo->nombre_campo?>]').val(data.<?=$campo->nombre_campo?>);
-							<?php
-						}
-					}
-					?>
+					
 
 					data.roles_asignados.forEach(function(rol){
 						roles_usuario.push(rol.rol_id);
@@ -125,7 +114,7 @@
 				{
 					show_ajax_error_message(jqXHR, textStatus, errorThrown);
 				}
-			});
+			});*/
 		}
 
 		function deshabilitar_usuario(id, temporal = false) {

@@ -74,7 +74,7 @@
             <ul class="nav navbar-nav me-auto nav-bar-1">
                 <li><a class="nav-link main-item" id="boton-inicio" href="">Inicio</a></li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">administración
+                    <a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">Administración
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
