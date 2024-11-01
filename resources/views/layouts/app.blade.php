@@ -133,8 +133,11 @@
 					return false;
 				}
 			});
-
-
+			
+			// Esperar 5 segundos antes de ocultar el mensaje
+			setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
 
 		});
 	</script>

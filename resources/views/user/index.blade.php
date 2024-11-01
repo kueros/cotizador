@@ -19,105 +19,21 @@
 
 		jQuery(document).ready(function($){
 			table = $('#usuarios-table').DataTable({
-				dom: 'Bfrtip',
-				buttons: [
-					{"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Usuarios'},
-					{"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Usuarios'},
-					{"extend": 'excel', "text":'Export',"className": 'btn btn-success', title: 'Usuarios'},
-					{"extend": 'print', "text":'Export',"className": 'btn btn-secondary', title: 'Usuarios'}
-				],
-				initComplete: function () {
-					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
-					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
-					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
-					$('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
-				}
+			language: traduccion_datatable,
+            dom: 'Bfrtip',
+            buttons: [
+                {"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Usuarios'},
+                {"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Usuarios'},
+                {"extend": 'excel', "text":'Export',"className": 'btn btn-success', title: 'Usuarios'},
+                {"extend": 'print', "text":'Export',"className": 'btn btn-secondary', title: 'Usuarios'}
+            ],
+            initComplete: function () {
+                $('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
+                $('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
+                $('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
+                $('.buttons-print').html('<span class="glyphicon glyphicon-print" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
+            }
 			});
-			/*$("#importador_form_usuarios").submit(function(e) {
-				e.preventDefault(); // avoid to execute the actual submit of the form.
-
-				show_loading();   
-				var formData = new FormData(this);
-
-				$.ajax({
-					type: "POST",
-					url: "{{ url('usuarios/ajax_importador_submit') }}",
-					data: formData,
-					cache: false,
-					contentType: false,
-					processData: false,
-					success: function(data){
-						hide_loading();
-						location.reload();
-					}, 
-					error: function (jqXHR, textStatus, errorThrown){
-						show_ajax_error_message(jqXHR, textStatus, errorThrown);
-					}
-				});
-			});
-
-			//var filtrar_usuarios = '';
-
-			table = $('#usuarios-table').DataTable({
-				"ajax": {
-					url : "{{ url('users/ajax_listado') }}",
-					type : 'GET',
-					data: {filtrar_usuarios:filtrar_usuarios}
-				},
-				language: traduccion_datatable,
-				dom: 'Bfrtip',
-				buttons: [
-					{"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Usuarios'},
-					{"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Usuarios'},
-					{"extend": 'excel', "text":'Export',"className": 'btn btn-success', title: 'Usuarios'},
-					{"extend": 'print', "text":'Export',"className": 'btn btn-secondary', title: 'Usuarios'}
-				],
-				initComplete: function () {
-					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
-					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
-					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
-					$('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
-				}
-			});
-
-
-			$select_roles = $('#roles');
-			$.ajax({
-				url: "{{ url('roles/ajax_dropdown') }}"
-				, "type": "POST"
-				, data:{length:'',start:0}
-				, dataType: 'JSON'
-				, success: function (data) {
-					//clear the current content of the select
-					$select_roles.html('');
-					//iterate over the data and append a select option
-					$.each(data.roles, function (key, val) {
-						$select_roles.append('<option value="' + val.id + '">' + val.nombre + '</option>');
-					})
-				}
-				, error: function () {
-					$select_roles.html('<option id="-1">Ninguna disponible</option>');
-				}
-			});
-
-			$select_areas = $('#areas');
-			$.ajax({
-				url: "{{ url('area/ajax_dropdown') }}"
-				, "type": "POST"
-				, data:{length:'',start:0}
-				, dataType: 'JSON'
-				, success: function (data) {
-					//clear the current content of the select
-					$select_areas.html('');
-					//iterate over the data and append a select option
-					$.each(data.areas, function (key, val) {
-						$select_areas.append('<option value="' + val.id + '">' + val.nombre + '</option>');
-					})
-				}
-				, error: function () {
-					$select_areas.html('<option id="-1">Ninguna disponible</option>');
-				}
-			});*/
 		});
 
 		$('input[type="checkbox"]').on('change', function() {
@@ -141,6 +57,9 @@
 					_token: '{{ csrf_token() }}',
 					[variableName]: isChecked ? 1 : 0
 				},
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
 				dataType: "JSON",
 				success: function(response) {
 					alert('Estado guardado correctamente');
@@ -156,6 +75,98 @@
 			});
 		});
 
+		function limpiar_campos_requeridos(form_id){
+			/*$($('#'+form_id).prop('elements')).each(function(){
+				if($(this).prop("required") && !$(this).prop("disabled")){
+					$(this).removeClass('field-required');
+				}
+			});*/
+		}
+
+		function reload_table()
+		{
+			table.ajax.reload(null,false);
+		}
+
+		function add_usuario()
+		{
+			save_method = 'add';
+			limpiar_campos_requeridos('form');
+			$('#tabla_roles tbody').html('');
+			$('#form')[0].reset();
+			$('.form-group').removeClass('has-error');
+			$('.help-block').empty();
+			roles_usuario = new Array();
+			$('.modal-title').text('Agregar usuario');
+			$('#accion').val('add');
+			$('#password').prop("required",true);
+			$('#repassword').prop("required",true);
+			$('#modal_form').modal('show');
+		}
+
+		function edit_usuario(id)
+		{
+			save_method = 'update';
+			limpiar_campos_requeridos('form');
+			$('#form')[0].reset();
+			$('.form-group').removeClass('has-error');
+			$('.help-block').empty();
+			$('#accion').val('edit');
+			$('#tabla_roles tbody').html('');
+			$('#password').prop("required",false);
+			$('#repassword').prop("required",false);
+			roles_usuario = new Array();
+
+			$.ajax({
+				url : "<?php echo base_url('usuarios/ajax_edit/')?>/" + id,
+				type: "GET",
+				dataType: "JSON",
+				success: function(data)
+				{
+					$('[name="id"]').val(data.id);
+					$('[name="nombre"]').val(data.nombre);
+					$('[name="apellido"]').val(data.apellido);
+					$('[name="username"]').val(data.username);
+					$('[name="email"]').val(data.email);
+					$('[name=area]').val(data.area_id);
+					$('[name=enabled]').val(data.enabled);
+					$('[name=habilita_api]').val(data.habilita_api);
+
+					<?php
+					foreach($campos_usuarios as $campo){
+						if($campo->nombre_campo == 'password'){
+							continue;
+						}
+						if($campo->campo_base == 0){
+							?>
+							$('[name=<?=$campo->nombre_campo?>]').val(data.<?=$campo->nombre_campo?>);
+							<?php
+						}
+					}
+					?>
+
+					data.roles_asignados.forEach(function(rol){
+						roles_usuario.push(rol.rol_id);
+
+						row_roles = '';
+						row_roles += '<tr id="tr_rol_'+rol.rol_id+'">';
+						row_roles += '<td>'+rol.rol_nombre+'</td>';
+						row_roles += '<td><a class="btn btn-danger" onclick="eliminar_rol_usuario('+rol.rol_id+')"><span class="glyphicon glyphicon-trash"></span></a></td>';
+						row_roles += '</tr>';
+
+						$('#tabla_roles tbody').append(row_roles);
+					});
+
+					$('#modal_form').modal('show');
+					$('.modal-title').text('Editar usuario');
+				},
+				error: function (jqXHR, textStatus, errorThrown)
+				{
+					show_ajax_error_message(jqXHR, textStatus, errorThrown);
+				}
+			});
+		}
+
 		function deshabilitar_usuario(id, temporal = false) {
 			var texto = temporal 
 				? "¿Está seguro de que desea deshabilitar el usuario de forma temporal?" 
@@ -165,7 +176,7 @@
 			} else {
 				url = "{{ route('users.deshabilitar_usuario', ':id') }}";
 			}
-			swal({
+			swal.fire({
 				title: texto,
 				icon: "warning",
 				buttons: true,
@@ -181,7 +192,7 @@
 						data: {temporal: temporal},
 						dataType: "JSON",
 						success: function(data) {
-							swal({
+							swal.fire({
 								title: "Aviso",
 								text: "Usuario deshabilitado con éxito.",
 								icon: "success"
@@ -201,7 +212,7 @@
 
 		function blanquear_psw(id)
 		{
-			swal({
+			swal.fire({
 				title: "¿Desea blanquear la contraseña del usuario?",
 				icon: "warning",
 				buttons: true,
@@ -217,7 +228,7 @@
 						type: "PATCH",
 						dataType: "JSON",
 						success: function(data) {
-							swal({
+							swal.fire({
 								title: "Aviso",
 								text: "Contraseña blanqueada con éxito.",
 								icon: "success"
@@ -259,8 +270,8 @@
 									<div class="row">
 										<div class="col-md-12">
 											<div class="mb-3 row">
-												<label class="form-check-label col-md-3">Requerir cambio de contraseña después de 30 días</label>
-												<div class="col-md-9">
+												<label class="form-check-label col-md-6">Requerir cambio de contraseña después de 30 días</label>
+												<div class="col-md-6">
 													<input type="checkbox" value="1" <?php if($reset_password_30_dias){ echo 'checked'; }?> 
 														name="reset_password_30_dias" id="reset_password_30_dias">
 												</div>
@@ -270,8 +281,8 @@
 									<div class="row">
 										<div class="col-md-12">
 											<div class="mb-3 row">
-												<label class="form-check-label col-md-3">Configurar contraseñas</label>
-												<div class="col-md-3">
+												<label class="form-check-label col-md-6">Configurar contraseñas</label>
+												<div class="col-md-6">
 													<input type="checkbox" value="1" <?php if($configurar_claves){ echo 'checked'; }?> 
 														name="configurar_claves" id="configurar_claves">
 												</div>
@@ -312,13 +323,6 @@
 				</div>-->
 
 				<br>
-				<div class="float-right">
-					<a href="{{ route('users.create') }}" class="btn btn-primary btn-sm float-right" data-placement="left">
-						{{ __('Nuevo Usuario') }}
-					</a>
-				</div>
-				<br>
-				
 
 				<!-- Tabla de usuarios -->
 				<div class="p-12 sm:p-8 bg-white shadow sm:rounded-lg">
@@ -343,16 +347,15 @@
 								<i class="fas fa-file-import"></i> {{ __('Importar Usuarios') }}
 							</a>
 							@endif
-
 							@if ($permiso_agregar_usuario)
 							<a href="{{ route('users.create') }}" class="btn btn-outline-success float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px;">
 								<i class="fas fa-plus"></i> {{ __('Agregar Usuario') }}
 							</a>
 							@endif
-
 						</div>
-						<table id="usuarios-table" class="cell-border" style="width:100%">
-							<thead class="thead">
+						<br>
+						<table id="usuarios-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+							<thead>
 								<tr>
 									<th>Nombre</th>
 									<th>Apellido</th>
@@ -361,7 +364,7 @@
 									<th>Rol</th>
 									<th>Habilitado</th>
 									<th>Bloqueado</th>
-									<th colspan="2" class="text-center">Acciones</th>
+									<th class="text-center">Acciones</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -417,13 +420,7 @@
 														<i class="fas fa-trash"></i>
 													</button>
 												</form>
-											@endif										</td>
-												<!-- Botón para abrir el formulario de cambiar contraseña
-												<a href="{{ route('password.change', $user->user_id) }}" class="btn btn-warning btn-sm">
-													{{ __('Cambiar contraseña') }}
-												</a> -->
-											</form>
-												
+											@endif		
 										</td>
 									</tr>
 								@endforeach
@@ -470,6 +467,100 @@
 					</div>
 				@endif
 
+
+				<div class="modal fade" id="modal_form" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								<h3 class="modal-title">Formulario de usuario</h3>
+							</div>
+							<form method="post" action="{{ route('users.store') }}" class="mt-6 space-y-6">
+								<div class="modal-body form">
+									@csrf
+									<div class="form-body">
+										<div class="mb-3 row">
+											<label class="col-form-label col-md-3">{{ __('Nombre de Usuario') }}</label>
+											<div class="col-md-9">
+												<input name="username" maxlength="255" placeholder="Nombre de Usuario" 
+													id="username" class="form-control" type="text">
+												<span class="help-block"></span>
+											</div>
+										</div>
+									</div>
+
+									<div class="form-body">
+										<div class="mb-3 row">
+											<label class="col-form-label col-md-3">{{ __('Nombre') }}</label>
+											<div class="col-md-9">
+												<input name="nombre" maxlength="255" placeholder="Nombre" 
+													id="nombre" class="form-control" type="text">
+												<span class="help-block"></span>
+											</div>
+										</div>
+									</div>
+
+									<div class="form-body">
+										<div class="mb-3 row">
+											<label class="col-form-label col-md-3">{{ __('Apellido') }}</label>
+											<div class="col-md-9">
+												<input name="apellido" maxlength="255" placeholder="Apellido" 
+													id="apellido" class="form-control" type="text">
+												<span class="help-block"></span>
+											</div>
+										</div>
+									</div>
+
+									<div class="form-body">
+										<div class="mb-3 row">
+											<label class="col-form-label col-md-3">{{ __('Email') }}</label>
+											<div class="col-md-9">
+												<input name="email" maxlength="255" placeholder="Email" 
+													id="email" class="form-control" type="email">
+												<span class="help-block"></span>
+											</div>
+										</div>
+									</div>
+
+									<div>
+										<x-input-label for="rol_id" :value="__('Rol')" />
+										<select id="rol_id" name="rol_id" class="mt-1 block w-full">
+											<option value="0" {{ old('rol_id', $user->rol_id) === null ? 'selected' : '' }}>
+												{{ __('Elija un Rol') }}
+											</option>
+											@foreach($roles as $rol)
+											<option value="{{ $rol->rol_id }}" {{ old('rol_id', $user->rol_id) == $rol->rol_id ? 'selected' : '' }}>
+												{{ $rol->nombre }}
+											</option>
+											@endforeach
+										</select>
+										<x-input-error :messages="$errors->get('rol_id')" class="mt-2" />
+									</div>
+
+									<div>
+										<x-input-label for="habilitado" :value="__('Habilitado')" />
+										<div class="mt-1">
+											<label>
+												<input type="radio" name="habilitado" value="1"
+													{{ old('habilitado', $user->habilitado) === null || old('habilitado', $user->habilitado) == 1 ? 'checked' : '' }}>
+												Sí
+											</label>
+											<label class="ml-4">
+												<input type="radio" name="habilitado" value="0"
+													{{ old('habilitado', $user->habilitado) == 0 ? 'checked' : '' }}>
+												No
+											</label>
+										</div> <x-input-error :messages="$errors->get('habilitado')" class="mt-2" />
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="submit" class="btn btn-primary">{{ __('Guardar') }}</button>
+									<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
 				
 			</div>
 		</div>

@@ -129,7 +129,7 @@
 		<div class="row">
 			<div class="col-md-12">
 				<h2>Roles</h2>
-				
+				@include('layouts.partials.message')
 				<div class="accordion" id="accordionOpcionRoles">
 					<div class="accordion-item">
 						<h2 class="accordion-header" id="headingOne">
@@ -165,17 +165,23 @@
 				</div>
 				
 				<br>
-				<button id="agregar" class="btn btn-success" onclick="add_rol()"><i class="bi bi-plus"></i> Agregar rol</button>
-				<br>
-				<br>
-				<table id="roles-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
-					<thead>
-						<th>Nombre</th>
-						<th style="width:20%;">Acción</th>
-					</thead>
-					<tbody>
-                	</tbody>
-				</table>
+				
+				<div class="table-responsive">
+					<div class="float-right">
+						<button id="agregar" class="btn btn-success" onclick="add_rol()">
+							<i class="bi bi-plus"></i> {{ __('Nuevo Rol') }}
+						</button>
+					</div>
+					<br>
+					<table id="roles-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+						<thead>
+							<th>Nombre</th>
+							<th style="width:20%;">Acción</th>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
 				
 			</div>
 		</div>

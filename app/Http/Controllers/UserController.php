@@ -51,7 +51,10 @@ class UserController extends Controller
 			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
 			->select('users.*', 'roles.nombre as nombre_rol')
 			->paginate();
-		return view('user.index', compact('users', 'permiso_agregar_usuario', 'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario', 'reset_password_30_dias', 'configurar_claves'))
+		$roles = Rol::all();
+		return view('user.index', compact('users', 'permiso_agregar_usuario', 
+			'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario', 
+			'reset_password_30_dias', 'configurar_claves', 'roles'))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
 

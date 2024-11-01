@@ -86,6 +86,7 @@ class ConfiguracionController extends Controller
 			$to = "omarliberatto@yafoconsultora.com";
 			$myController->enviar_email($to, $body, $subject);
 			$log->save();
+			session()->flash('success', 'Estado guardado correctamente');
 			return response()->json(['success' => 'Estado guardado correctamente']);
 		} catch (\Exception $e) {
 			// Registrar el error para depuración
@@ -106,6 +107,7 @@ class ConfiguracionController extends Controller
 			$myController->enviar_email($to, $body, $subject);
 			$log->save();
 			Log::error('Error al guardar estado: ' . $e->getMessage());
+			session()->flash('error', 'Hubo un error al guardar el estado');
 			return response()->json(['error' => 'Hubo un error al guardar el estado'], 500);
 		}
 	}
@@ -139,8 +141,10 @@ class ConfiguracionController extends Controller
 		if ($from != '' || $from_name != '') {
 			Variable::where('nombre', '_notificaciones_email_from')->update(['valor' => $from]);
 			Variable::where('nombre', '_notificaciones_email_from_name')->update(['valor' => $from_name]);
+			session()->flash('success', 'Datos del remitente guardados.');
 			return response()->json(['success' => 'Datos del remitente guardados.']);
 		} else {
+			session()->flash('error', 'Ninguno de los 2 valores puede quedar vacío.');
 			return response()->json(['error' => 'Ninguno de los 2 valores puede quedar vacío.']);
 		}
 		return; // redirect()->route('configuracion');
@@ -156,10 +160,11 @@ class ConfiguracionController extends Controller
 
 		$parametro = trim($_POST['parametro']);
 		$valor = trim($_POST['valor']);
-		#dd($parametro, $valor); //234 y 234
+		//dd($parametro, $valor); //234 y 234
 		if ($parametro != '' && $valor != '') {
-			$notificaciones_email_config = Variable::where('nombre', 'notificaciones_email_config')->first();
+			$notificaciones_email_config = Variable::where('nombre', '_notificaciones_email_config')->first();
 			$configs = json_decode($notificaciones_email_config->valor);
+			
 			$mail_config = array();
 			if ($configs != '') {
 				foreach ($configs as $key => $config) {
@@ -170,7 +175,7 @@ class ConfiguracionController extends Controller
 			if (!isset($mail_config[$parametro])) {
 				$mail_config[$parametro] = $valor;
 
-				Variable::where('nombre', 'notificaciones_email_config')->update(['valor' => json_encode($mail_config)]);
+				Variable::where('nombre', '_notificaciones_email_config')->update(['valor' => json_encode($mail_config)]);
 				return redirect('/configuracion')->with('success', 'Parametro guardado.');
 			} else {
 				return redirect('/configuracion')->with('error', 'El parametro ya existe.');
@@ -194,7 +199,7 @@ class ConfiguracionController extends Controller
 		$parametro = trim($_POST['parametro']);
 
 		if ($parametro != '') {
-			$notificaciones_email_config = Variable::where('nombre', 'notificaciones_email_config')->first();
+			$notificaciones_email_config = Variable::where('nombre', '_notificaciones_email_config')->first();
 			$configs = json_decode($notificaciones_email_config->valor);
 			$mail_config = array();
 			foreach ($configs as $key => $config) {
@@ -205,10 +210,12 @@ class ConfiguracionController extends Controller
 				unset($mail_config[$parametro]);
 			}
 
-			Variable::where('nombre', 'notificaciones_email_config')->update(['valor' => json_encode($mail_config)]);
+			session()->flash('success', 'Se borró el parámetro.');
+			Variable::where('nombre', '_notificaciones_email_config')->update(['valor' => json_encode($mail_config)]);
 
 			return true;
 		} else {
+			session()->flash('error', 'Error al borrar el parámetro.');
 			return false;
 		}
 	}
