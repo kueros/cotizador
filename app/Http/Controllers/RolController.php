@@ -47,6 +47,33 @@ class RolController extends Controller
             );
         }
 
+		// RECORDAR AGREGAR EL TEMA DE LAS RESTRICCIONES
+		/*
+		@foreach ($roles as $rol)
+							<tr>
+								<td>{{ $rol->nombre }}</td>
+								<td>
+								@php
+								$rol_id = $roles->firstWhere('nombre', 'Administrador')->rol_id;
+								@endphp
+                                @if ($rol->rol_id != $rol_id)
+									@if ($permiso_editar_roles)
+									<a class="btn btn-sm btn-success" style="float:left;" href="{{ route('roles.edit', $rol->rol_id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Editar') }}
+									</a>
+									@endif
+									@if ($permiso_eliminar_roles)
+									<form action="{{ route('roles.destroy', $rol->rol_id) }}" method="POST">
+											@csrf
+											@method('DELETE')
+											<button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Está seguro de querer borrar?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+										</form>
+									@endif
+								@endif
+								</td>
+							</tr>
+							@endforeach
+		*/
+
         $output = array(
             "recordsTotal" => $roles->count(),
             "recordsFiltered" => $roles->count(),

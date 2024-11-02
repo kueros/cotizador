@@ -146,8 +146,8 @@
 								<div class="row">
 									<div class="form-body">
 										<div class="mb-3 row">
-											<label class="col-form-label col-md-3">Utilizar ID de grupo para asociar al rol en integración de login</label>
-											<div class="col-md-9">
+											<label class="col-form-label col-md-6">Utilizar ID de grupo para asociar al rol en integración de login</label>
+											<div class="col-md-6">
 												<input type="checkbox" value="1"  name="utilizar_id_grupo" id="utilizar_id_grupo">
 												<span class="help-block"></span>
 											</div>

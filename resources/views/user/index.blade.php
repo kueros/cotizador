@@ -54,7 +54,7 @@
 			save_method = 'add';
 			limpiar_campos_requeridos('form');
 			$('#tabla_roles tbody').html('');
-			$('#form')[0].reset();
+			//$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			roles_usuario = new Array();
@@ -199,11 +199,12 @@
 
 	</script>
 
-	<div class="container-full-width" id="pagina-permisos">
+	<div class="container" id="pagina-permisos">
 		<div class="row">
 			<div class="col-md-12">
 				<h2>Usuarios</h2>
 				<br>
+				@include('layouts.partials.message')
 				<div class="accordion" id="accordionOpcionUsuarios">
 					<div class="accordion-item">
 						<h2 class="accordion-header" id="headingOne">
@@ -249,109 +250,93 @@
 				</div>
 				<br>
 
-				<!-- Tabla de usuarios -->
-				<div class="p-12 sm:p-8 bg-white shadow sm:rounded-lg">
-									<!-- Manejo de errores -->
-					<div style="margin-top:1rem;">
-						@if (session('error')) 
-						<div class="alert alert-danger">
-							{{ session('error') }}
-						</div>
+				
+				<div class="table-responsive">
+					<div class="float-left">
+						@if ($permiso_agregar_usuario)
+						<a href="#" class="btn btn-outline-primary float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px; ">
+							<i class="fas fa-file-import"></i> {{ __('Importar Usuarios') }}
+						</a>
 						@endif
-						@if (session('success'))
-						<div class="alert alert-success" role="alert">
-								{{ session('success') }}
-							</div>
+						@if ($permiso_agregar_usuario)
+						<button id="agregar" class="btn btn-outline-success float-right" onclick="add_usuario()">
+							<i class="bi bi-plus"></i> {{ __('Agregar Usuario') }}
+						</button>
 						@endif
 					</div>
-
-					<div class="table-responsive">
-						<div class="float-left">
-							@if ($permiso_agregar_usuario)
-							<a href="#" class="btn btn-outline-primary float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px; ">
-								<i class="fas fa-file-import"></i> {{ __('Importar Usuarios') }}
-							</a>
-							@endif
-							@if ($permiso_agregar_usuario)
-							<a href="{{ route('users.create') }}" class="btn btn-outline-success float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px;">
-								<i class="fas fa-plus"></i> {{ __('Agregar Usuario') }}
-							</a>
-							@endif
-						</div>
-						<br>
-						<table id="usuarios-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
-							<thead>
+					<br>
+					<table id="usuarios-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th>Nombre</th>
+								<th>Apellido</th>
+								<th>Username</th>
+								<th>Email</th>
+								<th>Rol</th>
+								<th>Habilitado</th>
+								<th>Bloqueado</th>
+								<th class="text-center">Acciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach ($users as $user)
+							<?php 
+							$candadito = "";
+								if ($user->habilitado != 1){ 
+									$user->habilitado = 'No'; 
+									$candadito = "<i class='fas fa-lock'></i>";
+								} else { 
+									$user->habilitado = 'Si';  
+									$candadito = "<i class='fas fa-lock-open'></i>";
+								}
+							?>
 								<tr>
-									<th>Nombre</th>
-									<th>Apellido</th>
-									<th>Username</th>
-									<th>Email</th>
-									<th>Rol</th>
-									<th>Habilitado</th>
-									<th>Bloqueado</th>
-									<th class="text-center">Acciones</th>
+									<td>{{ $user->nombre }}</td>
+									<td>{{ $user->apellido }}</td>
+									<td>{{ $user->username }}</td>
+									<td>{{ $user->email }}</td>
+									<td>{{ $user->nombre_rol }}</td>
+									<td>{{ $user->habilitado }}</td>
+									<td>{{ $user->bloqueado ? 'Sí' : 'No' }}</td>
+									<td>
+										@if ($permiso_editar_usuario)
+										<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('users.edit', $user->user_id) }}">
+											<i class="fas fa-pencil-alt"></i>
+										</a>
+										@endif
+										
+										@if ($permiso_deshabilitar_usuario)
+										<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar" onclick="deshabilitar_usuario('{{ $user->user_id}}',0)">
+											<?php echo $candadito; ?>
+										</a>
+										@endif
+
+										@if ($permiso_deshabilitar_usuario)
+										<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar temporalmente" onclick="deshabilitar_usuario('{{ $user->user_id}}',2)">
+											<span class="fas fa-clock"></span>
+										</a>
+										@endif
+
+										@if ($permiso_blanquear_password)
+										<a class="btn btn-sm btn-outline-info" href="javascript:void(0)" title="Blanquear" onclick="blanquear_psw('{{ $user->user_id }}')">
+											<i class="fas fa-key"></i>
+										</a>
+										@endif
+
+										@if ($permiso_eliminar_usuario)
+											<form action="{{ route('users.destroy', $user->user_id) }}" method="POST" style="display:inline;">
+												@csrf
+												@method('DELETE')
+												<button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar este usuario?')">
+													<i class="fas fa-trash"></i>
+												</button>
+											</form>
+										@endif		
+									</td>
 								</tr>
-							</thead>
-							<tbody>
-								@foreach ($users as $user)
-								<?php 
-								$candadito = "";
-									if ($user->habilitado != 1){ 
-										$user->habilitado = 'No'; 
-										$candadito = "<i class='fas fa-lock'></i>";
-									} else { 
-										$user->habilitado = 'Si';  
-										$candadito = "<i class='fas fa-lock-open'></i>";
-									}
-								?>
-									<tr>
-										<td>{{ $user->nombre }}</td>
-										<td>{{ $user->apellido }}</td>
-										<td>{{ $user->username }}</td>
-										<td>{{ $user->email }}</td>
-										<td>{{ $user->nombre_rol }}</td>
-										<td>{{ $user->habilitado }}</td>
-										<td>{{ $user->bloqueado ? 'Sí' : 'No' }}</td>
-										<td>
-											@if ($permiso_editar_usuario)
-											<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('users.edit', $user->user_id) }}">
-												<i class="fas fa-pencil-alt"></i>
-											</a>
-											@endif
-											
-											@if ($permiso_deshabilitar_usuario)
-											<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar" onclick="deshabilitar_usuario('{{ $user->user_id}}',0)">
-												<?php echo $candadito; ?>
-											</a>
-											@endif
-
-											@if ($permiso_deshabilitar_usuario)
-											<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar temporalmente" onclick="deshabilitar_usuario('{{ $user->user_id}}',2)">
-												<span class="fas fa-clock"></span>
-											</a>
-											@endif
-
-											@if ($permiso_blanquear_password)
-											<a class="btn btn-sm btn-outline-info" href="javascript:void(0)" title="Blanquear" onclick="blanquear_psw('{{ $user->user_id }}')">
-												<i class="fas fa-key"></i>
-											</a>
-											@endif
-
-											@if ($permiso_eliminar_usuario)
-												<form action="{{ route('users.destroy', $user->user_id) }}" method="POST" style="display:inline;">
-													@csrf
-													@method('DELETE')
-													<button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar este usuario?')">
-														<i class="fas fa-trash"></i>
-													</button>
-												</form>
-											@endif		
-										</td>
-									</tr>
-								@endforeach
-							</tbody>
-						</table>
-					</div>
+							@endforeach
+						</tbody>
+					</table>
 				</div>
 
 				<!-- Mostrar formulario de cambio de contraseña si el usuario está establecido -->
@@ -391,7 +376,6 @@
 						</form>
 					</div>
 				@endif
-
 
 				<div class="modal fade" id="modal_form" role="dialog">
 					<div class="modal-dialog">
