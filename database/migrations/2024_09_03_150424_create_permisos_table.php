@@ -24,7 +24,7 @@ return new class extends Migration
 		// Verificar si el permiso "Permiso deAdministrador" ya existe, si no, crearlo
 		DB::table('permisos')->insert([
 			[
-				'id' => 101,
+				'id' => 1,
 				'nombre' => 'list_usr',
 				'descripcion' => 'Listar Usuarios',
 				'orden' => 1,
@@ -33,7 +33,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 102,
+				'id' => 2,
 				'nombre' => 'add_usr',
 				'descripcion' => 'Agregar Usuarios',
 				'orden' => 2,
@@ -42,7 +42,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 103,
+				'id' => 3,
 				'nombre' => 'edit_usr',
 				'descripcion' => 'Editar Usuarios',
 				'orden' => 3,
@@ -51,7 +51,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 104,
+				'id' => 4,
 				'nombre' => 'del_usr',
 				'descripcion' => 'Eliminar Usuarios',
 				'orden' => 4,
@@ -60,7 +60,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 105,
+				'id' => 5,
 				'nombre' => 'enable_usr',
 				'descripcion' => 'Habilitar/deshabilitar Usuarios',
 				'orden' => 5,
@@ -69,7 +69,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 106,
+				'id' => 6,
 				'nombre' => 'clean_pass',
 				'descripcion' => 'Blanquear password',
 				'orden' => 6,
@@ -78,7 +78,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 107,
+				'id' => 7,
 				'nombre' => 'setup_usr',
 				'descripcion' => 'Cambiar configuraciones de usuarios',
 				'orden' => 7,
@@ -87,7 +87,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 108,
+				'id' => 8,
 				'nombre' => 'import_usr',
 				'descripcion' => 'Importar usuarios',
 				'orden' => 8,
@@ -96,7 +96,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 201,
+				'id' => 9,
 				'nombre' => 'manage_perm',
 				'descripcion' => 'Asignar Permisos',
 				'orden' => 8,  // Proporciona un valor por defecto para orden
@@ -105,7 +105,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 301,
+				'id' => 10,
 				'nombre' => 'list_roles',
 				'descripcion' => 'Listar Roles',
 				'orden' => 9,  // Proporciona un valor por defecto para orden
@@ -114,7 +114,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 302,
+				'id' => 11,
 				'nombre' => 'add_rol',  // Condición para buscar el permiso
 				'descripcion' => 'Agregar Rol',
 				'orden' => 10,  // Proporciona un valor por defecto para orden
@@ -123,7 +123,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 303,
+				'id' => 12,
 				'nombre' => 'edit_rol',  // Condición para buscar el permiso
 				'descripcion' => 'Editar Rol',
 				'orden' => 11,  // Proporciona un valor por defecto para orden
@@ -132,7 +132,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 304,
+				'id' => 13,
 				'nombre' => 'del_rol',
 				'descripcion' => 'Eliminar Rol',
 				'orden' => 12,  // Proporciona un valor por defecto para orden
@@ -141,7 +141,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 401,
+				'id' => 14,
 				'nombre' => 'setup_soft',
 				'descripcion' => 'Acceder a las configuraciones del software',
 				'orden' => 13,  // Proporciona un valor por defecto para orden
@@ -150,7 +150,7 @@ return new class extends Migration
 				'updated_at' => now()
 			],
 			[
-				'id' => 402,
+				'id' => 15,
 				'nombre' => 'save_setup_soft',
 				'descripcion' => 'Guardar las configuraciones del software',
 				'orden' => 14,  // Proporciona un valor por defecto para orden
