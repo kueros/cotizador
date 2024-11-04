@@ -266,7 +266,6 @@
 								<hr>
 								<?php
 								if ($notificaciones_email == 1 && $notificaciones_email_aleph == 0) {
-
 								?>
 									<h4>Configuración del remitente</h4><br>
 									<!--<form id="form_config_remitente" action="{{ route('configuracion.guardar_remitente') }}" method="post">-->
@@ -274,14 +273,14 @@
 										<div class="row mb-3">
 											<label class="col-md-4 col-form-label">Email*</label>
 											<div class="col-md-6">
-												<input type="email" name="from" value="{{ $notificaciones_email_from }}" 
+												<input type="email" name="from" value="{{ $user->email }}" 
 													class="form-control" required placeholder="info@alephmanager.com">
 											</div>
 										</div>
 										<div class="row mb-3">
 											<label class="col-md-4 col-form-label">Nombre*</label>
 											<div class="col-md-6">
-												<input type="email" name="from_name" value="{{ $notificaciones_email_from_name }}" 
+												<input type="email" name="from_name" value="{{ $user->nombre.$user->apellido }}" 
 													class="form-control" required placeholder="Aleph Manager">
 											</div>
 										</div>

@@ -25,6 +25,8 @@ class ConfiguracionController extends Controller
 			abort(403, '.');
 			return false;
 		}
+		$user = User::where('user_id', Auth::user()->user_id)->first();
+		#dd($user);
 		$variables = Variable::where('nombre', 'like', '%noti%')
 			->orWhere('nombre', 'like', '%opav%')
 			->orWhere('nombre', 'like', '%copa%')
@@ -32,7 +34,7 @@ class ConfiguracionController extends Controller
 		$variables = $variables->filter(function ($variable) {
 			return !is_null($variable);
 		});
-		return view('configuracion.index', compact('variables'));
+		return view('configuracion.index', compact('variables', 'user'));
 	}
 
 	/**
