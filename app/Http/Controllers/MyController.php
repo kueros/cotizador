@@ -13,11 +13,10 @@ use Illuminate\Support\Facades\DB;
 class MyController extends Controller
 {
 
-	public function loguear($clientIP, $userAgent, $username, $action, $message)
+	public function loguear($clientIP, $userAgent, $username, $message)
 	{
 		$log = LogAdministracion::create([
 			'username' => $username,
-			'action' => $action,
 			'detalle' => $message,
 			'ip_address' => json_encode($clientIP),
 			'user_agent' => json_encode($userAgent)

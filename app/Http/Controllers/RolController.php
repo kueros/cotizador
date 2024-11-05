@@ -46,34 +46,6 @@ class RolController extends Controller
                 $accion
             );
         }
-
-		// RECORDAR AGREGAR EL TEMA DE LAS RESTRICCIONES
-		/*
-		@foreach ($roles as $rol)
-							<tr>
-								<td>{{ $rol->nombre }}</td>
-								<td>
-								@php
-								$rol_id = $roles->firstWhere('nombre', 'Administrador')->rol_id;
-								@endphp
-                                @if ($rol->rol_id != $rol_id)
-									@if ($permiso_editar_roles)
-									<a class="btn btn-sm btn-success" style="float:left;" href="{{ route('roles.edit', $rol->rol_id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Editar') }}
-									</a>
-									@endif
-									@if ($permiso_eliminar_roles)
-									<form action="{{ route('roles.destroy', $rol->rol_id) }}" method="POST">
-											@csrf
-											@method('DELETE')
-											<button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Está seguro de querer borrar?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
-										</form>
-									@endif
-								@endif
-								</td>
-							</tr>
-							@endforeach
-		*/
-
         $output = array(
             "recordsTotal" => $roles->count(),
             "recordsFiltered" => $roles->count(),
@@ -97,18 +69,14 @@ class RolController extends Controller
 			return false;
 		}
 		$rol = Rol::find($id);
-		// Almacena el nombre de rol antes de eliminarlo
 		$nombre = $rol->nombre;
-		// Elimina el rol
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		$username = Auth::user()->username;
+		$message = $username . " borró el rol " . $nombre;
+		$myController->loguear($clientIP, $userAgent, $username, $message);
+
 		$rol->delete();
-		$message = Auth::user()->username . " borró el rol " . $nombre;
-		Log::info($message);
-		$subject = "Borrado de rol";
-		$body = "Rol " . $nombre . " borrado correctamente por " . Auth::user()->username;
-		$to = "omarliberatto@yafoconsultora.com";
-		// Llamar a enviar_email de MyController
-		$myController->enviar_email($to, $body, $subject);
-		Log::info('Correo enviado exitosamente a ' . $to);
 		return response()->json(["status"=>true]);
     }
 
@@ -144,15 +112,8 @@ class RolController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$action = "roles.store";
 		$message = $username . " creó el rol " . $_POST['nombre'];
-		$myController->loguear($clientIP, $userAgent, $username, $action, $message);
-		$subject = "Creación de rol";
-		$body = "Rol ". $_POST['nombre'] . " creado correctamente por ". Auth::user()->username;
-		$to = Auth::user()->email;
-		// Llamar a enviar_email de MyController
-		$myController->enviar_email($to, $body, $subject);
-		Log::info('Correo enviado exitosamente a ' . $to);
+		$myController->loguear($clientIP, $userAgent, $username, $message);
 		return Redirect::route('roles.index')
 			->with('success', 'Rol created successfully.');
 	}
@@ -199,19 +160,11 @@ class RolController extends Controller
 		]);
 		#dd($validatedData);
 		$rol->update($validatedData);
-		dd($rol);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$action = "roles.update";
 		$message = $username . " actualizó el rol " . $_POST['nombre'];
-		$myController->loguear($clientIP, $userAgent, $username, $action, $message);
-		$subject = "Actualización de rol";
-		$body = "Rol ". $_POST['nombre'] . " actualizado correctamente por ". Auth::user()->username;
-		$to = Auth::user()->email;
-		// Llamar a enviar_email de MyController
-		$myController->enviar_email($to, $body, $subject);
-		Log::info('Correo enviado exitosamente a ' . $to);
+		$myController->loguear($clientIP, $userAgent, $username, $message);
 		return Redirect::route('roles.index')
 			->with('success', 'Rol updated successfully');
 	}
@@ -230,12 +183,6 @@ class RolController extends Controller
 		$rol->delete();
 		$message = Auth::user()->username . " borró el rol " . $nombre;
 		Log::info($message);
-		$subject = "Borrado de rol";
-		$body = "Rol " . $nombre . " borrado correctamente por " . Auth::user()->username;
-		$to = "omarliberatto@yafoconsultora.com";
-		// Llamar a enviar_email de MyController
-		$myController->enviar_email($to, $body, $subject);
-		Log::info('Correo enviado exitosamente a ' . $to);
 		return Redirect::route('roles.index')
 			->with('success', 'Rol deleted successfully');
 	}
