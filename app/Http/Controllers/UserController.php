@@ -357,6 +357,37 @@ class UserController extends Controller
 		}
 	}
 
+	public function ajax_delete($id, MyController $myController){
+        $permiso_borrar_usuario = $myController->tiene_permiso('del_usr');
+		if (!$permiso_borrar_usuario) {
+			abort(403, '.');
+			return false;
+		}
+		if(Auth::user()->user_id != $id) 
+		{
+			// Encuentra el usuario por su ID
+			$user = User::withTrashed()->find($id);
+			// Almacena el nombre de usuario antes de eliminarlo
+			$username = $user->username;
+			// Elimina el usuario
+			$user->delete();
+			$message = Auth::user()->username . " borró el usuario " . $username;
+			Log::info($message);
+			$subject = "Borrado de usuario";
+			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
+			$to = "omarliberatto@yafoconsultora.com";
+			// Llamar a enviar_email de MyController
+			$myController->enviar_email($to, $body, $subject);
+			Log::info('Correo enviado exitosamente a ' . $to);
+			session()->flash('success', 'Usuario eliminado correctamente.');
+			return response()->json(['success' => 'Usuario eliminado correctamente.']);
+		} else {
+			session()->flash('error', 'No se puede borrar tu propia cuenta.');
+			return response()->json(['error' => 'No se puede borrar tu propia cuenta.']);
+			#return response()->json('No se puede borrar tu propia cuenta', 403);
+		}
+    }
+
 	/**************************************************************************
 	*
 	**************************************************************************/

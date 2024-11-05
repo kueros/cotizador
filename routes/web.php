@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
 	Route::patch('/users/{id}/deshabilitar', 			[UserController::class, 'deshabilitar_usuario'])->name('users.deshabilitar_usuario');
 	Route::patch('/users/{id}/deshabilitar_usuario_temporal', 	[UserController::class, 'deshabilitar_usuario_temporal'])->name('users.deshabilitar_usuario_temporal');
 	Route::get('/unlock-account/{userId}', 				[UserController::class, 'unlockAccount'])->name('account.unlock');
+	Route::post('/users/ajax_delete/{id}', 				[UserController::class, 'ajax_delete'])->name('users.ajax_delete');
 });
 
 
