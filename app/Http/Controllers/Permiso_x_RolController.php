@@ -8,9 +8,12 @@ use App\Models\Permiso_x_Rol;
 use App\Models\Permiso;
 use App\Models\Rol;
 use App\Models\Seccion;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\RolController;
 use Illuminate\Support\Facades\DB;
+
+
 class Permiso_x_RolController extends Controller
 {
 
@@ -45,16 +48,22 @@ class Permiso_x_RolController extends Controller
 			if (str_contains($key, 'new_')) {
 				// Extraemos rol_id y permiso_id de la clave del array (cuando es un nuevo registro)
 				[$prefix, $rolId, $permisoId] = explode('_', $key);
-
+				$permiso_nombre = Permiso::where('id', $permisoId)->first()['descripcion'];
+				$rol_nombre = Rol::where('rol_id', $rolId)->first()['nombre'];
 				// Creamos el nuevo registro
 				$nuevoRegistro = Permiso_x_Rol::create([
 					'rol_id' => $rolId,
 					'permiso_id' => $permisoId,
 					'habilitado' => 1, // Asignamos habilitado a 1 para los nuevos permisos
 				]);
-
 				// Agregamos el ID recién creado a la lista de IDs permitidos
 				$idsPermitidos[] = $nuevoRegistro->id;
+				$clientIP = \Request::ip();
+				$userAgent = \Request::userAgent();
+				$username = Auth::user()->username;
+				$message = $username . " actualizó el permiso " . $permiso_nombre . 
+										" para el rol " . $rol_nombre;
+				$myController->loguear($clientIP, $userAgent, $username, $message);
 			} else {
 				// Buscamos en la tabla por el ID existente
 				$registro = Permiso_x_Rol::where('id', $key)->first();
@@ -62,10 +71,18 @@ class Permiso_x_RolController extends Controller
 					$registro->habilitado = 1;
 					$registro->save();
 				}
-
+				#dd($registro);
+				$permiso_nombre = Permiso::where('id', $registro->permiso_id)->first()['descripcion'];
+				$rol_nombre = Rol::where('rol_id', $registro->rol_id)->first()['nombre'];
 				// Aseguramos que el ID también esté en los permitidos
 				$idsPermitidos[] = $key;
-			}
+/* 				$clientIP = \Request::ip();
+				$userAgent = \Request::userAgent();
+				$username = Auth::user()->username;
+				$message = $username . " actualizó el permiso " . $permiso_nombre . 
+										" para el rol " . $rol_nombre;
+				$myController->loguear($clientIP, $userAgent, $username, $message);
+ */			}
 		}
 
 		// Paso 2: Eliminamos los registros que no están en el array del formulario ni en los nuevos

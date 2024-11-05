@@ -202,7 +202,7 @@ return new class extends Migration
 				'id' => 158,
 				'nombre' => '_notificaciones_email_from',
 				'nombre_menu' => '',
-				'valor' => 'omarliberatto@yafoconsultora.com',
+				'valor' => '',
 				'created_at' => now(),
 				'updated_at' => now()
 			],
@@ -210,7 +210,7 @@ return new class extends Migration
 				'id' => 159,
 				'nombre' => '_notificaciones_email_from_name',
 				'nombre_menu' => '',
-				'valor' => 'omar',
+				'valor' => '',
 				'created_at' => now(),
 				'updated_at' => now()
 			],
