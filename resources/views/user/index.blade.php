@@ -64,9 +64,9 @@
 
 		function edit_usuario(id)
 		{
-			/*save_method = 'update';
+			save_method = 'update';
 			limpiar_campos_requeridos('form');
-			$('#form')[0].reset();
+			//$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#accion').val('edit');
@@ -76,23 +76,24 @@
 			roles_usuario = new Array();
 
 			$.ajax({
-				url : "/" + id,
+				url : "{{ url('users/ajax_edit/') }}" + "/" + id,
 				type: "GET",
 				dataType: "JSON",
 				success: function(data)
 				{
-					$('[name="id"]').val(data.id);
-					$('[name="nombre"]').val(data.nombre);
-					$('[name="apellido"]').val(data.apellido);
-					$('[name="username"]').val(data.username);
-					$('[name="email"]').val(data.email);
-					$('[name=area]').val(data.area_id);
-					$('[name=enabled]').val(data.enabled);
-					$('[name=habilita_api]').val(data.habilita_api);
+					let user = data.user;
+					$('[name="id"]').val(user.id);
+					$('[name="nombre"]').val(user.nombre);
+					$('[name="apellido"]').val(user.apellido);
+					$('[name="username"]').val(user.username);
+					$('[name="email"]').val(user.email);
+					$('[name="habilitado"]').val(user.habilitado);
+					$('[name="rol_id"]').val(user.rol_id);
 
-					
+					$('#form_usuario').attr('action', "{{ url('users') }}" + "/" + id);
+            		$('#method').val('PUT');
 
-					data.roles_asignados.forEach(function(rol){
+					/*data.roles_asignados.forEach(function(rol){
 						roles_usuario.push(rol.rol_id);
 
 						row_roles = '';
@@ -102,7 +103,7 @@
 						row_roles += '</tr>';
 
 						$('#tabla_roles tbody').append(row_roles);
-					});
+					});*/
 
 					$('#modal_form').modal('show');
 					$('.modal-title').text('Editar usuario');
@@ -111,7 +112,7 @@
 				{
 					show_ajax_error_message(jqXHR, textStatus, errorThrown);
 				}
-			});*/
+			});
 		}
 
 		function deshabilitar_usuario(id, temporal = false) {
@@ -340,8 +341,8 @@
 									<td>{{ $user->bloqueado ? 'Sí' : 'No' }}</td>
 									<td>
 										@if ($permiso_editar_usuario)
-										<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('users.edit', $user->user_id) }}">
-											<i class="fas fa-pencil-alt"></i>
+										<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" 
+											onclick="edit_usuario('{{ $user->user_id }}')"><i class="bi bi-pencil"></i>
 										</a>
 										@endif
 										
@@ -375,45 +376,8 @@
 					</table>
 				</div>
 
-				<!-- Mostrar formulario de cambio de contraseña si el usuario está establecido -->
-				@if(isset($selectedUser))
-					<div class="p-12 sm:p-8 bg-white shadow sm:rounded-lg">
-						<h2 class="text-lg font-medium text-gray-900">
-							{{ __('Cambiar contraseña de ') . $selectedUser->nombre }}
-						</h2>
 
-						<form method="post" action="{{ route('password.update', $selectedUser->user_id) }}" class="p-6">
-							@csrf
-							@method('patch')
-
-							<!-- Campo para nueva contraseña -->
-							<div class="mt-4">
-								<x-input-label for="password" value="{{ __('Nueva Contraseña') }}" />
-								<x-text-input id="password" name="password" type="password" class="mt-1 block w-3/4" placeholder="{{ __('Nueva Contraseña') }}" />
-								<x-input-error :messages="$errors->get('password')" class="mt-2" />
-							</div>
-
-							<!-- Confirmar nueva contraseña -->
-							<div class="mt-4">
-								<x-input-label for="password_confirmation" value="{{ __('Confirmar Contraseña') }}" />
-								<x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-3/4" placeholder="{{ __('Confirmar Contraseña') }}" />
-								<x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-							</div>
-
-							<div class="mt-6 flex justify-end">
-								<a href="{{ route('users.index') }}" class="btn btn-secondary">
-									{{ __('Cancelar') }}
-								</a>
-
-								<x-danger-button class="ml-3">
-									{{ __('Cambiar contraseña') }}
-								</x-danger-button>
-							</div>
-						</form>
-					</div>
-				@endif
-
-
+				
 				<div class="modal fade" id="modal_form" role="dialog">
 					<div class="modal-dialog">
 						<div class="modal-content">
@@ -421,7 +385,7 @@
 								<h5 class="modal-title">Formulario de usuario</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
-							<form method="post" action="" class="mt-6 space-y-6">
+							<form id="form_usuario" method="post" action="" class="mt-6 space-y-6">
 								<input name="_method" type="hidden" id="method">
 								<div class="modal-body form">
 									@csrf

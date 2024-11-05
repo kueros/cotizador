@@ -242,6 +242,7 @@ class UserController extends Controller
 	public function usersUpdate(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
 		#dd($request);
+		dd($request);
 		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
 		if (!$permiso_editar_usuario) {
 			abort(403, '.');
@@ -356,6 +357,21 @@ class UserController extends Controller
 			#return response()->json('No se puede borrar tu propia cuenta', 403);
 		}
 	}
+
+	public function ajax_edit($id, MyController $myController){
+		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
+		if (!$permiso_editar_usuario) {
+			abort(403, '.');
+			return false;
+		}
+		$roles = Rol::all();
+		$user = User::find($id);
+		$data = [
+			'roles' => $roles,
+			'user' => $user
+		];
+		return response()->json($data);
+    }
 
 	public function ajax_delete($id, MyController $myController){
         $permiso_borrar_usuario = $myController->tiene_permiso('del_usr');
