@@ -15,9 +15,8 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfiguracionController extends Controller
 {
-	/**
-	 * Display a listing of the resource.
-	 */
+	/*****************************************************************************************************************
+	 *****************************************************************************************************************/
 	public function index( MyController $myController): View
 	{
 		$permiso_configuraciones_software = $myController->tiene_permiso('setup_soft');
@@ -35,9 +34,8 @@ class ConfiguracionController extends Controller
 		return view('configuracion.index', compact('variables'));
 	}
 
-	/**
-	 * Muestro la vista de variables.
-	 */
+	/*****************************************************************************************************************
+	 *****************************************************************************************************************/
 	public function variables( MyController $myController)
 	{
 		$permiso_configuraciones_software = $myController->tiene_permiso('setup_soft');
@@ -49,6 +47,8 @@ class ConfiguracionController extends Controller
 		return view('configuracion.variables', compact('variables'));
 	}
 
+	/*****************************************************************************************************************
+	 *****************************************************************************************************************/
 	public function guardar_estado(Request $request, MyController $myController)
 	{
 		$permiso_guardar_configuraciones_software = $myController->tiene_permiso('save_setup_soft');
@@ -70,7 +70,7 @@ class ConfiguracionController extends Controller
 					$variable->save();
 				}
 			}
-			$message = "Guardar estado recibido. " . json_encode($request->all());
+			$message = "Configuración global modificada por " . Auth::user()->apellido . ", " . Auth::user()->nombre . ": " . $nombre . " al valor: " . $valor;
 			$users = User::find(Auth::user()->user_id);
 			Log::info($message);
 			$log = LogAdministracion::create([
@@ -80,30 +80,6 @@ class ConfiguracionController extends Controller
 				'ip_address' => $_SERVER['REMOTE_ADDR'],
 				'user_agent' => $_SERVER['HTTP_USER_AGENT']
 			]);
-			$username = $users->username;
-			$subject = "Guardar estado";
-			$body = "Usuario " . $username . " ha guardado los estados correctamente.";
-			$to = "omarliberatto@yafoconsultora.com";
-
-
-
-
-
-
-
-
-
-
-			/*
-			
-			
-			
-			VER EL $TO QUE ESTÁ HARDCODEADOOOOOOOOOOOOOOOOOOO
-			
-			
-			
-			*/
-			$myController->enviar_email($to, $body, $subject);
 			$log->save();
 			session()->flash('success', 'Estado guardado correctamente');
 			return response()->json(['success' => 'Estado guardado correctamente']);
@@ -119,11 +95,6 @@ class ConfiguracionController extends Controller
 				'ip_address' => $_SERVER['REMOTE_ADDR'],
 				'user_agent' => $_SERVER['HTTP_USER_AGENT']
 			]);
-			$username = $users->username;
-			$subject = "Guardar estado";
-			$body = "Usuario " . $username . " no ha podido guardar los estados.";
-			$to = Auth::user()->email;
-			$myController->enviar_email($to, $body, $subject);
 			$log->save();
 			Log::error('Error al guardar estado: ' . $e->getMessage());
 			session()->flash('error', 'Hubo un error al guardar el estado');
@@ -131,6 +102,8 @@ class ConfiguracionController extends Controller
 		}
 	}
 
+	/*****************************************************************************************************************
+	 *****************************************************************************************************************/
 	public function guardar_remitente(Request $request, MyController $myController)
 	{
 		$permiso_guardar_configuraciones_software = $myController->tiene_permiso('save_setup_soft');
@@ -138,8 +111,11 @@ class ConfiguracionController extends Controller
 			abort(403, '.');
 			return false;
 		}
-		$message = "Guardar remitente recibido. " . json_encode($request->all());
+
+		$from = trim($_POST['from']);
+		$from_name = trim($_POST['from_name']);
 		$users = User::find(Auth::user()->user_id);
+		$message = "Se modificó el remitente guardado a: Email = " . $from . " Nombre = " . $from_name . " por " . $users->apellido . ", " . $users->nombre;		
 		Log::info($message);
 		$log = LogAdministracion::create([
 			'username' => Auth::user()->username,
@@ -148,15 +124,7 @@ class ConfiguracionController extends Controller
 			'ip_address' => $_SERVER['REMOTE_ADDR'],
 			'user_agent' => $_SERVER['HTTP_USER_AGENT']
 		]);
-		$username = $users->username;
-		$subject = "Guardar remitente";
-		$body = "Usuario " . $username . " ha guardado el remitente correctamente.";
-		$to = Auth::user()->email;
-		$myController->enviar_email($to, $body, $subject);
 		$log->save();
-
-		$from = trim($_POST['from']);
-		$from_name = trim($_POST['from_name']);
 		if ($from != '' || $from_name != '') {
 			Variable::where('nombre', '_notificaciones_email_from')->update(['valor' => $from]);
 			Variable::where('nombre', '_notificaciones_email_from_name')->update(['valor' => $from_name]);
@@ -169,6 +137,8 @@ class ConfiguracionController extends Controller
 		return; // redirect()->route('configuracion');
 	}
 
+	/*****************************************************************************************************************
+	 *****************************************************************************************************************/
 	public function add_parametro_email(Request $request, MyController $myController)
 	{
 		$permiso_guardar_configuraciones_software = $myController->tiene_permiso('save_setup_soft');
@@ -195,6 +165,19 @@ class ConfiguracionController extends Controller
 				$mail_config[$parametro] = $valor;
 
 				Variable::where('nombre', '_notificaciones_email_config')->update(['valor' => json_encode($mail_config)]);
+
+				$users = User::find(Auth::user()->user_id);
+				$message = "Se agregó el parámetro " . $valor . " al email por " . $users->apellido . ", " . $users->nombre;		
+				Log::info($message);
+				$log = LogAdministracion::create([
+					'username' => Auth::user()->username,
+					'action' => "guardar_remitente",
+					'detalle' => $message,
+					'ip_address' => $_SERVER['REMOTE_ADDR'],
+					'user_agent' => $_SERVER['HTTP_USER_AGENT']
+				]);
+				$log->save();
+
 				return redirect('/configuracion')->with('success', 'Parametro guardado.');
 			} else {
 				return redirect('/configuracion')->with('error', 'El parametro ya existe.');
@@ -207,6 +190,8 @@ class ConfiguracionController extends Controller
 		return redirect('/configuracion');
 	}
 
+	/*****************************************************************************************************************
+	 *****************************************************************************************************************/
 	public function ajax_delete_parametro_email(MyController $myController)
 	{
 		$permiso_guardar_configuraciones_software = $myController->tiene_permiso('save_setup_soft');
@@ -224,11 +209,20 @@ class ConfiguracionController extends Controller
 			foreach ($configs as $key => $config) {
 				$mail_config[$key] = $config;
 			}
-
 			if (isset($mail_config[$parametro])) {
+				$users = User::find(Auth::user()->user_id);
+				$message = "Se borró el parámetro " . $mail_config[$parametro] . " del email por " . $users->apellido . ", " . $users->nombre;		
+				Log::info($message);
+				$log = LogAdministracion::create([
+					'username' => Auth::user()->username,
+					'action' => "guardar_remitente",
+					'detalle' => $message,
+					'ip_address' => $_SERVER['REMOTE_ADDR'],
+					'user_agent' => $_SERVER['HTTP_USER_AGENT']
+				]);
+				$log->save();
 				unset($mail_config[$parametro]);
 			}
-
 			session()->flash('success', 'Se borró el parámetro.');
 			Variable::where('nombre', '_notificaciones_email_config')->update(['valor' => json_encode($mail_config)]);
 

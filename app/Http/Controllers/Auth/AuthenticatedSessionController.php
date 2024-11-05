@@ -158,13 +158,6 @@
 			'ip_address' => $_SERVER['REMOTE_ADDR'],
 			'user_agent' => $_SERVER['HTTP_USER_AGENT']
 		]);
-		$username = $users->username;
-		$subject = "Logout";
-		$body = "Usuario " . $username . " ha cerrado sesión correctamente.";
-		$to = "omarliberatto@yafoconsultora.com";
-
-		$myController->enviar_email($to, $body, $subject);
-
 		$log->save();
 
 		Auth::guard('web')->logout();
