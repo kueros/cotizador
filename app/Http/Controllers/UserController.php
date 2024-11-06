@@ -268,6 +268,7 @@ class UserController extends Controller
 		#dd($validatedData);
 		// Si el usuario no existe, redirige con un mensaje de error
 		if (!$user) {
+			session()->flash('error', 'El usuario no existe.');
 			return redirect('/users')->with('error', 'El usuario no existe.');
 		}
 
@@ -305,18 +306,20 @@ class UserController extends Controller
 		// Actualizar el usuario con los datos validados
 		$user->update($validatedData);
 
-
-
+		session()->flash('success', 'Usuario actualizado correctamente.');
 		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
 		} catch (ValidationException $e) {
 			// Si ocurre un error de validación, redirigir con los mensajes de error
+			session()->flash('errors', $e->validator->errors());
 			return redirect()->back()->withErrors($e->validator)->withInput();
 		} catch (TokenMismatchException $e) {
 			// Si se detecta un error 419, redirigir al login
+			session()->flash('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
 			return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
 		} catch (\Exception $e) {
 			Log::error('Error en la actualización del usuario: '.$e->getMessage());
 			#dd('Error: '.$e->getMessage());  // Muestra el mensaje exacto del error
+			session()->flash('error', 'Ocurrió un error inesperado.');
 			return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
 		}
 	}
