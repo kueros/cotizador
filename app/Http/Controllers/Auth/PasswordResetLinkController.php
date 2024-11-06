@@ -31,6 +31,12 @@ class PasswordResetLinkController extends Controller
      */
     public function store(Request $request, MyController $myController)
     {
+		$email = User::where('email', $request->email)->first();
+		if(null===$email){
+			return redirect()->route('password.email')
+			->withErrors(['email' => 'El email ingresado no corresonde a un usuario válido.'])
+			->withInput($request->only('email'));
+		}
 		$ultimoReseteo = User::where('email', $request->email)->first()['ultima_fecha_restablecimiento'];
 		$ultimoReseteo = explode(' ', $ultimoReseteo)[0];
 		$hoy = Carbon::now()->toDateString();
