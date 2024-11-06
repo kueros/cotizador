@@ -5,10 +5,13 @@
 		</h2>
 	</x-slot>
 
-	
+<?php 
+$imagenHome = session('imagenHome')->valor ?? 'images/dashboard-bg.jpg';
+
+?>
     <style>
 		#dashboard{
-			background: url('images/dashboard-bg.jpg');
+			background: url( <?php echo $imagenHome; ?> );
 			background-repeat: none;
 			background-size: cover;
 			position: absolute;

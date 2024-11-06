@@ -27,7 +27,11 @@ Route::get('/session/check', function () {
         return response()->json(['session' => 'expired'], 401);
     }
 });
-
+/* 
+Route::get('/dashboard/{imagenHome}', function () {
+	return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+*/
 
 Route::get('/dashboard', function () {
 	return view('dashboard');
@@ -140,6 +144,7 @@ Route::middleware('auth')->group(
 		Route::patch('/configuracion/variables/{variable}', [ConfiguracionController::class, 'update'])->name('configuracion.variables.update');
 		Route::delete('/configuracion/variables/{variable}', [ConfiguracionController::class, 'destroy'])->name('configuracion.variables.destroy');
 		Route::post('/configuracion/ajax_delete_parametro_email', [ConfiguracionController::class, 'ajax_delete_parametro_email'])->name('configuracion.ajax_delete_parametro_email');
+		Route::post('/guardar_imagen_aleph', [ConfiguracionController::class, 'guardarImagen'])->name('configuracion.guardar_imagen');
 
 	}
 );
