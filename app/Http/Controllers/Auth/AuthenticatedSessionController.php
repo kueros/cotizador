@@ -124,13 +124,13 @@
 					$user->save();
 				}
 				return redirect()->route('login')
-								->withErrors(['email' => 'Username, email o contraseña incorrectos.'])
+								->withErrors(['email' => 'Username, email o contraseña incorrectos'])
 								->withInput($request->only('email'));
 			}
 		} catch (\Exception $e) {
 			// Manejar la excepción
 			return redirect()->route('login')
-							->withErrors(['email' => 'Se produjo un error en el inicio de sesión.'])
+							->withErrors(['email' => 'Se produjo un error en el inicio de sesión'])
 							->withInput($request->only('email'));
 		}
 	}
