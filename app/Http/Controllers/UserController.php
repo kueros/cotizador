@@ -260,7 +260,9 @@ class UserController extends Controller
 			'nombre' => 'required|string|max:255',
 			'apellido' => 'required|string|max:255',
 			'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
-			'rol_id' => 'required|exists:roles,rol_id', // Cambiar "id" por el nombre correcto de la columna primaria
+			'rol_id' => 'required|exists:roles,rol_id',
+			'habilitado' => 'required|boolean',
+			'bloqueado' => 'required|boolean'
 		], $messages);
 		// Encuentra el usuario por su ID
 		$user = User::find($user->user_id);
