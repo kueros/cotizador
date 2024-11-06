@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use App\Models\User;
 use App\Models\LogAdministracion;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ConfiguracionController extends Controller
 {
@@ -24,16 +25,15 @@ class ConfiguracionController extends Controller
 			abort(403, '.');
 			return false;
 		}
-		$user = User::where('user_id', Auth::user()->user_id)->first();
-		#dd($user);
 		$variables = Variable::where('nombre', 'like', '%noti%')
 			->orWhere('nombre', 'like', '%opav%')
 			->orWhere('nombre', 'like', '%copa%')
+			->orWhere('nombre', 'like', '%background%')
 			->get(['nombre', 'nombre_menu', 'valor']);
 		$variables = $variables->filter(function ($variable) {
 			return !is_null($variable);
 		});
-		return view('configuracion.index', compact('variables', 'user'));
+		return view('configuracion.index', compact('variables'));
 	}
 
 	/*****************************************************************************************************************
@@ -103,6 +103,25 @@ class ConfiguracionController extends Controller
 			return response()->json(['error' => 'Hubo un error al guardar el estado'], 500);
 		}
 	}
+
+	/*****************************************************************************************************************
+	 *****************************************************************************************************************/
+
+    public function guardarImagen(Request $request)
+    {
+        // Validar que el archivo es una imagen
+        $request->validate([
+            'copa_path' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096', 
+        ]);
+		// Obtener el archivo de la solicitud
+		$file = $request->file('copa_path');
+		$filename = 'background_home.jpg';// . '.' . $file->getClientOriginalExtension();
+		$path = $file->storeAs('uploads/imagenes', $filename, 'public');
+
+		Variable::where('nombre', 'background_home_custom_path')->update(['valor' => $path]);
+        // Retornar la ruta o cualquier mensaje de éxito
+        return redirect()->back()->with('success', 'Imagen guardada exitosamente en: ' . $path);
+    }
 
 	/*****************************************************************************************************************
 	 *****************************************************************************************************************/

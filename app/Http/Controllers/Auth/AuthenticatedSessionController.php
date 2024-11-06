@@ -112,7 +112,14 @@
 					'ip_address' => $_SERVER['REMOTE_ADDR'],
 					'user_agent' => $_SERVER['HTTP_USER_AGENT'],
 				]);
-				return redirect()->intended(route('dashboard', absolute: false));
+				$imagenHome = Variable::where('nombre', 'background_home_custom_path')
+										->first(['valor']);
+				#dd($imagenHome);
+				#return redirect()->intended(route('dashboard', absolute: false));
+				#return redirect()->intended(route('dashboard', absolute: false), compact('imagenHome'));
+				#return view('dashboard.index', compact('imagenHome'));
+				return redirect()->route('dashboard')->with('imagenHome', $imagenHome);
+
 			} else {
 				// Incrementar el número de intentos fallidos
 				if ($user) {
