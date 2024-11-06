@@ -82,12 +82,15 @@
 				success: function(data)
 				{
 					let user = data.user;
-					$('[name="id"]').val(user.id);
+					$('[name="id"]').val(user.user_id);
 					$('[name="nombre"]').val(user.nombre);
 					$('[name="apellido"]').val(user.apellido);
 					$('[name="username"]').val(user.username);
 					$('[name="email"]').val(user.email);
-					$('[name="habilitado"]').val(user.habilitado);
+					//$('[name="habilitado"]').val(user.habilitado);
+					$('[name="habilitado"]').prop('checked', user.habilitado == 1);
+					//$('[name="bloqueado"]').val(user.bloqueado);
+					$('[name="bloqueado"]').prop('checked', user.bloqueado == 1);
 					$('[name="rol_id"]').val(user.rol_id);
 
 					$('#form_usuario').attr('action', "{{ url('users') }}" + "/" + id);
@@ -377,7 +380,7 @@
 				</div>
 
 
-				
+
 				<div class="modal fade" id="modal_form" role="dialog">
 					<div class="modal-dialog">
 						<div class="modal-content">
@@ -387,6 +390,7 @@
 							</div>
 							<form id="form_usuario" method="post" action="" class="mt-6 space-y-6">
 								<input name="_method" type="hidden" id="method">
+								<input type="hidden" value="" name="id"/>
 								<div class="modal-body form">
 									@csrf
 									<div class="form-body">
@@ -452,14 +456,32 @@
 										</div>
 									</div>
 									
+									<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
+									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
+									 ya que el checkbox tiene prioridad sobre el hidden -->
 									<div class="form-body">
 										<div class="row mb-3">
 											<label class="col-md-3 col-form-label">{{ __('Habilitado') }}</label>
 											<div class="col-md-9">
 												<div class="form-check form-switch">
+													<input type="hidden" name="habilitado" value="0">
 													<input class="form-check-input" name="habilitado" id="habilitado" 
 														value="1" type="checkbox" {{ old('habilitado', $user->habilitado) === null || old('habilitado', $user->habilitado) == 1 ? 'checked' : '' }} >
 													<label class="form-check-label" for="habilitado"></label>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="form-body">
+										<div class="row mb-3">
+											<label class="col-md-3 col-form-label">{{ __('Bloqueado') }}</label>
+											<div class="col-md-9">
+												<div class="form-check form-switch">
+													<input type="hidden" name="bloqueado" value="0">
+													<input class="form-check-input" name="bloqueado" id="bloqueado" 
+														value="1" type="checkbox" {{ old('bloqueado', $user->bloqueado) === null || old('bloqueado', $user->bloqueado) == 1 ? 'checked' : '' }} >
+													<label class="form-check-label" for="bloqueado"></label>
 												</div>
 											</div>
 										</div>

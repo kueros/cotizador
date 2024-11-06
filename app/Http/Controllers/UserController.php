@@ -242,7 +242,6 @@ class UserController extends Controller
 	public function usersUpdate(UserRequest $request, User $user, MyController $myController): RedirectResponse
 	{
 		#dd($request);
-		dd($request);
 		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
 		if (!$permiso_editar_usuario) {
 			abort(403, '.');
