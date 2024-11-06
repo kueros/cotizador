@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Http\Controllers\MyController;
 use App\Models\PasswordHistory;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class PasswordResetLinkController extends Controller
 {
@@ -30,7 +31,12 @@ class PasswordResetLinkController extends Controller
      */
     public function store(Request $request, MyController $myController)
     {
-        #dd($request);
+		$ultimoReseteo = User::where('email', $request->email)->first()['ultima_fecha_restablecimiento'];
+		$ultimoReseteo = explode(' ', $ultimoReseteo)[0];
+		$hoy = Carbon::now()->toDateString();
+
+		#dd($ultimoReseteo);
+        #dd($request->email);
         $request->validate([
             'email' => ['required', 'email'],
         ]);
@@ -40,33 +46,38 @@ class PasswordResetLinkController extends Controller
 			$user = User::where('email', $request->only('email'))
                         ->first();
             #dd($user);
-			if ($user) {
-				// Poner el campo 'password' a null y resetear los intentos de login
-				$user->password = null;
-				$user->intentos_login = 0;
-				$user->bloqueado = 0; // Desbloquea al usuario si estaba bloqueado
-				$user->save();
-				// Generar el token de restablecimiento de contraseña
-				$token = Password::createToken($user);
-				$email = $user->email;
+			if ($ultimoReseteo < $hoy) {
+				if ($user) {
+					// Poner el campo 'password' a null y resetear los intentos de login
+					$user->password = null;
+					$user->intentos_login = 0;
+					$user->bloqueado = 0; // Desbloquea al usuario si estaba bloqueado
+					$user->save();
+					// Generar el token de restablecimiento de contraseña
+					$token = Password::createToken($user);
+					$email = $user->email;
 
-				// Generar la URL para el restablecimiento de contraseña con el token
-				#$resetUrl = route('users.password.reset?token='.$token);
-				#$resetUrl = route('password.reset') . '?token=' . $token;
-				$resetUrl = route('reset_pass_form', ['token' => $token, 'email' => $email]);
-				// Enviar correo
-				$subject = "Aviso de restablecimiento de contraseña";
-                $body = 'Está recibiendo este mail porque Ud. solicitó un restablecimiento de contraseña o porque esta expiró, para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';
-				$to = $user->email;
-				#echo "kdk2 ".$resetUrl;
-				$myController->enviar_email($to, $body, $subject);
-				#return response()->json(['success' => true, 'message' => 'Contraseña blanqueada y correo enviado con éxito.']);
-                return redirect()->route('login')->with('success', 'Contraseña blanqueada y correo enviado con éxito.');
+					// Generar la URL para el restablecimiento de contraseña con el token
+					#$resetUrl = route('users.password.reset?token='.$token);
+					#$resetUrl = route('password.reset') . '?token=' . $token;
+					$resetUrl = route('reset_pass_form', ['token' => $token, 'email' => $email]);
+					// Enviar correo
+					$subject = "Aviso de restablecimiento de contraseña";
+					$body = 'Para continuar con el restablecimiento de su contraseña por favor siga el siguiente link a continuación:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';
+					$to = $user->email;
+					#echo "kdk2 ".$resetUrl;
+					$myController->enviar_email($to, $body, $subject);
+					#return response()->json(['success' => true, 'message' => 'Contraseña blanqueada y correo enviado con éxito.']);
+					return redirect()->route('login')->with('success', 'Reseteo de contraseña correctamente realizado.');
+				} else {
+					return redirect()->route('password.email')
+					->withErrors(['email' => 'Email incorrecto.'])
+					->withInput($request->only('email'));
+				}
 			} else {
-				return redirect()->route('password.email')
-				->withErrors(['email' => 'Email incorrecto.'])
-				->withInput($request->only('email'));
-
+					return redirect()->route('password.email')
+					->withErrors(['email' => 'Solo puede restablecer la contraseña 1 vez por día.'])
+					->withInput($request->only('email'));
 			}
     }
 

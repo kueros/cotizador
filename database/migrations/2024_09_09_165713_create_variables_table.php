@@ -65,7 +65,7 @@ return new class extends Migration
 			[
 				'id' => 11,
 				'nombre' => 'notificaciones_locales',
-				'nombre_menu' => 'Utilizar notificacines locales',
+				'nombre_menu' => 'Utilizar notificaciones locales',
 				'valor' => '1',
 				'created_at' => now(),
 				'updated_at' => now()

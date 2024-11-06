@@ -29,9 +29,9 @@
 	*/
 	class AuthenticatedSessionController extends Controller
 	{
-	/**
-	 * Display the login view.
-	 */
+	/**************************************************************************
+	*
+	**************************************************************************/
 	public function create(): View
 	{
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -56,24 +56,26 @@
 		]);
 	}
 
-	/**
-	 * Handle an incoming authentication request.
-		*/
+	/**************************************************************************
+	*
+	**************************************************************************/
 	public function store(LoginRequest $request): RedirectResponse
 	{
 		try {
 			// Verificamos si la entrada es un email o un username
 			$loginField = filter_var($request->input('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-
 			// Buscar el usuario para verificar intentos previos
 			$user = User::where($loginField, $request->input('email'))->first();
-
 			if ($user && $user->bloqueado) {
 				return redirect()->route('login')
 								->withErrors(['email' => 'Su cuenta está bloqueada debido a múltiples intentos fallidos.'])
 								->withInput($request->only('email'));
 			}
-
+			if ($user && $user->habilitado == 0) {
+				return redirect()->route('login')
+								->withErrors(['email' => 'Su cuenta no está habilitada, comuníquese con el administrador.'])
+								->withInput($request->only('email'));
+			}
 			// Intentamos autenticar al usuario con el campo detectado
 			$credentials = [
 				$loginField => $request->input('email'),
@@ -82,8 +84,6 @@
 			$reset_password_30_dias = Variable::where('nombre', 'reset_password_30_dias')
 				->first()['valor'];
 			if($reset_password_30_dias){
-
-
 				$fecha_actual = time();
 				$ultima_fecha_restablecimiento = strtotime($user->ultima_fecha_restablecimiento);
 				if($ultima_fecha_restablecimiento && ($fecha_actual - $ultima_fecha_restablecimiento) > 2592000){
@@ -94,29 +94,24 @@
 					return redirect()->route('login')
 						->withErrors(['email' => 'Su clave ha expirado, debe actualizarla para seguir usando la cuenta, para continuar y cambiar la contraseña haga click en "Olvidé mi contraseña"'])
 						->withInput($request->only('email'));
-
 				}
 			}
 
 			if (Auth::attempt($credentials)) {
 				$request->session()->regenerate();
-
 				// Registro del login exitoso
 				$message = "Solicitud de autenticación recibida. " . json_encode($request->all());
 				Log::info($message);
-
 				// Restablecer los intentos fallidos
 				$user->intentos_login = 0;
 				$user->ultimo_login = now();
 				$user->save();
-
 				// Guardar en la tabla de logs de acceso
 				LogAcceso::create([
 					'email' => $user->email,
 					'ip_address' => $_SERVER['REMOTE_ADDR'],
 					'user_agent' => $_SERVER['HTTP_USER_AGENT'],
 				]);
-				
 				return redirect()->intended(route('dashboard', absolute: false));
 			} else {
 				// Incrementar el número de intentos fallidos
@@ -128,21 +123,20 @@
 					}
 					$user->save();
 				}
-
 				return redirect()->route('login')
-								->withErrors(['email' => 'Username, email o contraseña incorrectos.'])
+								->withErrors(['email' => 'Username, email o contraseña incorrectos'])
 								->withInput($request->only('email'));
 			}
 		} catch (\Exception $e) {
 			// Manejar la excepción
 			return redirect()->route('login')
-							->withErrors(['email' => 'Se produjo un error en el inicio de sesión.'])
+							->withErrors(['email' => 'Se produjo un error en el inicio de sesión'])
 							->withInput($request->only('email'));
 		}
 	}
-	/**
-	 * Destroy an authenticated session.
-	 */
+	/**************************************************************************
+	*
+	**************************************************************************/
 	public function destroy(Request $request, MyController $myController): RedirectResponse
 	{
 
@@ -158,13 +152,6 @@
 			'ip_address' => $_SERVER['REMOTE_ADDR'],
 			'user_agent' => $_SERVER['HTTP_USER_AGENT']
 		]);
-		$username = $users->username;
-		$subject = "Logout";
-		$body = "Usuario " . $username . " ha cerrado sesión correctamente.";
-		$to = "omarliberatto@yafoconsultora.com";
-
-		$myController->enviar_email($to, $body, $subject);
-
 		$log->save();
 
 		Auth::guard('web')->logout();

@@ -260,7 +260,9 @@ class UserController extends Controller
 			'nombre' => 'required|string|max:255',
 			'apellido' => 'required|string|max:255',
 			'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
-			'rol_id' => 'required|exists:roles,rol_id', // Cambiar "id" por el nombre correcto de la columna primaria
+			'rol_id' => 'required|exists:roles,rol_id',
+			'habilitado' => 'required|boolean',
+			'bloqueado' => 'required|boolean'
 		], $messages);
 		// Encuentra el usuario por su ID
 		$user = User::find($user->user_id);
@@ -268,6 +270,7 @@ class UserController extends Controller
 		#dd($validatedData);
 		// Si el usuario no existe, redirige con un mensaje de error
 		if (!$user) {
+			session()->flash('error', 'El usuario no existe.');
 			return redirect('/users')->with('error', 'El usuario no existe.');
 		}
 
@@ -305,18 +308,20 @@ class UserController extends Controller
 		// Actualizar el usuario con los datos validados
 		$user->update($validatedData);
 
-
-
+		session()->flash('success', 'Usuario actualizado correctamente.');
 		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
 		} catch (ValidationException $e) {
 			// Si ocurre un error de validación, redirigir con los mensajes de error
+			session()->flash('errors', $e->validator->errors());
 			return redirect()->back()->withErrors($e->validator)->withInput();
 		} catch (TokenMismatchException $e) {
 			// Si se detecta un error 419, redirigir al login
+			session()->flash('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
 			return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
 		} catch (\Exception $e) {
 			Log::error('Error en la actualización del usuario: '.$e->getMessage());
 			#dd('Error: '.$e->getMessage());  // Muestra el mensaje exacto del error
+			session()->flash('error', 'Ocurrió un error inesperado.');
 			return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
 		}
 	}
@@ -356,6 +361,52 @@ class UserController extends Controller
 			#return response()->json('No se puede borrar tu propia cuenta', 403);
 		}
 	}
+
+	public function ajax_edit($id, MyController $myController){
+		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
+		if (!$permiso_editar_usuario) {
+			abort(403, '.');
+			return false;
+		}
+		$roles = Rol::all();
+		$user = User::find($id);
+		$data = [
+			'roles' => $roles,
+			'user' => $user
+		];
+		return response()->json($data);
+    }
+
+	public function ajax_delete($id, MyController $myController){
+        $permiso_borrar_usuario = $myController->tiene_permiso('del_usr');
+		if (!$permiso_borrar_usuario) {
+			abort(403, '.');
+			return false;
+		}
+		if(Auth::user()->user_id != $id) 
+		{
+			// Encuentra el usuario por su ID
+			$user = User::withTrashed()->find($id);
+			// Almacena el nombre de usuario antes de eliminarlo
+			$username = $user->username;
+			// Elimina el usuario
+			$user->delete();
+			$message = Auth::user()->username . " borró el usuario " . $username;
+			Log::info($message);
+			$subject = "Borrado de usuario";
+			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
+			$to = "omarliberatto@yafoconsultora.com";
+			// Llamar a enviar_email de MyController
+			$myController->enviar_email($to, $body, $subject);
+			Log::info('Correo enviado exitosamente a ' . $to);
+			session()->flash('success', 'Usuario eliminado correctamente.');
+			return response()->json(['success' => 'Usuario eliminado correctamente.']);
+		} else {
+			session()->flash('error', 'No se puede borrar tu propia cuenta.');
+			return response()->json(['error' => 'No se puede borrar tu propia cuenta.']);
+			#return response()->json('No se puede borrar tu propia cuenta', 403);
+		}
+    }
 
 	/**************************************************************************
 	*

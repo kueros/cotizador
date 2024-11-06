@@ -75,9 +75,6 @@
 					No
 				</label>
 			</div>
-			<!-- Campo oculto para enviar el valor de "bloqueado" -->
-			<input type="hidden" name="habilitado" value="{{ $users->habilitado }}">
-			<x-input-error :messages="$errors->get('habilitado')" class="mt-2" />
 		</div>
 		<div style="display: none;">
 			<x-input-label for="bloqueado" :value="__('Bloqueado')" />

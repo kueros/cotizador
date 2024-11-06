@@ -85,7 +85,7 @@
 				<a class="link_monitoreo" href="<?= route('monitoreo.log_administracion') ?>">
 					<div class="div-contenedor-acceso">
 						<div class="div-logs-img" id="log_administracion"></div>
-						<span class="monitoreo-title">Log de administración</span>
+						<span class="monitoreo-title">Log de acciones</span>
 					</div>
 				</a>
 			</div>

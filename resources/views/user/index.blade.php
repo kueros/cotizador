@@ -37,16 +37,11 @@
 		});
 
 		function limpiar_campos_requeridos(form_id){
-			/*$($('#'+form_id).prop('elements')).each(function(){
+			$($('#'+form_id).prop('elements')).each(function(){
 				if($(this).prop("required") && !$(this).prop("disabled")){
 					$(this).removeClass('field-required');
 				}
-			});*/
-		}
-
-		function reload_table()
-		{
-			table.ajax.reload(null,false);
+			});
 		}
 
 		function add_usuario()
@@ -63,13 +58,15 @@
 			$('#password').prop("required",true);
 			$('#repassword').prop("required",true);
 			$('#modal_form').modal('show');
+			$('#form').attr('action', "{{ url('roles') }}");
+    		$('#method').val('POST');
 		}
 
 		function edit_usuario(id)
 		{
-			/*save_method = 'update';
+			save_method = 'update';
 			limpiar_campos_requeridos('form');
-			$('#form')[0].reset();
+			//$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#accion').val('edit');
@@ -79,23 +76,27 @@
 			roles_usuario = new Array();
 
 			$.ajax({
-				url : "/" + id,
+				url : "{{ url('users/ajax_edit/') }}" + "/" + id,
 				type: "GET",
 				dataType: "JSON",
 				success: function(data)
 				{
-					$('[name="id"]').val(data.id);
-					$('[name="nombre"]').val(data.nombre);
-					$('[name="apellido"]').val(data.apellido);
-					$('[name="username"]').val(data.username);
-					$('[name="email"]').val(data.email);
-					$('[name=area]').val(data.area_id);
-					$('[name=enabled]').val(data.enabled);
-					$('[name=habilita_api]').val(data.habilita_api);
+					let user = data.user;
+					$('[name="id"]').val(user.user_id);
+					$('[name="nombre"]').val(user.nombre);
+					$('[name="apellido"]').val(user.apellido);
+					$('[name="username"]').val(user.username);
+					$('[name="email"]').val(user.email);
+					//$('[name="habilitado"]').val(user.habilitado);
+					$('[name="habilitado"]').prop('checked', user.habilitado == 1);
+					//$('[name="bloqueado"]').val(user.bloqueado);
+					$('[name="bloqueado"]').prop('checked', user.bloqueado == 1);
+					$('[name="rol_id"]').val(user.rol_id);
 
-					
+					$('#form_usuario').attr('action', "{{ url('users') }}" + "/" + id);
+            		$('#method').val('PUT');
 
-					data.roles_asignados.forEach(function(rol){
+					/*data.roles_asignados.forEach(function(rol){
 						roles_usuario.push(rol.rol_id);
 
 						row_roles = '';
@@ -105,7 +106,7 @@
 						row_roles += '</tr>';
 
 						$('#tabla_roles tbody').append(row_roles);
-					});
+					});*/
 
 					$('#modal_form').modal('show');
 					$('.modal-title').text('Editar usuario');
@@ -114,7 +115,7 @@
 				{
 					show_ajax_error_message(jqXHR, textStatus, errorThrown);
 				}
-			});*/
+			});
 		}
 
 		function deshabilitar_usuario(id, temporal = false) {
@@ -129,10 +130,11 @@
 			swal.fire({
 				title: texto,
 				icon: "warning",
-				buttons: true,
-				dangerMode: true,
-			}).then((confirmacion) => {
-				if (confirmacion) {
+				showCancelButton: true,
+				confirmButtonText: "OK",
+				cancelButtonText: "Cancelar"
+			}).then((result) => {
+				if( result.isConfirmed ){
 					show_loading(); // Función personalizada que muestra un loader
 					$.ajax({ headers: {
 									'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -165,10 +167,11 @@
 			swal.fire({
 				title: "¿Desea blanquear la contraseña del usuario?",
 				icon: "warning",
-				buttons: true,
-				dangerMode: true,
-			}).then((confirmacion) => {
-				if (confirmacion) {
+				showCancelButton: true,
+				confirmButtonText: "OK",
+				cancelButtonText: "Cancelar"
+			}).then((result) => {
+				if( result.isConfirmed ){
 					show_loading();
 					$.ajax({ 
 						headers: {
@@ -195,6 +198,47 @@
 					});
 				}
 			});
+		}
+
+		function delete_usuario(id)
+		{
+			swal.fire({
+				title: "¿Desea borrar el usuario?",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonText: "OK",
+				cancelButtonText: "Cancelar"
+			}).then((result) => {
+				if( result.isConfirmed ){
+					show_loading();
+					$.ajax({
+						url : "{{ url('/users/ajax_delete/') }}"+"/"+id,
+						type: "POST",
+						dataType: "JSON",
+						headers: {
+							'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+						},
+						success: function(data)
+						{
+							swal.fire({
+								title: "Aviso",
+								text: "Usuario eliminado con éxito.",
+								icon: "success"
+							}).then(() => {
+								// Recargar la tabla DataTables al cerrar el modal de éxito
+								location.reload();
+							});
+
+							$('#modal_form').modal('hide');
+						},
+						error: function (jqXHR, textStatus, errorThrown)
+						{
+							show_ajax_error_message(jqXHR, textStatus, errorThrown);
+						}
+					});
+				}
+			});
+
 		}
 
 	</script>
@@ -300,8 +344,8 @@
 									<td>{{ $user->bloqueado ? 'Sí' : 'No' }}</td>
 									<td>
 										@if ($permiso_editar_usuario)
-										<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('users.edit', $user->user_id) }}">
-											<i class="fas fa-pencil-alt"></i>
+										<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" 
+											onclick="edit_usuario('{{ $user->user_id }}')"><i class="bi bi-pencil"></i>
 										</a>
 										@endif
 										
@@ -324,13 +368,9 @@
 										@endif
 
 										@if ($permiso_eliminar_usuario)
-											<form action="{{ route('users.destroy', $user->user_id) }}" method="POST" style="display:inline;">
-												@csrf
-												@method('DELETE')
-												<button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar este usuario?')">
-													<i class="fas fa-trash"></i>
-												</button>
-											</form>
+										<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" 
+											onclick="delete_usuario('{{ $user->user_id }}')"><i class="bi bi-trash"></i>
+										</a>
 										@endif		
 									</td>
 								</tr>
@@ -339,52 +379,18 @@
 					</table>
 				</div>
 
-				<!-- Mostrar formulario de cambio de contraseña si el usuario está establecido -->
-				@if(isset($selectedUser))
-					<div class="p-12 sm:p-8 bg-white shadow sm:rounded-lg">
-						<h2 class="text-lg font-medium text-gray-900">
-							{{ __('Cambiar contraseña de ') . $selectedUser->nombre }}
-						</h2>
 
-						<form method="post" action="{{ route('password.update', $selectedUser->user_id) }}" class="p-6">
-							@csrf
-							@method('patch')
-
-							<!-- Campo para nueva contraseña -->
-							<div class="mt-4">
-								<x-input-label for="password" value="{{ __('Nueva Contraseña') }}" />
-								<x-text-input id="password" name="password" type="password" class="mt-1 block w-3/4" placeholder="{{ __('Nueva Contraseña') }}" />
-								<x-input-error :messages="$errors->get('password')" class="mt-2" />
-							</div>
-
-							<!-- Confirmar nueva contraseña -->
-							<div class="mt-4">
-								<x-input-label for="password_confirmation" value="{{ __('Confirmar Contraseña') }}" />
-								<x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-3/4" placeholder="{{ __('Confirmar Contraseña') }}" />
-								<x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-							</div>
-
-							<div class="mt-6 flex justify-end">
-								<a href="{{ route('users.index') }}" class="btn btn-secondary">
-									{{ __('Cancelar') }}
-								</a>
-
-								<x-danger-button class="ml-3">
-									{{ __('Cambiar contraseña') }}
-								</x-danger-button>
-							</div>
-						</form>
-					</div>
-				@endif
 
 				<div class="modal fade" id="modal_form" role="dialog">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-								<h3 class="modal-title">Formulario de usuario</h3>
+								<h5 class="modal-title">Formulario de usuario</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
-							<form method="post" action="{{ route('users.store') }}" class="mt-6 space-y-6">
+							<form id="form_usuario" method="post" action="" class="mt-6 space-y-6">
+								<input name="_method" type="hidden" id="method">
+								<input type="hidden" value="" name="id"/>
 								<div class="modal-body form">
 									@csrf
 									<div class="form-body">
@@ -431,35 +437,54 @@
 										</div>
 									</div>
 
-									<div>
-										<x-input-label for="rol_id" :value="__('Rol')" />
-										<select id="rol_id" name="rol_id" class="mt-1 block w-full">
-											<option value="0" {{ old('rol_id', $user->rol_id) === null ? 'selected' : '' }}>
-												{{ __('Elija un Rol') }}
-											</option>
-											@foreach($roles as $rol)
-											<option value="{{ $rol->rol_id }}" {{ old('rol_id', $user->rol_id) == $rol->rol_id ? 'selected' : '' }}>
-												{{ $rol->nombre }}
-											</option>
-											@endforeach
-										</select>
-										<x-input-error :messages="$errors->get('rol_id')" class="mt-2" />
+									<div class="form-body">
+										<div class="mb-3 row">
+											<label class="col-form-label col-md-3">{{ __('Rol') }}</label>
+											<div class="col-md-9">
+												<select id="rol_id" name="rol_id" class="mt-1 block w-full form-control">
+													<option value="0" {{ old('rol_id', $user->rol_id) === null ? 'selected' : '' }}>
+														{{ __('Elija un Rol') }}
+													</option>
+													@foreach($roles as $rol)
+													<option value="{{ $rol->rol_id }}" {{ old('rol_id', $user->rol_id) == $rol->rol_id ? 'selected' : '' }}>
+														{{ $rol->nombre }}
+													</option>
+													@endforeach
+												</select>
+												<span class="help-block"></span>
+											</div>
+										</div>
+									</div>
+									
+									<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
+									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
+									 ya que el checkbox tiene prioridad sobre el hidden -->
+									<div class="form-body">
+										<div class="row mb-3">
+											<label class="col-md-3 col-form-label">{{ __('Habilitado') }}</label>
+											<div class="col-md-9">
+												<div class="form-check form-switch">
+													<input type="hidden" name="habilitado" value="0">
+													<input class="form-check-input" name="habilitado" id="habilitado" 
+														value="1" type="checkbox" {{ old('habilitado', $user->habilitado) === null || old('habilitado', $user->habilitado) == 1 ? 'checked' : '' }} >
+													<label class="form-check-label" for="habilitado"></label>
+												</div>
+											</div>
+										</div>
 									</div>
 
-									<div>
-										<x-input-label for="habilitado" :value="__('Habilitado')" />
-										<div class="mt-1">
-											<label>
-												<input type="radio" name="habilitado" value="1"
-													{{ old('habilitado', $user->habilitado) === null || old('habilitado', $user->habilitado) == 1 ? 'checked' : '' }}>
-												Sí
-											</label>
-											<label class="ml-4">
-												<input type="radio" name="habilitado" value="0"
-													{{ old('habilitado', $user->habilitado) == 0 ? 'checked' : '' }}>
-												No
-											</label>
-										</div> <x-input-error :messages="$errors->get('habilitado')" class="mt-2" />
+									<div class="form-body">
+										<div class="row mb-3">
+											<label class="col-md-3 col-form-label">{{ __('Bloqueado') }}</label>
+											<div class="col-md-9">
+												<div class="form-check form-switch">
+													<input type="hidden" name="bloqueado" value="0">
+													<input class="form-check-input" name="bloqueado" id="bloqueado" 
+														value="1" type="checkbox" {{ old('bloqueado', $user->bloqueado) === null || old('bloqueado', $user->bloqueado) == 1 ? 'checked' : '' }} >
+													<label class="form-check-label" for="bloqueado"></label>
+												</div>
+											</div>
+										</div>
 									</div>
 								</div>
 								<div class="modal-footer">

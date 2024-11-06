@@ -38,6 +38,16 @@
 <body class="font-sans antialiased">
 
 	<style>
+		.accordion-header > button{
+			background-color: #e2e9ff;
+			color: #337ab7;
+		}
+
+		.accordion-header > button:hover{
+			color: #23527c;
+			text-decoration: underline;
+		}
+
 		.colapsable-aleph {
 			width: 100%;
 			height: 35px;
