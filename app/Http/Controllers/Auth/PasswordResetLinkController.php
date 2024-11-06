@@ -63,7 +63,7 @@ class PasswordResetLinkController extends Controller
 					$resetUrl = route('reset_pass_form', ['token' => $token, 'email' => $email]);
 					// Enviar correo
 					$subject = "Aviso de restablecimiento de contraseña";
-					$body = 'Está recibiendo este mail porque Ud. solicitó un restablecimiento de contraseña o porque esta expiró, para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';
+					$body = 'Para continuar con el restablecimiento de su contraseña por favor siga el siguiente link a continuación:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';
 					$to = $user->email;
 					#echo "kdk2 ".$resetUrl;
 					$myController->enviar_email($to, $body, $subject);
