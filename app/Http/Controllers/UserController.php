@@ -153,7 +153,14 @@ class UserController extends Controller
 			$subject = "Restauración de usuario";
 			$body = "Usuario ". $existingUser->username . " restaurado correctamente por ". Auth::user()->username;
 			$to = Auth::user()->email;
-			$myController->enviar_email($to, $body, $subject);
+			$emailEnviado = $myController->enviar_email($to, $body, $subject);
+
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$email = $existingUser->email;
+			$detalle = "Aviso de restauración de cuenta y cambio de contraseña";
+			$enviado = $emailEnviado ? "Si" : "No";
+			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 
 			Log::info('Correo enviado exitosamente a ' . $to);
 			session()->flash('success', 'Usuario restaurado correctamente.');
@@ -297,10 +304,14 @@ class UserController extends Controller
 		} else {
 			$to = $user->email;
 		}
-
 		// Llamar a enviar_email de MyController
-		$myController->enviar_email($to, $body, $subject);
-
+		$emailEnviado = $myController->enviar_email($to, $body, $subject);
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		$email = $user->email;
+		$detalle = "Aviso de modificación de cuenta y cambio de contraseña";
+		$enviado = $emailEnviado ? "Si" : "No";
+		$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 		Log::info('Correo enviado exitosamente a ' . $to);
 		if(Auth::user()->username != "omar"){
 			#dd("1".Auth::user()->username );
@@ -352,7 +363,15 @@ class UserController extends Controller
 			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
 			$to = "omarliberatto@yafoconsultora.com";
 			// Llamar a enviar_email de MyController
-			$myController->enviar_email($to, $body, $subject);
+			#dd($subject);
+			$emailEnviado = $myController->enviar_email($to, $body, $subject);
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$email = $user->email;
+			#dd($email);
+			$detalle = "Aviso de eliminación de cuenta";
+			$enviado = $emailEnviado ? "Si" : "No";
+			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 			Log::info('Correo enviado exitosamente a ' . $to);
 			return Redirect::route('users.index')
 			->with('success', 'Usuario eliminado correctamente.');
@@ -398,7 +417,14 @@ class UserController extends Controller
 			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
 			$to = "omarliberatto@yafoconsultora.com";
 			// Llamar a enviar_email de MyController
-			$myController->enviar_email($to, $body, $subject);
+			$emailEnviado = $myController->enviar_email($to, $body, $subject);
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$email = $user->email;
+			$detalle = "Aviso de eliminación de cuenta";
+			#echo $detalle;
+			$enviado = $emailEnviado ? "Si" : "No";
+			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 			Log::info('Correo enviado exitosamente a ' . $to);
 			session()->flash('success', 'Usuario eliminado correctamente.');
 			return response()->json(['success' => 'Usuario eliminado correctamente.']);
