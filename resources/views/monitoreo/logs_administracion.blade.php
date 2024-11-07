@@ -34,14 +34,13 @@
 					type : 'GET'
 				},
 				"order": [[ 3, "desc" ]],
-				"ordering": false,
+				"ordering": true,
 				bAutoWidth: false, 
 				aoColumns : [
 					{ sWidth: '5%' },
 					{ sWidth: '10%' },
 					{ sWidth: '30%' },
 					{ sWidth: '15%' },
-					{ sWidth: '10%' },
 					{ sWidth: '15%' }
 				],
 				language: traduccion_datatable,
@@ -76,7 +75,6 @@
 						<th>Detalle</th>
 						<th>Fecha</th>
 						<th>IP</th>
-						<th>Agente</th>
 					</thead>
 					<tbody>
 					</tbody>

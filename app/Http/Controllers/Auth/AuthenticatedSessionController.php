@@ -38,12 +38,12 @@
 			$message = "Solicitud de autenticacion recibida.1 " . json_encode($_POST);
 			$users = User::find(Auth::user()->user_id);
 			Log::info($message);
-			$log = LogAcceso::create([
+/* 			$log = LogAcceso::create([
 				'email' => $users->email,
 				'ip_address' => $_SERVER['REMOTE_ADDR'],
 				'user_agent' => $_SERVER['HTTP_USER_AGENT']
 			]);
-			$log->save();
+ */			#$log->save();
 		}
 		#return view('auth.login');
 
@@ -152,7 +152,7 @@
 		$users = User::find(Auth::user()->user_id);
 		Log::info($message);
 
-		$log = LogAdministracion::create([
+/* 		$log = LogAdministracion::create([
 			'username' => Auth::user()->username,
 			'action' => "logout",
 			'detalle' => $message,
@@ -160,7 +160,7 @@
 			'user_agent' => $_SERVER['HTTP_USER_AGENT']
 		]);
 		$log->save();
-
+ */
 		Auth::guard('web')->logout();
 		$request->session()->invalidate();
 		$request->session()->regenerateToken();
