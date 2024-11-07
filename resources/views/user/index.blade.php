@@ -21,6 +21,12 @@
 			table = $('#usuarios-table').DataTable({
 			language: traduccion_datatable,
             dom: 'Bfrtip',
+			columnDefs: [
+				{
+					"targets": 'no-sort',
+					"orderable": false
+				}
+			],
             buttons: [
                 {"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Usuarios'},
                 {"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Usuarios'},
@@ -48,32 +54,32 @@
 		{
 			save_method = 'add';
 			limpiar_campos_requeridos('form');
-			$('#tabla_roles tbody').html('');
-			//$('#form')[0].reset();
+			//$('#tabla_roles tbody').html('');
+			$('#form_usuario')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
-			roles_usuario = new Array();
+			//roles_usuario = new Array();
 			$('.modal-title').text('Agregar usuario');
 			$('#accion').val('add');
 			$('#password').prop("required",true);
 			$('#repassword').prop("required",true);
 			$('#modal_form').modal('show');
-			$('#form').attr('action', "{{ url('roles') }}");
-    		$('#method').val('POST');
+			//$('#form').attr('action', "{{ url('users') }}");
+    		//$('#method').val('POST');
 		}
 
 		function edit_usuario(id)
 		{
 			save_method = 'update';
 			limpiar_campos_requeridos('form');
-			//$('#form')[0].reset();
+			$('#form_usuario')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#accion').val('edit');
-			$('#tabla_roles tbody').html('');
+			//$('#tabla_roles tbody').html('');
 			$('#password').prop("required",false);
 			$('#repassword').prop("required",false);
-			roles_usuario = new Array();
+			//roles_usuario = new Array();
 
 			$.ajax({
 				url : "{{ url('users/ajax_edit/') }}" + "/" + id,
@@ -93,8 +99,8 @@
 					$('[name="bloqueado"]').prop('checked', user.bloqueado == 1);
 					$('[name="rol_id"]').val(user.rol_id);
 
-					$('#form_usuario').attr('action', "{{ url('users') }}" + "/" + id);
-            		$('#method').val('PUT');
+					//$('#form_usuario').attr('action', "{{ url('users') }}" + "/" + id);
+            		//$('#method').val('PUT');
 
 					/*data.roles_asignados.forEach(function(rol){
 						roles_usuario.push(rol.rol_id);
@@ -241,6 +247,87 @@
 
 		}
 
+		function validar_campos_requeridos(form_id){
+			var form_status = true;
+
+			$($('#'+form_id).find(':input')).each(function(){
+				if($(this).prop("required") && !$(this).prop("disabled")){
+					if($(this).val()){
+						if(!$(this)[0].checkValidity()){
+							$(this).addClass('field-required');
+							form_status = false;
+						}else{
+							$(this).removeClass('field-required');
+						}
+					}else{
+						$(this).addClass('field-required');
+						form_status = false;
+					}
+				}
+			});
+
+			return form_status;
+		}
+		
+		function guardar_datos(){
+			let form_data = $('#form_usuario').serializeArray();
+			let url_guarda_datos = "{{ url('users') }}";
+			let type_guarda_datos = "POST";
+
+			if(!validar_campos_requeridos('form_usuario')){
+				$('#form_usuario')[0].reportValidity();
+				//swal("Aviso", "Complete los campos obligatorios", "warning");
+				return false;
+			}
+
+			if( $('#accion').val() != "add" ){
+				url_guarda_datos = "{{ url('users') }}" + "/" + $('[name="id"]').val();
+				type_guarda_datos = "PUT";
+			}
+
+			show_loading();
+			$.ajax({
+				url : url_guarda_datos,
+				type: type_guarda_datos,
+				data: {form_data:form_data},
+				dataType: "JSON",
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				success: function(data){
+					hide_loading();
+					if(data.status == 0){
+						let errorMessage = data.message + "</br>";
+    					if (data.errors && Object.keys(data.errors).length > 0) {
+							// Recorre cada campo y sus mensajes de error
+							for (let field in data.errors) {
+								if (data.errors.hasOwnProperty(field)) {
+									errorMessage += `${field}: ${data.errors[field].join(", ")}</br>`;
+								}
+							}
+						} else {
+							errorMessage += "No se encontraron errores específicos para los campos.";
+						}
+
+						swal.fire("Aviso", errorMessage, "warning");
+						return false;
+					}else{
+						swal.fire({
+							title: "Aviso",
+							text: data.message,
+							icon: "success"
+						}).then(() => {
+							// Recargar la tabla DataTables al cerrar el modal de éxito
+							location.reload();
+						});
+					}
+				},
+				error: function (jqXHR, textStatus, errorThrown){
+					show_ajax_error_message(jqXHR, textStatus, errorThrown);
+				}
+			});
+		}
+
 	</script>
 
 	<div class="container" id="pagina-permisos">
@@ -319,7 +406,7 @@
 								<th>Rol</th>
 								<th>Habilitado</th>
 								<th>Bloqueado</th>
-								<th class="text-center">Acciones</th>
+								<th class="text-center no-sort">Acciones</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -390,6 +477,7 @@
 							</div>
 							<form id="form_usuario" method="post" action="" class="mt-6 space-y-6">
 								<input name="_method" type="hidden" id="method">
+								<input type="hidden" value="" name="accion" id="accion"/>
 								<input type="hidden" value="" name="id"/>
 								<div class="modal-body form">
 									@csrf
@@ -397,8 +485,8 @@
 										<div class="mb-3 row">
 											<label class="col-form-label col-md-3">{{ __('Nombre de Usuario') }}</label>
 											<div class="col-md-9">
-												<input name="username" maxlength="255" placeholder="Nombre de Usuario" 
-													id="username" class="form-control" type="text">
+												<input name="username" minlength="3" maxlength="255" placeholder="Nombre de Usuario" 
+													id="username" class="form-control" type="text" required>
 												<span class="help-block"></span>
 											</div>
 										</div>
@@ -408,8 +496,8 @@
 										<div class="mb-3 row">
 											<label class="col-form-label col-md-3">{{ __('Nombre') }}</label>
 											<div class="col-md-9">
-												<input name="nombre" maxlength="255" placeholder="Nombre" 
-													id="nombre" class="form-control" type="text">
+												<input name="nombre" minlength="3" maxlength="255" placeholder="Nombre" 
+													id="nombre" class="form-control" type="text" required>
 												<span class="help-block"></span>
 											</div>
 										</div>
@@ -419,8 +507,8 @@
 										<div class="mb-3 row">
 											<label class="col-form-label col-md-3">{{ __('Apellido') }}</label>
 											<div class="col-md-9">
-												<input name="apellido" maxlength="255" placeholder="Apellido" 
-													id="apellido" class="form-control" type="text">
+												<input name="apellido" minlength="3" maxlength="255" placeholder="Apellido" 
+													id="apellido" class="form-control" type="text" required>
 												<span class="help-block"></span>
 											</div>
 										</div>
@@ -430,8 +518,8 @@
 										<div class="mb-3 row">
 											<label class="col-form-label col-md-3">{{ __('Email') }}</label>
 											<div class="col-md-9">
-												<input name="email" maxlength="255" placeholder="Email" 
-													id="email" class="form-control" type="email">
+												<input name="email" minlength="3" maxlength="255" placeholder="Email" 
+													id="email" class="form-control" type="email" required>
 												<span class="help-block"></span>
 											</div>
 										</div>
@@ -441,12 +529,12 @@
 										<div class="mb-3 row">
 											<label class="col-form-label col-md-3">{{ __('Rol') }}</label>
 											<div class="col-md-9">
-												<select id="rol_id" name="rol_id" class="mt-1 block w-full form-control">
+												<select id="rol_id" name="rol_id" class="mt-1 block w-full form-control" required>
 													<option value="0" {{ old('rol_id', $user->rol_id) === null ? 'selected' : '' }}>
 														{{ __('Elija un Rol') }}
 													</option>
 													@foreach($roles as $rol)
-													<option value="{{ $rol->rol_id }}" {{ old('rol_id', $user->rol_id) == $rol->rol_id ? 'selected' : '' }}>
+													<option value="{{ $rol->rol_id }}">
 														{{ $rol->nombre }}
 													</option>
 													@endforeach
@@ -488,8 +576,8 @@
 									</div>
 								</div>
 								<div class="modal-footer">
-									<button type="submit" class="btn btn-primary">{{ __('Guardar') }}</button>
-									<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+									<a onclick="guardar_datos()" class="btn btn-primary">{{ __('Guardar') }}</a>
+									<a class="btn btn-danger" data-bs-dismiss="modal">Cancelar</a>
 								</div>
 							</form>
 						</div>

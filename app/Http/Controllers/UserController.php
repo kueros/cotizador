@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\Models\Variable;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -83,122 +84,149 @@ class UserController extends Controller
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store(Request $request, MyController $myController): RedirectResponse
+	public function store(Request $request, MyController $myController)
 	{
-		#dd($request);
-		$permiso_agregar_usuario = $myController->tiene_permiso('add_usr');
-		if (!$permiso_agregar_usuario) {
-			abort(403, '.');
-			return false;
-		}
-		$validatedData = $request->validate([
-			'username' => [
-				'required',
-				'string',
-				'max:255',
-				'regex:/^[a-zA-Z0-9._-]+$/', // Permitir solo letras, números, puntos, guiones y guiones bajos
-				Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
-			],
-			'nombre' => [
-				'required',
-				'string',
-				'max:255',
-				'min:3',
-				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-			],
-			'apellido' => [
-				'required',
-				'string',
-				'max:255',
-				'min:3',
-				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-			],
-			'email' => [
-				'required',
-				'string',
-				'email',
-				'max:255',
-				Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
-			],
-			'rol_id' => 'required|exists:roles,rol_id',
-			'habilitado' => 'required|boolean',
-		], [
-			'username.regex' => 'El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos.',
-			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-			'apellido.regex' => 'El apellido solo puede contener letras y espacios.',
-		]);
-		// Verificar si el usuario con el mismo username o email está soft deleted
-		$existingUser = User::onlyTrashed()
-			->where(function ($query) use ($validatedData) {
-				$query->where('username', $validatedData['username'])
-					->orWhere('email', $validatedData['email']);
-			})
-			->first();
-		#dd($existingUser);
-		if ($existingUser) {
-			// Restaurar el usuario si está soft deleted
-			$existingUser->restore();
-			$existingUser->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
-			$existingUser->save();
+		try {
+			#dd($request);
+			$response = [
+				"status" => 0,
+				"message" => ""
+			];
+			$formData = [];
+			foreach ($request->input('form_data') as $input) {
+				$formData[$input['name']] = $input['value'];
+			}
+			$permiso_agregar_usuario = $myController->tiene_permiso('add_usr');
+			if (!$permiso_agregar_usuario) {
+				abort(403, '.');
+				return false;
+			}
+			//$validatedData = $request->validate([
+			$validatedData = Validator::make($formData, [
+				'username' => [
+					'required',
+					'string',
+					'max:255',
+					'regex:/^[a-zA-Z0-9._-]+$/', // Permitir solo letras, números, puntos, guiones y guiones bajos
+					Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
+				],
+				'nombre' => [
+					'required',
+					'string',
+					'max:255',
+					'min:3',
+					'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				],
+				'apellido' => [
+					'required',
+					'string',
+					'max:255',
+					'min:3',
+					'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				],
+				'email' => [
+					'required',
+					'string',
+					'email',
+					'max:255',
+					Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
+				],
+				'rol_id' => 'required|exists:roles,rol_id',
+				'habilitado' => 'required|boolean',
+			], [
+				'username.regex' => 'El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos.',
+				'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+				'apellido.regex' => 'El apellido solo puede contener letras y espacios.',
+			]);
+			// Verifica si la validación falla
+			if ($validatedData->fails()) {
+				$response["message"] = 'Error en la validación de los datos.';
+				$response["errors"] = $validatedData->errors();
+				return response()->json($response);
+			}
+			$validatedData = $validatedData->validated();
 
-			// Actualizar los datos del usuario restaurado con los nuevos valores
-			$existingUser->update($validatedData);
+			// Verificar si el usuario con el mismo username o email está soft deleted
+			$existingUser = User::onlyTrashed()
+				->where(function ($query) use ($validatedData) {
+					$query->where('username', $validatedData['username'])
+						->orWhere('email', $validatedData['email']);
+				})
+				->first();
+			#dd($existingUser);
+			if ($existingUser) {
+				// Restaurar el usuario si está soft deleted
+				$existingUser->restore();
+				$existingUser->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
+				$existingUser->save();
 
-			$clientIP = \Request::ip();
-			$userAgent = \Request::userAgent();
-			$username = Auth::user()->username;
-			$action = "users.restore";
-			$message = $username . " restauró el usuario " . $existingUser->username;
-			$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+				// Actualizar los datos del usuario restaurado con los nuevos valores
+				$existingUser->update($validatedData);
 
-			$subject = "Restauración de usuario";
-			$body = "Usuario ". $existingUser->username . " restaurado correctamente por ". Auth::user()->username;
-			$to = Auth::user()->email;
-			$myController->enviar_email($to, $body, $subject);
+				$clientIP = \Request::ip();
+				$userAgent = \Request::userAgent();
+				$username = Auth::user()->username;
+				$action = "users.restore";
+				$message = $username . " restauró el usuario " . $existingUser->username;
+				$myController->loguear($clientIP, $userAgent, $username, $action, $message);
 
-			Log::info('Correo enviado exitosamente a ' . $to);
-			session()->flash('success', 'Usuario restaurado correctamente.');
-			return redirect()->route('users.index')->with('success', 'Usuario restaurado correctamente.');
-		} else {
+				$subject = "Restauración de usuario";
+				$body = "Usuario ". $existingUser->username . " restaurado correctamente por ". Auth::user()->username;
+				$to = Auth::user()->email;
+				$myController->enviar_email($to, $body, $subject);
 
-			// Si no existe un usuario soft deleted, crear uno nuevo
-			#$validatedData['ultima_fecha_restablecimiento'] = Carbon::now(); // Añadir fecha actual
-			#dd($validatedData);
-			$user = User::create($validatedData);
-			$user->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
-			$user->save();
+				Log::info('Correo enviado exitosamente a ' . $to);
+				$response = [
+					'status' => 1,
+					'message' => 'Usuario restaurado correctamente.'
+				];
+				return response()->json($response);
+			} else {
 
-			$clientIP = \Request::ip();
-			$userAgent = \Request::userAgent();
-			$username = Auth::user()->username;
-			$action = "users.store";
-			$message = $username . " creó el usuario " . $validatedData['username'];
-			$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+				// Si no existe un usuario soft deleted, crear uno nuevo
+				#$validatedData['ultima_fecha_restablecimiento'] = Carbon::now(); // Añadir fecha actual
+				#dd($validatedData);
+				$user = User::create($validatedData);
+				$user->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
+				$user->save();
 
-			#Envío de mail al administrador que creó de la cuenta del usuario
-			$subject = "Creación de usuario";
-			$body = "Usuario ". $validatedData['username'] . " creado correctamente por ". Auth::user()->username;
-			$to = Auth::user()->email;
-			$myController->enviar_email($to, $body, $subject);
+				$clientIP = \Request::ip();
+				$userAgent = \Request::userAgent();
+				$username = Auth::user()->username;
+				$action = "users.store";
+				$message = $username . " creó el usuario " . $validatedData['username'];
+				$myController->loguear($clientIP, $userAgent, $username, $action, $message);
 
-			#Envío de mail al usuario de la nueva cuenta creada
+				#Envío de mail al administrador que creó de la cuenta del usuario
+				$subject = "Creación de usuario";
+				$body = "Usuario ". $validatedData['username'] . " creado correctamente por ". Auth::user()->username;
+				$to = Auth::user()->email;
+				$myController->enviar_email($to, $body, $subject);
 
-			$user = User::where('email', $validatedData['email'])
-						->first();
-			//Genero email por la creacion de usuario
-			$email = $user->email;
-			$username = $user->username;
-			$nombre = $user->nombre;
-			$token = Str::random(60);
-			$link = route('create_pass_form', ['token' => $token, 'email' => $email]);
-			$subject = "Aviso de creación de cuenta y cambio de contraseña";
-			$body = '<p>Hola '.$nombre.',</p>Se ha registrado una nueva cuenta en el sistema de gestión Aleph Manager con su email, su nombre de usuario es "'.$username.'" para continuar la verificación y cambiar la contraseña siga el siguiente link a continuacion:<br><a href="'.$link.'">Haz clic aquí</a>';
-			$to = $email;
-			$myController->enviar_email($to, $body, $subject);
+				#Envío de mail al usuario de la nueva cuenta creada
 
-			Log::info('Correo enviado exitosamente a ' . $to);
-			session()->flash('success', 'Usuario creado correctamente.');
-			return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
+				$user = User::where('email', $validatedData['email'])
+							->first();
+				//Genero email por la creacion de usuario
+				$email = $user->email;
+				$username = $user->username;
+				$nombre = $user->nombre;
+				$token = Str::random(60);
+				$link = route('create_pass_form', ['token' => $token, 'email' => $email]);
+				$subject = "Aviso de creación de cuenta y cambio de contraseña";
+				$body = '<p>Hola '.$nombre.',</p>Se ha registrado una nueva cuenta en el sistema de gestión Aleph Manager con su email, su nombre de usuario es "'.$username.'" para continuar la verificación y cambiar la contraseña siga el siguiente link a continuacion:<br><a href="'.$link.'">Haz clic aquí</a>';
+				$to = $email;
+				$myController->enviar_email($to, $body, $subject);
+
+				Log::info('Correo enviado exitosamente a ' . $to);
+				$response = [
+					'status' => 1,
+					'message' => 'Usuario creado correctamente.'
+				];
+				return response()->json($response);
+			}
+		} catch (ValidationException $e) {
+			return response()->json(['errors' => $e->validator->errors()], 422);
 		}
 	}
 
@@ -241,90 +269,108 @@ class UserController extends Controller
 	/**
 	 * Update the specified resource in storage.
 	 */
-	public function usersUpdate(UserRequest $request, User $user, MyController $myController): RedirectResponse
+	public function usersUpdate(UserRequest $request, User $user, MyController $myController)
 	{
 		#dd($request);
+		$response = [
+			"status" => 0,
+			"message" => ""
+		];
+		$formData = [];
+		foreach ($request->input('form_data') as $input) {
+			$formData[$input['name']] = $input['value'];
+		}
 		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
 		if (!$permiso_editar_usuario) {
 			abort(403, '.');
 			return false;
 		}
 		try {
-		$messages = [
-			'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
-			'email.unique' => 'El correo electrónico ya está registrado por otro usuario.',
-			'rol_id.required' => 'El rol es obligatorio.',
-			'rol_id.exists' => 'El rol seleccionado no es válido.',
-		];
-		// Validar los datos del usuario, ignorando al usuario actual
-		$validatedData = $request->validate([
-			'username' => 'required|string|max:255|unique:users,username,' . $user->user_id . ',user_id',
-			'nombre' => 'required|string|max:255',
-			'apellido' => 'required|string|max:255',
-			'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
-			'rol_id' => 'required|exists:roles,rol_id',
-			'habilitado' => 'required|boolean',
-			'bloqueado' => 'required|boolean'
-		], $messages);
-		// Encuentra el usuario por su ID
-		$user = User::find($user->user_id);
-		#dd($user);
-		#dd($validatedData);
-		// Si el usuario no existe, redirige con un mensaje de error
-		if (!$user) {
-			session()->flash('error', 'El usuario no existe.');
-			return redirect('/users')->with('error', 'El usuario no existe.');
-		}
+			$messages = [
+				'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
+				'email.unique' => 'El correo electrónico ya está registrado por otro usuario.',
+				'rol_id.required' => 'El rol es obligatorio.',
+				'rol_id.exists' => 'El rol seleccionado no es válido.',
+			];
+			// Validar los datos del usuario, ignorando al usuario actual
+			$validatedData = Validator::make($formData, [
+				'username' => 'required|string|max:255|unique:users,username,' . $user->user_id . ',user_id',
+				'nombre' => 'required|string|max:255',
+				'apellido' => 'required|string|max:255',
+				'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
+				'rol_id' => 'required|exists:roles,rol_id',
+				'habilitado' => 'required|boolean',
+				'bloqueado' => 'required|boolean'
+			], $messages);
+			// Verifica si la validación falla
+			if ($validatedData->fails()) {
+				$response["message"] = 'Error en la validación de los datos.';
+				$response["errors"] = $validatedData->errors();
+				return response()->json($response);
+			}
+			$validatedData = $validatedData->validated();
 
-		// Almacena el usuario antes de modificarlo
-		$username = $user->username;
-		$message = Auth::user()->username . " actualizó el usuario " . $username;
-		Log::info($message);
+			// Encuentra el usuario por su ID
+			$user = User::find($user->user_id);
+			#dd($user);
+			#dd($validatedData);
+			// Si el usuario no existe, redirige con un mensaje de error
+			if (!$user) {
+				$response['message'] = 'El usuario no existe.';
+				return response()->json($response);
+			}
 
-		$subject = "Actualización de usuario";
-		$body = "El usuario " . $username . " correspondiente a ". $user->nombre ." ". $user->apellido ." fue actualizado por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+			// Almacena el usuario antes de modificarlo
+			$username = $user->username;
+			$message = Auth::user()->username . " actualizó el usuario " . $username;
+			Log::info($message);
 
-		#dd($user->email." - ".$validatedData['email']);
-		if ($user->email != $validatedData['email']) {
-			$to = $user->email.",".$validatedData['email'];
-			$body = "El email del usuario ". $user->nombre ." ". $user->apellido ." fue actualizado de ".$user->email." a ".$validatedData['email']." por " . Auth::user()->nombre . " " . Auth::user()->apellido;
-		} else {
-			$to = $user->email;
-		}
+			$subject = "Actualización de usuario";
+			$body = "El usuario " . $username . " correspondiente a ". $user->nombre ." ". $user->apellido ." fue actualizado por " . Auth::user()->nombre . " " . Auth::user()->apellido;
 
-		if ($user->username != $validatedData['username']) {
-			$to = $validatedData['email'];
-			$body = "El username del usuario ". $user->nombre ." ". $user->apellido ." fue actualizado de ".$user->username." a ".$validatedData['username']." por " . Auth::user()->nombre . " " . Auth::user()->apellido;
-		} else {
-			$to = $user->email;
-		}
+			#dd($user->email." - ".$validatedData['email']);
+			if ($user->email != $validatedData['email']) {
+				$to = $user->email.",".$validatedData['email'];
+				$body = "El email del usuario ". $user->nombre ." ". $user->apellido ." fue actualizado de ".$user->email." a ".$validatedData['email']." por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+			} else {
+				$to = $user->email;
+			}
 
-		// Llamar a enviar_email de MyController
-		$myController->enviar_email($to, $body, $subject);
+			if ($user->username != $validatedData['username']) {
+				$to = $validatedData['email'];
+				$body = "El username del usuario ". $user->nombre ." ". $user->apellido ." fue actualizado de ".$user->username." a ".$validatedData['username']." por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+			} else {
+				$to = $user->email;
+			}
 
-		Log::info('Correo enviado exitosamente a ' . $to);
-		if(Auth::user()->username != "omar"){
-			#dd("1".Auth::user()->username );
-		}
+			// Llamar a enviar_email de MyController
+			$myController->enviar_email($to, $body, $subject);
 
-		// Actualizar el usuario con los datos validados
-		$user->update($validatedData);
+			Log::info('Correo enviado exitosamente a ' . $to);
+			if(Auth::user()->username != "omar"){
+				#dd("1".Auth::user()->username );
+			}
 
-		session()->flash('success', 'Usuario actualizado correctamente.');
-		return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
+			// Actualizar el usuario con los datos validados
+			$user->update($validatedData);
+
+			$response = [
+				'status' => 1,
+				'message' => 'Usuario actualizado correctamente.'
+			];
+			return response()->json($response);
 		} catch (ValidationException $e) {
 			// Si ocurre un error de validación, redirigir con los mensajes de error
-			session()->flash('errors', $e->validator->errors());
-			return redirect()->back()->withErrors($e->validator)->withInput();
+			return response()->json(['errors' => $e->validator->errors()], 422);
 		} catch (TokenMismatchException $e) {
 			// Si se detecta un error 419, redirigir al login
-			session()->flash('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
-			return redirect()->route('login')->with('error', 'Tu sesión ha expirado. Inicia sesión nuevamente.');
+			$response['message'] = 'Tu sesión ha expirado. Inicia sesión nuevamente.';
+			return response()->json($response);
 		} catch (\Exception $e) {
 			Log::error('Error en la actualización del usuario: '.$e->getMessage());
 			#dd('Error: '.$e->getMessage());  // Muestra el mensaje exacto del error
-			session()->flash('error', 'Ocurrió un error inesperado.');
-			return redirect()->back()->with('error', 'Ocurrió un error inesperado.');
+			$response['message'] = 'Ocurrió un error inesperado.';
+			return response()->json($response);
 		}
 	}
 
