@@ -411,7 +411,7 @@
 										</div>
 									</div>
 								</div>
-								<div id="div_{{ $variable->nombre }}" style="display: {{ $variable->valor == 1 ? 'block' : 'none' }}">
+								<div id="div_{{ $variable->nombre }}" style="display: {{ $variable->valor == 1 ? 'none' : 'block' }}">
 									<form action="{{ route('configuracion.guardar_imagen') }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 										@csrf
 										<div class="form-group row">
@@ -433,7 +433,7 @@
 					console.log(variableName)
 					const checkbox = document.getElementById(variableName);
 					const uploadDiv = document.getElementById(`div_${variableName}`);
-					uploadDiv.style.display = checkbox.checked ? 'block' : 'none';
+					uploadDiv.style.display = checkbox.checked ? 'none' : 'block';
 				}
 				</script>				
 				</div>
