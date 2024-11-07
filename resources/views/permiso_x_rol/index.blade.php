@@ -3,10 +3,10 @@ use App\Models\Permiso_x_Rol;
 
 ?>
 
-<x-app-layout title="Permisos por Rol" :roles="$roles" :breadcrumbs="[['title' => 'Inicio', 'url' => route('dashboard')]]">
+<x-app-layout title="Asignación de Permisos" :roles="$roles" :breadcrumbs="[['title' => 'Inicio', 'url' => route('dashboard')]]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
-			{{ __('Permisos x Rol') }}
+			{{ __('Asignación de permisos') }}
 		</h2>
 	</x-slot>
 

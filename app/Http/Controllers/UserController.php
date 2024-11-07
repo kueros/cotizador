@@ -160,20 +160,25 @@ class UserController extends Controller
 				$existingUser->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
 				$existingUser->save();
 
-				// Actualizar los datos del usuario restaurado con los nuevos valores
 				$existingUser->update($validatedData);
 
 				$clientIP = \Request::ip();
 				$userAgent = \Request::userAgent();
 				$username = Auth::user()->username;
-				$action = "users.restore";
 				$message = $username . " restauró el usuario " . $existingUser->username;
-				$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+				$myController->loguear($clientIP, $userAgent, $username, $message);
 
 				$subject = "Restauración de usuario";
 				$body = "Usuario ". $existingUser->username . " restaurado correctamente por ". Auth::user()->username;
 				$to = Auth::user()->email;
-				$myController->enviar_email($to, $body, $subject);
+				$emailEnviado = $myController->enviar_email($to, $body, $subject);
+
+				$clientIP = \Request::ip();
+				$userAgent = \Request::userAgent();
+				$email = $existingUser->email;
+				$detalle = "Aviso de restauración de cuenta y cambio de contraseña";
+				$enviado = $emailEnviado ? "Si" : "No";
+				$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 
 				Log::info('Correo enviado exitosamente a ' . $to);
 				$response = [
@@ -183,9 +188,6 @@ class UserController extends Controller
 				return response()->json($response);
 			} else {
 
-				// Si no existe un usuario soft deleted, crear uno nuevo
-				#$validatedData['ultima_fecha_restablecimiento'] = Carbon::now(); // Añadir fecha actual
-				#dd($validatedData);
 				$user = User::create($validatedData);
 				$user->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
 				$user->save();
@@ -203,8 +205,6 @@ class UserController extends Controller
 				$to = Auth::user()->email;
 				$myController->enviar_email($to, $body, $subject);
 
-				#Envío de mail al usuario de la nueva cuenta creada
-
 				$user = User::where('email', $validatedData['email'])
 							->first();
 				//Genero email por la creacion de usuario
@@ -216,7 +216,14 @@ class UserController extends Controller
 				$subject = "Aviso de creación de cuenta y cambio de contraseña";
 				$body = '<p>Hola '.$nombre.',</p>Se ha registrado una nueva cuenta en el sistema de gestión Aleph Manager con su email, su nombre de usuario es "'.$username.'" para continuar la verificación y cambiar la contraseña siga el siguiente link a continuacion:<br><a href="'.$link.'">Haz clic aquí</a>';
 				$to = $email;
-				$myController->enviar_email($to, $body, $subject);
+				$emailEnviado = $myController->enviar_email($to, $body, $subject);
+
+				$clientIP = \Request::ip();
+				$userAgent = \Request::userAgent();
+				$email = $user->email;
+				$detalle = "Aviso de creación de cuenta y cambio de contraseña";
+				$enviado = $emailEnviado ? "Si" : "No";
+				$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 
 				Log::info('Correo enviado exitosamente a ' . $to);
 				$response = [
@@ -344,13 +351,15 @@ class UserController extends Controller
 			}
 
 			// Llamar a enviar_email de MyController
-			$myController->enviar_email($to, $body, $subject);
-
+			$emailEnviado = $myController->enviar_email($to, $body, $subject);
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$email = $user->email;
+			$detalle = "Aviso de modificación de cuenta y cambio de contraseña";
+			$enviado = $emailEnviado ? "Si" : "No";
+			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 			Log::info('Correo enviado exitosamente a ' . $to);
-			if(Auth::user()->username != "omar"){
-				#dd("1".Auth::user()->username );
-			}
-
+			
 			// Actualizar el usuario con los datos validados
 			$user->update($validatedData);
 
@@ -399,7 +408,15 @@ class UserController extends Controller
 			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
 			$to = "omarliberatto@yafoconsultora.com";
 			// Llamar a enviar_email de MyController
-			$myController->enviar_email($to, $body, $subject);
+			#dd($subject);
+			$emailEnviado = $myController->enviar_email($to, $body, $subject);
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$email = $user->email;
+			#dd($email);
+			$detalle = "Aviso de eliminación de cuenta";
+			$enviado = $emailEnviado ? "Si" : "No";
+			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 			Log::info('Correo enviado exitosamente a ' . $to);
 			return Redirect::route('users.index')
 			->with('success', 'Usuario eliminado correctamente.');
@@ -445,7 +462,14 @@ class UserController extends Controller
 			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
 			$to = "omarliberatto@yafoconsultora.com";
 			// Llamar a enviar_email de MyController
-			$myController->enviar_email($to, $body, $subject);
+			$emailEnviado = $myController->enviar_email($to, $body, $subject);
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$email = $user->email;
+			$detalle = "Aviso de eliminación de cuenta";
+			#echo $detalle;
+			$enviado = $emailEnviado ? "Si" : "No";
+			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 			Log::info('Correo enviado exitosamente a ' . $to);
 			session()->flash('success', 'Usuario eliminado correctamente.');
 			return response()->json(['success' => 'Usuario eliminado correctamente.']);

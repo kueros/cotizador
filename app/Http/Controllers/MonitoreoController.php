@@ -7,13 +7,14 @@ use Illuminate\View\View;
 use App\Models\LogAcceso;
 use App\Http\Requests\LogAccesoRequest;
 use App\Models\LogAdministracion;
+use App\Models\LogEmail;
 
 
 class MonitoreoController extends Controller
 {
-	/**
-	 * Muestro la vista de monitoreo.
-	 */
+	/**************************************************************************
+	*
+	**************************************************************************/
     public function index()
     {
 		$data = [
@@ -25,9 +26,9 @@ class MonitoreoController extends Controller
         return view('monitoreo.index')->with($data);
     }
 
-	/**
-	 * Muestro la vista de logs de accesos.
-	 */
+	/**************************************************************************
+	*
+	**************************************************************************/
 	public function log_accesos(Request $request): View
 	{
 		$logs_accesos = LogAcceso::orderBy('created_at', 'desc')->get();
@@ -36,9 +37,9 @@ class MonitoreoController extends Controller
 	}
 
 
-	/**
-	 * Muestro la vista de logs de accesos.
-	 */
+	/**************************************************************************
+	*
+	**************************************************************************/
 	public function log_administracion(Request $request): View
 	{
 		$logs_administracion = LogAdministracion::select(['id', 'username', 'detalle', 'created_at', 'ip_address', 'user_agent'])
@@ -46,7 +47,21 @@ class MonitoreoController extends Controller
 		#dd($logs_administracion);
 		return view('monitoreo.logs_administracion', compact('logs_administracion'));
 	}
+
+	/**************************************************************************
+	*
+	**************************************************************************/
+	public function log_emails(Request $request): View
+	{
+		$logs_emails = LogEmail::select(['id', 'created_at', 'email', 'detalle', 'enviado'])
+			->orderBy('created_at', 'desc')->get();
+		#dd($logs_administracion);
+		return view('monitoreo.logs_emails', compact('logs_emails'));
+	}
 	
+	/**************************************************************************
+	*
+	**************************************************************************/
 	public function ajax_log_administracion(){
         ini_set('memory_limit', '-1');
 
@@ -75,6 +90,9 @@ class MonitoreoController extends Controller
 		return response()->json($output);
     }
 
+	/**************************************************************************
+	*
+	**************************************************************************/
 	public function ajax_log_acceso(){
         ini_set('memory_limit', '-1');
 
@@ -101,4 +119,35 @@ class MonitoreoController extends Controller
 
 		return response()->json($output);
     }
+
+	/**************************************************************************
+	*
+	**************************************************************************/
+	public function ajax_log_emails(){
+        ini_set('memory_limit', '-1');
+
+		$logs_emails = LogEmail::select(['id', 'created_at', 'email', 'detalle', 'enviado'])
+			->orderBy('created_at', 'desc')->get();
+		$data = array();
+		foreach($logs_emails as $r){
+			$data[] = array(
+				$r->id,
+				$r->created_at,
+				$r->email,
+				$r->detalle,
+				$r->enviado
+			);
+		}
+
+		$output = [
+            "recordsTotal" => $logs_emails->count(),
+            "recordsFiltered" => $logs_emails->count(),
+            "data" => $data
+        ];
+		#dd($output);
+
+		return response()->json($output);
+    }
+
+
 }

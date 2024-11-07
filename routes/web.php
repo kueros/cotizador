@@ -128,6 +128,7 @@ Route::middleware('auth')->group(function () {
 	Route::get('/monitoreo/log_emails', [MonitoreoController::class, 'log_emails'])->name('monitoreo.log_emails');
 	Route::get('/monitoreo/ajax_log_acceso', [MonitoreoController::class, 'ajax_log_acceso'])->name('monitoreo.ajax_log_acceso');
 	Route::get('/monitoreo/ajax_log_administracion', [MonitoreoController::class, 'ajax_log_administracion'])->name('monitoreo.ajax_log_administracion');
+	Route::get('/monitoreo/ajax_log_emails', [MonitoreoController::class, 'ajax_log_emails'])->name('monitoreo.ajax_log_emails');
 });
 
 Route::middleware('auth')->group(

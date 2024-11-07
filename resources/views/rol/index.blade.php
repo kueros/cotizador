@@ -136,41 +136,6 @@
 			<div class="col-md-12">
 				<h2>Roles</h2>
 				@include('layouts.partials.message')
-				<div class="accordion" id="accordionOpcionRoles">
-					<div class="accordion-item">
-						<h2 class="accordion-header" id="headingOne">
-							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-								data-bs-target="#opciones-roles" aria-expanded="true" aria-controls="collapseOne">
-								Opciones
-							</button>
-						</h2>
-						<div id="opciones-roles" class="accordion-collapse collapse" aria-labelledby="headingOne" 
-							data-bs-parent="#accordionOpcionRoles">
-							<div class="accordion-body">
-								
-							<form action="{{ url('roles/opciones_submit') }}" method="post">
-								<div class="row">
-									<div class="form-body">
-										<div class="mb-3 row">
-											<label class="col-form-label col-md-6">Utilizar ID de grupo para asociar al rol en integración de login</label>
-											<div class="col-md-6">
-												<input type="checkbox" value="1"  name="utilizar_id_grupo" id="utilizar_id_grupo">
-												<span class="help-block"></span>
-											</div>
-										</div>
-									</div>
-								</div>
-								<br>
-								<button type="submit" class="btn btn-success"><span class="bi bi-floppy2-fill">
-									</span> Guardar opciones</button>
-							</form>
-							<hr>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-				<br>
 				
 				<div class="table-responsive">
 					<div class="float-right">
