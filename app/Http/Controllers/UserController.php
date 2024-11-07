@@ -147,9 +147,8 @@ class UserController extends Controller
 			$clientIP = \Request::ip();
 			$userAgent = \Request::userAgent();
 			$username = Auth::user()->username;
-			$action = "users.restore";
 			$message = $username . " restauró el usuario " . $existingUser->username;
-			$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+			$myController->loguear($clientIP, $userAgent, $username, $message);
 
 			$subject = "Restauración de usuario";
 			$body = "Usuario ". $existingUser->username . " restaurado correctamente por ". Auth::user()->username;
@@ -167,13 +166,6 @@ class UserController extends Controller
 			$user = User::create($validatedData);
 			$user->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
 			$user->save();
-
-			$clientIP = \Request::ip();
-			$userAgent = \Request::userAgent();
-			$username = Auth::user()->username;
-			$action = "users.store";
-			$message = $username . " creó el usuario " . $validatedData['username'];
-			$myController->loguear($clientIP, $userAgent, $username, $action, $message);
 
 			#Envío de mail al administrador que creó de la cuenta del usuario
 			$subject = "Creación de usuario";
@@ -194,7 +186,14 @@ class UserController extends Controller
 			$subject = "Aviso de creación de cuenta y cambio de contraseña";
 			$body = '<p>Hola '.$nombre.',</p>Se ha registrado una nueva cuenta en el sistema de gestión Aleph Manager con su email, su nombre de usuario es "'.$username.'" para continuar la verificación y cambiar la contraseña siga el siguiente link a continuacion:<br><a href="'.$link.'">Haz clic aquí</a>';
 			$to = $email;
-			$myController->enviar_email($to, $body, $subject);
+			$emailEnviado = $myController->enviar_email($to, $body, $subject);
+
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$email = $user->email;
+			$detalle = "Aviso de creación de cuenta y cambio de contraseña";
+			$enviado = $emailEnviado ? "Si" : "No";
+			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 
 			Log::info('Correo enviado exitosamente a ' . $to);
 			session()->flash('success', 'Usuario creado correctamente.');

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\LogAdministracion;
 use App\Models\Permiso_x_Rol;
 use App\Models\User;
+use App\Models\LogEmail;
 use Illuminate\Support\Facades\DB;
 
 class MyController extends Controller
@@ -25,6 +26,54 @@ class MyController extends Controller
 		$log->save();
 		return true;
 	}
+
+public function loguearAdministracion($clientIP, $userAgent, $username, $message)
+{
+    try {
+        $log = LogAdministracion::create([
+            'username' => $username,
+            'detalle' => $message,
+            'ip_address' => json_encode($clientIP),
+            'user_agent' => json_encode($userAgent)
+        ]);
+        Log::info($message);
+        
+        // Llamada innecesaria a save() porque create() ya guarda el registro en la base de datos
+        return true;
+
+    } catch (\Exception $e) {
+        // Registrar el error en el log para revisarlo más adelante
+        Log::error("Error al guardar el log de administración: " . $e->getMessage());
+        
+        // Retornar false o manejar el error según tus necesidades
+        return false;
+    }
+}
+
+public function loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado)
+{
+	#dd($enviado);
+	try {
+        $log = LogEmail::create([
+            'email' => $email,
+            'detalle' => $detalle,
+            'enviado' => $enviado,
+            'ip_address' => $clientIP,
+            'user_agent' => $userAgent
+        ]);
+        Log::info($detalle);
+        
+        // Llamada innecesaria a save() porque create() ya guarda el registro en la base de datos
+        return true;
+
+    } catch (\Exception $e) {
+        // Registrar el error en el log para revisarlo más adelante
+        Log::error("Error al guardar el log de administración: " . $e->getMessage());
+        
+        // Retornar false o manejar el error según tus necesidades
+        return false;
+    }
+}
 
 	public function tiene_permiso($permiso)
 	{
