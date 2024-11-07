@@ -376,66 +376,7 @@
 							</div>
 						</div>
 					</div>
-					<?php
- 					$imagenHomePath = "";
-					foreach ($variables as $variable) {
-						if($variable->nombre == 'background_home_custom_path'){
-							$imagenHomePath = $variable->valor;
-						}
-					}
-					?>
-
-				<div class="accordion-item">
-					<h2 class="accordion-header" id="headingOne">
-						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-							data-bs-target="#configuracion_pantallas" aria-expanded="true" aria-controls="collapseOne">
-							Configuración de pantallas
-						</button>
-					</h2>
-					<div id="configuracion_pantallas" class="accordion-collapse collapse" aria-labelledby="headingOne" 
-						data-bs-parent="#accordionConfiguraciones">
-						<div class="accordion-body">
-							<br>
-							<!-- Contenido de Configuración de pantallas -->
-							@csrf
-							@foreach ($variables as $variable)
-								@if(Str::startsWith($variable->nombre, 'copa'))
-								<div class="row mb-3">
-									<label class="col-md-6 col-form-label">{{ $variable->nombre_menu }}</label>
-									<div class="col-md-6">
-										<div class="form-check form-switch">
-											<input class="form-check-input" name="{{ $variable->nombre }}" id="{{ $variable->nombre }}" 
-												value="1" type="checkbox" {{ $variable->valor == 1 ? 'checked' : '' }} 
-												onclick="toggleImageUpload('{{ $variable->nombre }}')">
-											<label class="form-check-label" for="{{ $variable->nombre }}"></label>
-										</div>
-									</div>
-								</div>
-								<div id="div_{{ $variable->nombre }}" style="display: {{ $variable->valor == 1 ? 'none' : 'block' }}">
-									<form action="{{ route('configuracion.guardar_imagen') }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
-										@csrf
-										<div class="form-group row">
-											<label class="control-label col-md-4">Subir imagen</label>
-											<div class="col-md-8">
-												<input type="file" class="form-control" name="copa_path" accept="image/png, .jpeg, .jpg, .webp, image/gif" required>
-												<button type="submit" class="btn btn-primary mt-2">Guardar</button>
-											</div>
-										</div>
-									</form>                </div>
-								@endif
-							@endforeach
-						</div>    
-					</div>
-				</div>
-
-				<script>
-				function toggleImageUpload(variableName) {
-					console.log(variableName)
-					const checkbox = document.getElementById(variableName);
-					const uploadDiv = document.getElementById(`div_${variableName}`);
-					uploadDiv.style.display = checkbox.checked ? 'none' : 'block';
-				}
-				</script>				
+		
 				</div>
 
 			</div>
