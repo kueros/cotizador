@@ -10,6 +10,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
+use Illuminate\Validation\Rule;
 
 class RolController extends Controller
 {
@@ -106,7 +107,16 @@ class RolController extends Controller
 		}
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
-			'nombre' => 'required|string|max:255|unique:roles,nombre',
+			'nombre' => [
+				'required',
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				Rule::unique('roles'),
+			],
+		], [
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
 		]);
 		Rol::create($validatedData);
 		$clientIP = \Request::ip();
@@ -115,7 +125,7 @@ class RolController extends Controller
 		$message = $username . " creó el rol " . $_POST['nombre'];
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 		return Redirect::route('roles.index')
-			->with('success', 'Rol created successfully.');
+			->with('success', 'Rol creado exitosamente.');
 	}
 
 	/**
