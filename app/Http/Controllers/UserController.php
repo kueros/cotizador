@@ -142,7 +142,7 @@ class UserController extends Controller
 			$existingUser->save();
 
 			// Actualizar los datos del usuario restaurado con los nuevos valores
-			$existingUser->update($validatedData);
+			$existingUser->update($validatedData); 	
 
 			$clientIP = \Request::ip();
 			$userAgent = \Request::userAgent();
@@ -319,9 +319,6 @@ class UserController extends Controller
 		$enviado = $emailEnviado ? "Si" : "No";
 		$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 		Log::info('Correo enviado exitosamente a ' . $to);
-		if(Auth::user()->username != "omar"){
-			#dd("1".Auth::user()->username );
-		}
 
 		// Actualizar el usuario con los datos validados
 		$user->update($validatedData);
