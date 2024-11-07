@@ -25,6 +25,12 @@
 				},
 				language: traduccion_datatable,
 				dom: 'Bfrtip',
+				columnDefs: [
+					{
+						"targets": 'no-sort',
+						"orderable": false
+					}
+				],
 				buttons: [
 					{"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Roles'},
 					{"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Roles'},
@@ -141,7 +147,7 @@
 					<table id="roles-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
 						<thead>
 							<th>Nombre</th>
-							<th style="width:20%;">Acción</th>
+							<th style="width:20%;" class="no-sort">Acción</th>
 						</thead>
 						<tbody>
 						</tbody>
