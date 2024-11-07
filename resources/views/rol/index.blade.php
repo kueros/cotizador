@@ -155,7 +155,7 @@
 									</div>
 								</div>
 								<br>
-								<button type="submit" class="btn btn-success"><span class="bi bi-save">
+								<button type="submit" class="btn btn-success"><span class="bi bi-floppy2-fill">
 									</span> Guardar opciones</button>
 							</form>
 							<hr>

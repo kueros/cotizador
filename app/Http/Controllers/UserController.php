@@ -157,6 +157,7 @@ class UserController extends Controller
 			$myController->enviar_email($to, $body, $subject);
 
 			Log::info('Correo enviado exitosamente a ' . $to);
+			session()->flash('success', 'Usuario restaurado correctamente.');
 			return redirect()->route('users.index')->with('success', 'Usuario restaurado correctamente.');
 		} else {
 
@@ -196,6 +197,7 @@ class UserController extends Controller
 			$myController->enviar_email($to, $body, $subject);
 
 			Log::info('Correo enviado exitosamente a ' . $to);
+			session()->flash('success', 'Usuario creado correctamente.');
 			return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
 		}
 	}

@@ -285,7 +285,7 @@
 										</div>
 									</div>
 									<br>
-									<button type="submit" class="btn btn-success"><span class="bi bi-save"></span> Guardar opciones</button>
+									<button type="submit" class="btn btn-success"><span class="bi bi-floppy2-fill"></span> Guardar opciones</button>
 								</form>
 								<hr>
 							</div>
@@ -298,14 +298,14 @@
 				<div class="table-responsive">
 					<div class="float-left">
 						@if ($permiso_agregar_usuario)
-						<a href="#" class="btn btn-outline-primary float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px; ">
-							<i class="fas fa-file-import"></i> {{ __('Importar Usuarios') }}
-						</a>
-						@endif
-						@if ($permiso_agregar_usuario)
 						<button id="agregar" class="btn btn-outline-success float-right" onclick="add_usuario()">
 							<i class="bi bi-plus"></i> {{ __('Agregar Usuario') }}
 						</button>
+						@endif
+						@if ($permiso_agregar_usuario)
+						<a href="#" class="btn btn-outline-primary float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px; ">
+							<i class="fas fa-file-import"></i> {{ __('Importar Usuarios') }}
+						</a>
 						@endif
 					</div>
 					<br>
