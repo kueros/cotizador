@@ -47,8 +47,8 @@
 				"pageLength": 100,
 				dom: 'Bfrtip',
 				buttons: [
-					{"extend": 'pdf', "text":'Portapapeles',"className": 'btn btn-danger', title: 'Log de emails'},
-					{"extend": 'copy', "text":'PDF',"className": 'btn btn-primary', title: 'Log de emails'},
+					{"extend": 'copy', "text":'Portapapeles',"className": 'btn btn-primary', title: 'Log de emails'},
+					{"extend": 'pdf', "text":'PDF',"className": 'btn btn-danger', title: 'Log de emails'},
 					{"extend": 'excel', "text":'Excel',"className": 'btn btn-success', title: 'Log de emails'},
 					{"extend": 'print', "text":'Imprimir',"className": 'btn btn-secondary', title: 'Log de emails'}
 				],
