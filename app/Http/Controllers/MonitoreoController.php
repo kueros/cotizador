@@ -65,9 +65,9 @@ class MonitoreoController extends Controller
 	public function ajax_log_administracion(){
         ini_set('memory_limit', '-1');
 
-		$logs_administracion = LogAdministracion::select(['id', 'username', 'detalle', 'created_at', 'ip_address', 'user_agent'])
+		$logs_administracion = LogAdministracion::select(['id', 'username', 'detalle', 'created_at', 'ip_address'])
 			->orderBy('created_at', 'desc')->get();
-		
+		#dd($logs_administracion);
 		$data = array();
 		foreach($logs_administracion as $r){
 
@@ -75,9 +75,8 @@ class MonitoreoController extends Controller
 				$r->id,
 				$r->username,
 				$r->detalle,
-				$r->created_at,
-				$r->ip_address,
-				$r->user_agent
+				$r->created_at->format('Y-m-d H:i:s'), // Formato ajustado de fecha
+				$r->ip_address
 			);
 		}
 
@@ -93,32 +92,34 @@ class MonitoreoController extends Controller
 	/**************************************************************************
 	*
 	**************************************************************************/
+
 	public function ajax_log_acceso(){
-        ini_set('memory_limit', '-1');
+		ini_set('memory_limit', '-1');
 
 		$logs_acceso = LogAcceso::select(['id', 'email', 'created_at', 'ip_address', 'user_agent'])
 			->orderBy('created_at', 'desc')->get();
-		
 		$data = array();
-		foreach($logs_acceso as $r){
 
+		foreach($logs_acceso as $r){
 			$data[] = array(
 				$r->id,
 				$r->email,
-				$r->created_at,
+				$r->created_at->format('Y-m-d H:i:s'), // Formato ajustado de fecha
 				$r->user_agent,
 				$r->ip_address
 			);
 		}
 
 		$output = [
-            "recordsTotal" => $logs_acceso->count(),
-            "recordsFiltered" => $logs_acceso->count(),
-            "data" => $data
-        ];
+			"recordsTotal" => $logs_acceso->count(),
+			"recordsFiltered" => $logs_acceso->count(),
+			"data" => $data
+		];
 
 		return response()->json($output);
-    }
+	}
+
+
 
 	/**************************************************************************
 	*
@@ -132,7 +133,7 @@ class MonitoreoController extends Controller
 		foreach($logs_emails as $r){
 			$data[] = array(
 				$r->id,
-				$r->created_at,
+				$r->created_at->format('Y-m-d H:i:s'), // Formato ajustado de fecha
 				$r->email,
 				$r->detalle,
 				$r->enviado

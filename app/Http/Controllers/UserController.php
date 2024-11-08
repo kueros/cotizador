@@ -160,7 +160,7 @@ class UserController extends Controller
 				$existingUser->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
 				$existingUser->save();
 
-				$existingUser->update($validatedData);
+				$existingUser->update($validatedData); 	
 
 				$clientIP = \Request::ip();
 				$userAgent = \Request::userAgent();
@@ -188,29 +188,25 @@ class UserController extends Controller
 				return response()->json($response);
 			} else {
 
-				$user = User::create($validatedData);
-				$user->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
-				$user->save();
-
-				$clientIP = \Request::ip();
-				$userAgent = \Request::userAgent();
-				$username = Auth::user()->username;
-				$action = "users.store";
-				$message = $username . " creó el usuario " . $validatedData['username'];
-				$myController->loguear($clientIP, $userAgent, $username, $action, $message);
+			// Si no existe un usuario soft deleted, crear uno nuevo
+			#$validatedData['ultima_fecha_restablecimiento'] = Carbon::now(); // Añadir fecha actual
+			#dd($validatedData);
+			$user = User::create($validatedData);
+			$user->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
+			$user->save();
 
 				#Envío de mail al administrador que creó de la cuenta del usuario
 				$subject = "Creación de usuario";
 				$body = "Usuario ". $validatedData['username'] . " creado correctamente por ". Auth::user()->username;
 				$to = Auth::user()->email;
 				$myController->enviar_email($to, $body, $subject);
-
 				$user = User::where('email', $validatedData['email'])
 							->first();
 				//Genero email por la creacion de usuario
 				$email = $user->email;
 				$username = $user->username;
-				$nombre = $user->nombre;
+				#dd($username);
+			$nombre = $user->nombre;
 				$token = Str::random(60);
 				$link = route('create_pass_form', ['token' => $token, 'email' => $email]);
 				$subject = "Aviso de creación de cuenta y cambio de contraseña";
@@ -218,12 +214,19 @@ class UserController extends Controller
 				$to = $email;
 				$emailEnviado = $myController->enviar_email($to, $body, $subject);
 
-				$clientIP = \Request::ip();
-				$userAgent = \Request::userAgent();
-				$email = $user->email;
-				$detalle = "Aviso de creación de cuenta y cambio de contraseña";
-				$enviado = $emailEnviado ? "Si" : "No";
-				$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
+			$clientIP = $_SERVER['REMOTE_ADDR'];
+			$userAgent = \Request::userAgent();
+			$email = $user->email;
+			$detalle = "Aviso de creación de cuenta y cambio de contraseña";
+			$enviado = $emailEnviado ? "Si" : "No";
+			#dd($clientIP);
+			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
+
+			$clientIP = $_SERVER['REMOTE_ADDR'];
+			$userAgent = \Request::userAgent();
+			$username = $user->username;
+			$message = "Aviso de creación de cuenta y cambio de contraseña";
+			$myController->loguearAdministracion($clientIP, $userAgent, $username, $message);
 
 				Log::info('Correo enviado exitosamente a ' . $to);
 				$response = [

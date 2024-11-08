@@ -33,7 +33,7 @@ public function loguearAdministracion($clientIP, $userAgent, $username, $message
         $log = LogAdministracion::create([
             'username' => $username,
             'detalle' => $message,
-            'ip_address' => json_encode($clientIP),
+            'ip_address' => $clientIP,
             'user_agent' => json_encode($userAgent)
         ]);
         Log::info($message);
@@ -58,7 +58,7 @@ public function loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado)
             'email' => $email,
             'detalle' => $detalle,
             'enviado' => $enviado,
-            'ip_address' => $clientIP,
+            'ip_address' => $_SERVER['REMOTE_ADDR'],
             'user_agent' => $userAgent
         ]);
         Log::info($detalle);
@@ -149,16 +149,16 @@ public function loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado)
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 				//Guardo el email antes de enviarlo
-				$clientIP = \Request::ip();
+				$clientIP = $_SERVER['REMOTE_ADDR'];
 				$userAgent = \Request::userAgent();
 				#dd($userAgent);
-				$message = /*Auth::user()->username.*/" creó el email para ". $to . " con el asunto: ". $subject;
+				$message = Auth::user()->username." creó el email para ". $to . " con el asunto: ". $subject;
 				Log::info($message);
-				$log = LogAdministracion::create([
-					'username' => 'Auth::user()->username',
-					'action' => "users.store",
+				$log = LogEmail::create([
+					'email' => Auth::user()->email,
 					'detalle' => $message,
-					'ip_address' => json_encode($clientIP),
+					'enviado' => 'Si',
+					'ip_address' => $_SERVER['REMOTE_ADDR'],
 					'user_agent' => json_encode($userAgent)
 				]);
 				$log->save();
