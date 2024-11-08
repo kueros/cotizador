@@ -6,20 +6,37 @@
 	</x-slot>
 
 <?php 
-$imagenHome = session('imagenHome')->valor ?? 'images/dashboard-bg.jpg';
-
+$copa_background_home_custom = session('copa_background_home_custom');
+$background_home_custom_path = session('background_home_custom_path');
 ?>
     <style>
-		#dashboard{
-			background: url( <?php echo $imagenHome; ?> );
-			background-repeat: none;
+
+		<?php 
+		#$copa_background_login_custom = 1;
+		if($copa_background_home_custom == '0'){
+		?>
+			body, html {
+			height: 100%;
+			background-repeat: no-repeat;
+			background: url('<?= $background_home_custom_path ?>') center top no-repeat;
+			background-repeat: no-repeat;
 			background-size: cover;
-			position: absolute;
-			width: 100%;
-			top: 0;
-			min-height: 100%;
-			z-index: -9999;
+			}
+		<?php 
+		}else{
+			?>
+			body, html {
+				height: 100%;
+				background-repeat: no-repeat;
+				background: url(/images/login-background.jpg) center top no-repeat;
+				background-repeat: no-repeat;
+				background-size: cover;
+			}
+		<?php
 		}
+		?>
+
+
 	</style>
 
 	<div id="dashboard">

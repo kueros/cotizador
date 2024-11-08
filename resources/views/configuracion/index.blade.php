@@ -376,44 +376,96 @@
 							</div>
 						</div>
 					</div>
-		
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-	<div class="modal fade" id="modal_form_parametro" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title_parametro">Formulario roles</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body form">
-				<?php //route('configuracion/add_parametro_email') ?>
-					<form action="{{ route('configuracion.add_parametro_email') }}" id="form_parametro" method="post" enctype="multipart/form-data" class="form-horizontal">
-						@csrf
-						<div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">Parametro</label>
-								<div class="col-md-9">
-									<input name="parametro" required class="form-control" maxlength="255" type="text">
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="headingOne">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+								data-bs-target="#configuracion_pantallas" aria-expanded="true" aria-controls="collapseOne">
+								Configuración de pantallas
+							</button>
+						</h2>
+						<div id="configuracion_pantallas" class="accordion-collapse collapse" aria-labelledby="headingOne" 
+							data-bs-parent="#accordionConfiguraciones">
+							<div class="accordion-body">
+								<br>
+								<?php #print_r($variables); 
+								
+								$config = $variables->where('nombre', 'copa_background_home_custom')->first()['valor'];
+								?>
+								<!-- Contenido de Configuración de pantallas -->
+								@csrf
+								<div class="row mb-3">
+									<label class="col-md-6 col-form-label">Utilizar imagen home default</label>
+									<div class="col-md-6">
+										<div class="form-check form-switch">
+											<input class="form-check-input" name="copa_background_home_custom" id="copa_background_home_custom" 
+												value="1" type="checkbox" {{ $variables->where('nombre', 'copa_background_home_custom')->first()['valor'] == 1 ? 'checked' : '' }} 
+												onclick="toggleImageUpload('copa_background_home_custom')">
+											<label class="form-check-label" for="copa_background_home_custom"></label>
+										</div>
+									</div>
 								</div>
-							</div>
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">Valor</label>
-								<div class="col-md-9">
-									<input name="valor" required class="form-control" maxlength="255" type="text">
+								<div id="div_copa_background_home_custom" style="display: {{ $variables->where('nombre', 'copa_background_home_custom')->first()['valor'] == 1 ? 'none' : 'block' }}">
+									<form action="{{ route('configuracion.guardar_imagen_home') }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+										@csrf
+										<div class="form-group row">
+											<label class="control-label col-md-4">Subir imagen</label>
+											<div class="col-md-8">
+												<input type="file" class="form-control" name="copa_path" accept="image/png, .jpeg, .jpg, .webp, image/gif" required>
+												<button type="submit" class="btn btn-primary mt-2">Guardar</button>
+											</div>
+										</div>
+									</form>
 								</div>
-							</div>
+
+
+								<div class="row mb-3">
+									<label class="col-md-6 col-form-label">Utilizar imagen login default</label>
+									<div class="col-md-6">
+										<div class="form-check form-switch">
+											<input class="form-check-input" name="copa_background_login_custom" id="copa_background_login_custom" 
+												value="1" type="checkbox" {{ $variables->where('nombre', 'copa_background_login_custom')->first()['valor'] == 1 ? 'checked' : '' }} 
+												onclick="toggleImageUpload('copa_background_login_custom')">
+											<label class="form-check-label" for="copa_background_login_custom"></label>
+										</div>
+									</div>
+								</div>
+								<div id="copa_background_login_custom" style="display: {{ $variables->where('nombre', 'copa_background_login_custom')->first()['valor'] == 1 ? 'none' : 'block' }}">
+									<form action="{{ route('configuracion.guardar_imagen_login') }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+										@csrf
+										<div class="form-group row">
+											<label class="control-label col-md-4">Subir imagen</label>
+											<div class="col-md-8">
+												<input type="file" class="form-control" name="copa_path" accept="image/png, .jpeg, .jpg, .webp, image/gif" required>
+												<button type="submit" class="btn btn-primary mt-2">Guardar</button>
+											</div>
+										</div>
+									</form>
+								</div>
+
+
+
+
+							</div>    
 						</div>
-						<div class="modal-footer">
-							<button type="submit" class="btn btn-primary">Guardar</button>
-							<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-						</div>
-					</form>
-				</div>
+					</div>
+					<?php
+						$imagenHomePath = "";
+						foreach ($variables as $variable) {
+							if($variable->nombre == 'background_home_custom_path'){
+								$imagenHomePath = $variable->valor;
+							}
+						}
+					?>
+
+					<script>
+					function toggleImageUpload(variableName) {
+						console.log(variableName)
+						const checkbox = document.getElementById(variableName);
+						const uploadDiv = document.getElementById(`div_${variableName}`);
+						uploadDiv.style.display = checkbox.checked ? 'none' : 'block';
+					}
+					</script>
+
 			</div>
 		</div>
 	</div>

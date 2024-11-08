@@ -49,11 +49,20 @@
 
 		// Verificar si hay un mensaje flash en la sesión (por ejemplo, de restablecimiento de contraseña)
 		$successMessage = session()->get('success', null);
-
+		$successMessage = "mierda";
 		// Retornar la vista pasando el mensaje si existe
+		$background_login_custom_path = Variable::where('nombre', 'background_login_custom_path')
+								->value('valor');
+		$copa_background_login_custom = Variable::where('nombre', 'copa_background_login_custom')
+								->value('valor');
 		return view('auth.login', [
-			'successMessage' => $successMessage
-		]);
+			'successMessage' => $successMessage,
+			'copa_background_login_custom' => $copa_background_login_custom,
+			'background_login_custom_path' => $background_login_custom_path
+		]);	
+
+
+
 	}
 
 	/**************************************************************************
@@ -112,14 +121,14 @@
 					'ip_address' => $_SERVER['REMOTE_ADDR'],
 					'user_agent' => $_SERVER['HTTP_USER_AGENT'],
 				]);
-				$imagenHome = Variable::where('nombre', 'background_home_custom_path')
-										->first(['valor']);
-				#dd($imagenHome);
-				#return redirect()->intended(route('dashboard', absolute: false));
-				#return redirect()->intended(route('dashboard', absolute: false), compact('imagenHome'));
-				#return view('dashboard.index', compact('imagenHome'));
-				return redirect()->route('dashboard')->with('imagenHome', $imagenHome);
-
+				$copa_background_home_custom = Variable::where('nombre', 'copa_background_home_custom')
+										->value('valor');
+				$background_home_custom_path = Variable::where('nombre', 'background_home_custom_path')
+										->value('valor');
+				return redirect()->route('dashboard')->with([
+					'copa_background_home_custom' => $copa_background_home_custom,
+					'background_home_custom_path' => $background_home_custom_path
+				]);
 			} else {
 				// Incrementar el número de intentos fallidos
 				if ($user) {
@@ -165,7 +174,16 @@
 		$request->session()->invalidate();
 		$request->session()->regenerateToken();
 
-		return redirect()->route('login');
-	}
-	}
 
+		$copa_background_login_custom = Variable::where('nombre', 'copa_background_login_custom')
+								->value('valor');
+		$background_login_custom_path  = Variable::where('nombre', 'background_login_custom_path')
+								->value('valor');
+		return redirect()->route('login')->with([
+			'copa_background_login_custom' => $copa_background_login_custom,
+			'background_login_custom_path' => $background_login_custom_path
+		]);
+
+
+	}
+}

@@ -114,7 +114,7 @@ return new class extends Migration
 				'id' => 73,
 				'nombre' => 'copa_background_home_custom',
 				'nombre_menu' => 'Utilizar imagen home default',
-				'valor' => '0',
+				'valor' => '1',
 				'created_at' => now(),
 				'updated_at' => now()
 			],
@@ -122,7 +122,7 @@ return new class extends Migration
 				'id' => 74,
 				'nombre' => 'background_home_custom_path',
 				'nombre_menu' => '',
-				'valor' => 'slide0028_image054.jpg',
+				'valor' => 'uploads/imagenes/background_home.jpg',
 				'created_at' => now(),
 				'updated_at' => now()
 			],
@@ -138,7 +138,7 @@ return new class extends Migration
 				'id' => 76,
 				'nombre' => 'background_login_custom_path',
 				'nombre_menu' => '',
-				'valor' => 'login-background.jpg',
+				'valor' => 'uploads/imagenes/background_login.jpg',
 				'created_at' => now(),
 				'updated_at' => now()
 			],

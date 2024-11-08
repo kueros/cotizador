@@ -107,7 +107,7 @@ class ConfiguracionController extends Controller
 	/*****************************************************************************************************************
 	 *****************************************************************************************************************/
 
-    public function guardarImagen(Request $request)
+    public function guardarImagenHome(Request $request)
     {
         // Validar que el archivo es una imagen
         $request->validate([
@@ -118,8 +118,23 @@ class ConfiguracionController extends Controller
 		$filename = 'background_home.jpg';// . '.' . $file->getClientOriginalExtension();
 		$path = $file->storeAs('uploads/imagenes', $filename, 'public');
 
-		Variable::where('nombre', 'background_home_custom_path')->update(['valor' => $path]);
-        // Retornar la ruta o cualquier mensaje de éxito
+		return redirect()->back()->with('success', 'Imagen guardada exitosamente en: ' . $path);
+    }
+
+	/*****************************************************************************************************************
+	 *****************************************************************************************************************/
+
+    public function guardarImagenLogin(Request $request)
+    {
+        // Validar que el archivo es una imagen
+        $request->validate([
+            'copa_path' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096', 
+        ]);
+		// Obtener el archivo de la solicitud
+		$file = $request->file('copa_path');
+		$filename = 'background_login.jpg';// . '.' . $file->getClientOriginalExtension();
+		$path = $file->storeAs('uploads/imagenes', $filename, 'public');
+
         return redirect()->back()->with('success', 'Imagen guardada exitosamente en: ' . $path);
     }
 
