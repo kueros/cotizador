@@ -124,11 +124,20 @@
 			});
 		}
 
-		function deshabilitar_usuario(id, temporal = false) {
-			var texto = temporal 
-				? "¿Está seguro de que desea deshabilitar el usuario de forma temporal?" 
-				: "¿Está seguro de que desea deshabilitar el usuario?";
-			if (temporal) {
+		function deshabilitar_usuario(id, temporal = false, habilitado) {
+			console.log(habilitado)
+			if(habilitado == 0){
+				var texto = temporal 
+					? "¿Está seguro de que desea habilitar el usuario de forma temporal?" 
+					: "¿Está seguro de que desea habilitar el usuario?";
+				var cartelito = "Usuario habilitado con éxito."
+			} else {
+				var texto = temporal 
+					? "¿Está seguro de que desea deshabilitar el usuario de forma temporal?" 
+					: "¿Está seguro de que desea deshabilitar el usuario?";
+				var cartelito = "Usuario deshabilitado con éxito."
+			}
+ 				if (temporal) {
 				url = "{{ route('users.deshabilitar_usuario_temporal', ':id') }}";
 			} else {
 				url = "{{ route('users.deshabilitar_usuario', ':id') }}";
@@ -152,7 +161,7 @@
 						success: function(data) {
 							swal.fire({
 								title: "Aviso",
-								text: "Usuario deshabilitado con éxito.",
+								text: cartelito,
 								icon: "success"
 							}).then(() => {
 								// Recargar la tabla DataTables al cerrar el modal de éxito
@@ -414,11 +423,17 @@
 							<?php 
 							$candadito = "";
 								if ($user->habilitado != 1){ 
-									$user->habilitado = 'No'; 
+									$color = "btn-outline-info";
+									$user_habilitado = 'No'; 
+									$habilitado = 0;
 									$candadito = "<i class='fas fa-lock'></i>";
+									$titulo = "Habilitar";
 								} else { 
-									$user->habilitado = 'Si';  
+									$color = "btn-outline-warning";
+									$user_habilitado = 'Si';  
+									$habilitado = 1;
 									$candadito = "<i class='fas fa-lock-open'></i>";
+									$titulo = "Deshabilitar";
 								}
 							?>
 								<tr>
@@ -427,7 +442,7 @@
 									<td>{{ $user->username }}</td>
 									<td>{{ $user->email }}</td>
 									<td>{{ $user->nombre_rol }}</td>
-									<td>{{ $user->habilitado }}</td>
+									<td>{{ $user_habilitado }}</td>
 									<td>{{ $user->bloqueado ? 'Sí' : 'No' }}</td>
 									<td>
 										@if ($permiso_editar_usuario)
@@ -437,15 +452,21 @@
 										@endif
 										
 										@if ($permiso_deshabilitar_usuario)
-										<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar" onclick="deshabilitar_usuario('{{ $user->user_id}}',0)">
+										<a class="btn btn-sm <?php echo $color; ?>" href="javascript:void(0)" 
+											title="<?php echo $titulo; ?>" 
+											onclick="deshabilitar_usuario('{{ $user->user_id}}',false,'{{ $habilitado }}')">
 											<?php echo $candadito; ?>
 										</a>
 										@endif
 
 										@if ($permiso_deshabilitar_usuario)
-										<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" title="Deshabilitar temporalmente" onclick="deshabilitar_usuario('{{ $user->user_id}}',2)">
-											<span class="fas fa-clock"></span>
-										</a>
+											@if ($habilitado)
+												<a class="btn btn-sm btn-outline-warning" href="javascript:void(0)" 
+													title="Deshabilitar temporalmente" 
+													onclick="deshabilitar_usuario('{{ $user->user_id}}',true,'{{ $habilitado }}')">
+													<span class="fas fa-clock"></span>
+												</a>
+											@endif
 										@endif
 
 										@if ($permiso_blanquear_password)
