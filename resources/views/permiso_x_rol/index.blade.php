@@ -15,6 +15,7 @@ use App\Models\Permiso_x_Rol;
 			<div class="col-md-12">
 				<h2>Asignación de permisos</h2>
 				<br>
+				@include('layouts.partials.message')
 				<!-- Formulario para guardar permisos -->
 				<form action="{{ route('permisos_x_rol.update') }}" method="POST">
 					@csrf

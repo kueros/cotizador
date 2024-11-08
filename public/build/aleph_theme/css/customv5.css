@@ -57,6 +57,10 @@ textarea{
     margin-top: -1px;
 }
 
+.dropdown-menu{
+    margin-top: 5% !important;
+}
+
 #aleph-navbar{
     padding: 0px;
 }

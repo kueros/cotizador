@@ -147,7 +147,7 @@
 			
 			// Esperar 5 segundos antes de ocultar el mensaje
 			setTimeout(function() {
-                $('.alert').fadeOut('slow');
+                $('.alert').not('.no-fade-alert').fadeOut('slow');
             }, 5000);
 
 		});

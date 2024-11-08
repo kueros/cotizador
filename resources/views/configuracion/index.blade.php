@@ -293,10 +293,10 @@
 									<br>
 
 									<h4>Configuración de parametros email</h4>
-									<div class="alert alert-warning" role="alert">
+									<div class="alert alert-warning no-fade-alert" role="alert">
 										Alterar la configuración puede implicar detener el envio de notificaciones via email, realice la prueba antes de guardar su configuración
 									</div>
-									<div class="alert alert-info" role="alert">
+									<div class="alert alert-info no-fade-alert" role="alert">
 										Para conocer las configuraciones disponibles de la libreria siga <a class="alert-link" target="_blank" href="#">este enlace</a> y baje hasta la sección con el título "Email Preferences"
 									</div>
 									<button type="button" class="btn btn-success" onclick="add_parametro()">
