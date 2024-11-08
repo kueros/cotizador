@@ -64,7 +64,7 @@ return new class extends Migration
 			],
 			[
 				'id' => 11,
-				'nombre' => 'notificaciones_locales',
+				'nombre' => 'no_notificaciones_locales',
 				'nombre_menu' => 'Utilizar notificaciones locales',
 				'valor' => '1',
 				'created_at' => now(),
@@ -144,7 +144,7 @@ return new class extends Migration
 			],
 			[
 				'id' => 97,
-				'nombre' => 'opav_habilitar_ia_ciberseguridad',
+				'nombre' => 'no_opav_habilitar_ia_ciberseguridad',
 				'nombre_menu' => 'Habilitar IA en módulo de ciberseguridad',
 				'valor' => '0',
 				'created_at' => now(),
@@ -152,7 +152,7 @@ return new class extends Migration
 			],
 			[
 				'id' => 98,
-				'nombre' => 'opav_open_ai_api_key',
+				'nombre' => 'no_opav_open_ai_api_key',
 				'nombre_menu' => 'OpenAI API Token',
 				'valor' => '0',
 				'created_at' => now(),

@@ -1,4 +1,4 @@
-<x-app-layout title="Log acciones" :breadcrumbs="[['title' => 'Inicio', 'url' => route('dashboard')], ['title' => 'Monitoreo', 'url' => route('monitoreo.index')]]">
+<x-app-layout title="Log de Emails" :breadcrumbs="[['title' => 'Inicio', 'url' => route('dashboard')], ['title' => 'Monitoreo', 'url' => route('monitoreo.index')]]">
 	
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
