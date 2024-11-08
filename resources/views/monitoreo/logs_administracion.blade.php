@@ -47,10 +47,10 @@
 				"pageLength": 100,
 				dom: 'Bfrtip',
 				buttons: [
-					{"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', title: 'Log de acciones'},
-					{"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Log de acciones'},
-					{"extend": 'excel', "text":'Export',"className": 'btn btn-success', title: 'Log de acciones'},
-					{"extend": 'print', "text":'Export',"className": 'btn btn-secondary', title: 'Log de acciones'}
+					{"extend": 'pdf', "text":'Portapapeles',"className": 'btn btn-danger', title: 'Log de acciones'},
+					{"extend": 'copy', "text":'PDF',"className": 'btn btn-primary', title: 'Log de acciones'},
+					{"extend": 'excel', "text":'Excel',"className": 'btn btn-success', title: 'Log de acciones'},
+					{"extend": 'print', "text":'Imprimir',"className": 'btn btn-secondary', title: 'Log de acciones'}
 				],
 				initComplete: function () {
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
