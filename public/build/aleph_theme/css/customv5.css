@@ -81,6 +81,18 @@ textarea{
     color: #39DEFF!important;
 }
 
+#manager-menu .navbar-nav .dropdown .main-item.show,
+#manager-menu #user-menu-desktop .dropdown .dropdown-toggle.show{
+    background: none!important;
+    color: #39DEFF!important;
+}
+
+#manager-menu .navbar-nav .dropdown .main-item.show:hover,
+#manager-menu #user-menu-desktop .dropdown .dropdown-toggle.show:hover{
+    background: none!important;
+    color: #39DEFF!important;
+}
+
 #manager-menu #aleph-navbar ul a:hover,
 #manager-menu #aleph-navbar ul a:active,
 #manager-menu #aleph-navbar ul li.open a{
@@ -114,6 +126,10 @@ textarea{
 
 .user-button.dropdown a{
     color: #FFFFFF!important;
+}
+
+.user-button.dropdown a.cs{
+    color: #909CAC!important;
 }
 
 #manager-menu .dropdown.open a{
@@ -646,7 +662,7 @@ input:checked + .slider:before {
     -webkit-transition: all .3s ease-in;
     -moz-transition: all .3s ease-in;
     transition: all .3s ease-in;
-    background-color: #0747A6;
+    background-color: #bcbec1;
     color: #FFF;
 }
 
