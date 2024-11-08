@@ -62,7 +62,7 @@
         $permiso_listar_roles = tiene_permiso('list_roles');
         $permiso_configuraciones_software = tiene_permiso('setup_soft');
 	@endphp
-<nav class="navbar navbar-expand-lg navbar-dark" id="manager-menu">
+<nav class="navbar navbar-expand-lg" id="manager-menu">
     <div class="container-fluid">
         <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#aleph-navbar">
             <span class="navbar-toggler-icon"></span>
@@ -89,16 +89,26 @@
             <ul id="user-menu-desktop" class="nav navbar-nav nav-bar-2" style="min-width: 188px;">
                 
                 <li class="nav-item user-button dropdown">
-                    <a data-bs-toggle="dropdown" class="nav-link dropdown-toggle" href="#" aria-expanded="true">
-                        <span class="username"><strong> {{ Auth::user()->nombre }}</strong> </span><span style="font-size: 12px;" class="bi bi-person"></span><span class="caret"></span>
+                    <a data-bs-toggle="dropdown" class="nav-link dropdown-toggle main-item" href="#" aria-expanded="true">
+                        <span class="username"><strong> {{ Auth::user()->nombre }}</strong> </span>
+                        <span style="font-size: 12px;" class="bi bi-person"></span>
+                        <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" tabindex="5003" style="overflow: hidden; outline: none;">
-                        <form action="{{ route('logout') }}" method="post" style="display: inline;">
-                            @csrf
-                            <button type="submit" class="hover-aleph-buttons btn btn-link" style="padding: 0; border: none;">
+                        <!--<li>
+                            <a class="hover-aleph-buttons" href="">
+                                <span class="glyphicon glyphicon-log-in"></span> Cerrar sesión
+                            </a>
+                        </li>-->
+                        <li>
+                            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+                                class="dropdown-item hover-aleph-buttons cs">
                                 <i class="bi bi-box-arrow-in-right"></i> Cerrar sesión
-                            </button>
-                        </form>
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                        </li>
                     </ul>
                 </li>
             </ul>

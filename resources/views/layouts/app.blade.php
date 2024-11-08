@@ -12,7 +12,7 @@
 
 	<!--SECCION CSS-->
 	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/bootstrap/dist/css/bootstrap.min.css') }}">
-	<link rel="stylesheet" type="text/css" href="{{ asset('build/aleph_theme/css/customv5.css?v2') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/aleph_theme/css/customv5.css?v3') }}">
 	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/jqueryui/themes/base/jquery-ui.min.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/font-awesome/css/all.min.css') }}">
