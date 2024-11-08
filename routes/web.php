@@ -145,7 +145,8 @@ Route::middleware('auth')->group(
 		Route::patch('/configuracion/variables/{variable}', [ConfiguracionController::class, 'update'])->name('configuracion.variables.update');
 		Route::delete('/configuracion/variables/{variable}', [ConfiguracionController::class, 'destroy'])->name('configuracion.variables.destroy');
 		Route::post('/configuracion/ajax_delete_parametro_email', [ConfiguracionController::class, 'ajax_delete_parametro_email'])->name('configuracion.ajax_delete_parametro_email');
-		Route::post('/guardar_imagen_aleph', [ConfiguracionController::class, 'guardarImagen'])->name('configuracion.guardar_imagen');
+		Route::post('/guardar_imagen_home', [ConfiguracionController::class, 'guardarImagenHome'])->name('configuracion.guardar_imagen_home');
+		Route::post('/guardar_imagen_login', [ConfiguracionController::class, 'guardarImagenLogin'])->name('configuracion.guardar_imagen_login');
 
 	}
 );
