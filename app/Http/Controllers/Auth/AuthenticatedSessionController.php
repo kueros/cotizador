@@ -49,11 +49,15 @@
 
 		// Verificar si hay un mensaje flash en la sesión (por ejemplo, de restablecimiento de contraseña)
 		$successMessage = session()->get('success', null);
-
+		$successMessage = "mierda";
 		// Retornar la vista pasando el mensaje si existe
+		$background_login_custom_path = Variable::where('nombre', 'background_login_custom_path')->first();
+		$copa_background_login_custom = Variable::where('nombre', 'copa_background_login_custom')->first();
 		return view('auth.login', [
-			'successMessage' => $successMessage
-		]);
+			'successMessage' => $successMessage,
+			'copa_background_login_custom' => $copa_background_login_custom,
+			'background_login_custom_path' => $background_login_custom_path
+		]);	
 	}
 
 	/**************************************************************************

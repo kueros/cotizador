@@ -17,7 +17,21 @@
     <script type="text/javascript" src="{{ asset('build/assets/form/dist/jquery.form.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('build/assets/bootstrap/dist/js/bootstrap.min.js') }}"></script>
 
-	<style>
+    <style>
+        <?php 
+        #$copa_background_login_custom = 1;
+        if($copa_background_login_custom == '0'){
+        ?>
+            body, html {
+            height: 100%;
+            background-repeat: no-repeat;
+            background: url('/uploads/images/<?= $background_login_custom_path ?>') center top no-repeat;
+            background-repeat: no-repeat;
+            background-size: cover;
+            }
+        <?php 
+        }else{
+            ?>
             body, html {
                 height: 100%;
                 background-repeat: no-repeat;
@@ -25,6 +39,9 @@
                 background-repeat: no-repeat;
                 background-size: cover;
             }
+        <?php
+        }
+        ?>
 
         #logo-home{
             width: 270px;
