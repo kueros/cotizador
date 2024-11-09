@@ -136,6 +136,15 @@
 			<div class="col-md-12">
 				<h2>Roles</h2>
 				@include('layouts.partials.message')
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 				
 				<div class="table-responsive">
 					<div class="float-right">

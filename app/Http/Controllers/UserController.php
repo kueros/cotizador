@@ -137,6 +137,7 @@ class UserController extends Controller
 				'username.regex' => 'El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos.',
 				'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
 				'apellido.regex' => 'El apellido solo puede contener letras y espacios.',
+				'rol_id.required' => 'Debe seleccionar un rol para el usuario que va a crear.'
 			]);
 			// Verifica si la validación falla
 			if ($validatedData->fails()) {
@@ -144,6 +145,8 @@ class UserController extends Controller
 				$response["errors"] = $validatedData->errors();
 				return response()->json($response);
 			}
+
+			#dd($validatedData);
 			$validatedData = $validatedData->validated();
 
 			// Verificar si el usuario con el mismo username o email está soft deleted

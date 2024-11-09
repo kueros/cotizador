@@ -11,12 +11,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class RolController extends Controller
 {
-	/**
-	 * Display a listing of the resource.
-	 */
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
 	public function index(Request $request, MyController $myController): View
 	{
 		$permiso_listar_roles = $myController->tiene_permiso('list_roles');
@@ -29,6 +29,8 @@ class RolController extends Controller
 			->with('i', ($request->input('page', 1) - 1) * $roles->perPage());
 	}
 
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
 	public function ajax_listado(Request $request)
 	{
 		$roles = Rol::all();
@@ -57,12 +59,16 @@ class RolController extends Controller
 
 	}
 
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
 	public function ajax_edit($id){
 
         $data = Rol::find($id);
 		return response()->json($data);
     }
 
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
 	public function ajax_delete($id, MyController $myController){
         $permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
 		if (!$permiso_eliminar_roles) {
@@ -81,9 +87,8 @@ class RolController extends Controller
 		return response()->json(["status"=>true]);
     }
 
-	/**
-	 * Show the form for creating a new resource.
-	 */
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
 	public function create( MyController $myController): View
 	{
 		$permiso_agregar_roles = $myController->tiene_permiso('add_rol');
@@ -95,18 +100,22 @@ class RolController extends Controller
 		return view('rol.create', compact('roles'));
 	}
 
-	/**
-	 * Store a newly created resource in storage.
-	 */
-	public function store(Request $request, MyController $myController): RedirectResponse
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+/* 	public function store(Request $request, MyController $myController): RedirectResponse
 	{
+		#dd($request);
 		$permiso_agregar_roles = $myController->tiene_permiso('add_rol');
 		if (!$permiso_agregar_roles) {
 			abort(403, '.');
 			return false;
 		}
+		$formData = [];
+		foreach ($request->input('form_data') as $input) {
+			$formData[$input['name']] = $input['value'];
+		}
 		// Validar los datos del usuario
-		$validatedData = $request->validate([
+		$validatedData = Validator::make($formData, [
 			'nombre' => [
 				'required',
 				'string',
@@ -118,6 +127,13 @@ class RolController extends Controller
 		], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
 		]);
+		// Verifica si la validación falla
+		if ($validatedData->fails()) {
+			$response["message"] = 'Error en la validación de los datos.';
+			$response["errors"] = $validatedData->errors();
+			return response()->json($response);
+		}
+		$validatedData = $validatedData->validated();
 		Rol::create($validatedData);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
@@ -126,20 +142,57 @@ class RolController extends Controller
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 		return Redirect::route('roles.index')
 			->with('success', 'Rol creado exitosamente.');
+	} */
+
+	public function store(Request $request, MyController $myController): RedirectResponse
+{
+	#dd($request->input('nombre'));
+    $permiso_agregar_roles = $myController->tiene_permiso('add_rol');
+    if (!$permiso_agregar_roles) {
+        abort(403, '.');
+        return false;
+    }
+
+    // Validar los datos del usuario
+	$validatedData = $request->validate([
+		'nombre' => [
+			'required',
+			'string',
+			'max:255',
+			'min:3',
+			'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+			Rule::unique('roles'),
+		],
+	], [
+		'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+		'nombre.unique' => 'Este nombre de rol ya está en uso.',
+	]);
+
+	$rolExistente = Rol::where('nombre', $request->input('nombre'))->first();
+	if ($rolExistente) {
+		return redirect()->back()->withErrors(['nombre' => 'Este nombre de rol ya está en uso.'])->withInput();
 	}
 
-	/**
-	 * Display the specified resource.
-	 */
+    Rol::create($validatedData);
+
+    $clientIP = \Request::ip();
+    $userAgent = \Request::userAgent();
+    $username = Auth::user()->username;
+    $message = $username . " creó el rol " . $request->input('nombre');
+    $myController->loguear($clientIP, $userAgent, $username, $message);
+
+    return Redirect::route('roles.index')->with('success', 'Rol creado exitosamente.');
+}
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
 	public function show($id): View
 	{
 		$rol = Rol::find($id);
 		return view('rol.show', compact('rol'));
 	}
 
-	/**
-	 * Show the form for editing the specified resource.
-	 */
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
 	public function edit($id, MyController $myController): View
 	{
 		#dd($id);
@@ -153,9 +206,8 @@ class RolController extends Controller
 		return view('rol.edit', compact('roles'));
 	}
 
-	/**
-	 * Update the specified resource in storage.
-	 */
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
 	public function update(Request $request, Rol $rol, MyController $myController): RedirectResponse
 	{
 		#dd($request);
@@ -179,6 +231,8 @@ class RolController extends Controller
 			->with('success', 'Rol updated successfully');
 	}
 
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
 	public function destroy($id, MyController $myController): RedirectResponse
 	{
 		$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
@@ -197,7 +251,4 @@ class RolController extends Controller
 			->with('success', 'Rol deleted successfully');
 	}
 
-	/*public function opciones_submit(){
-        
-    }*/
 }
