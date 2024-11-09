@@ -38,10 +38,10 @@
 				bAutoWidth: false, 
 				aoColumns : [
 					{ sWidth: '5%' },
-					{ sWidth: '30%' },
 					{ sWidth: '15%' },
-					{ sWidth: '20%' }, 	
-					{ sWidth: '15%' }
+					{ sWidth: '30%' },
+					{ sWidth: '40%' }, 	
+					{ sWidth: '10%' }
 				],
 				language: traduccion_datatable,
 				"pageLength": 100,

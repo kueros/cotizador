@@ -69,7 +69,7 @@
 		<div class="row mt-4">
 			<h2>Monitoreo</h2>
 		</div>
-		<div class="row mt-5">
+		<div class="row mt-5 justify-content-around">
 			<!-- Tarjeta 1: Log de accesos -->
 			<div class="col-md-3 col-sm-6">
 				<a class="link_monitoreo" href="<?= route('monitoreo.log_accesos') ?>">
@@ -88,16 +88,6 @@
 						<span class="monitoreo-title">Log de acciones</span>
 					</div>
 				</a>
-			</div>
-
-			<!-- Tarjeta 3: Log de notificaciones -->
-			<div class="col-md-3 col-sm-6">
-				<!-- <a class="link_monitoreo" href="<?= route('monitoreo.log_notificaciones') ?>"> -->
-					<div class="div-contenedor-acceso">
-						<div class="div-logs-img" id="log_notificaciones"></div>
-						<span class="monitoreo-title">Log de notificaciones</span>
-					</div>
-				<!-- </a> -->
 			</div>
 
 			<!-- Tarjeta 4: Log de emails -->

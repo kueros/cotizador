@@ -215,11 +215,11 @@
 <body>
 <div class="container">
     <div class="row">
-        <div class="card card-default login-box">
+        <div class="card card-default login-box" style="padding-top:5px;">
             
             @if(isset($token))
-                <div class="card-heading" style="display: flex;">
-					<img class="logo-home" src="images/aleph_logo.gif" alt="" title="">
+                <div class="card-heading">
+					<img class="logo-home" src="{{ asset('build/aleph_theme/img/logo.png') }}" alt="" title="">
                 </div>
                 <div class="card-body">
 					<div style="margin-top:1rem;">

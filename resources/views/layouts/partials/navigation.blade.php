@@ -69,10 +69,14 @@
         </button>
         <div class="collapse navbar-collapse" id="aleph-navbar">
             
-			<div class="logo-home"><a href=""><img src="{{ asset('images/aleph_logo.gif') }}" alt="" title=""></a></div>
+			<div class="logo-home">
+                <a href="{{ url('dashboard') }}">
+                    <img src="{{ asset('images/aleph_logo.gif') }}" alt="" title="">
+                </a>
+            </div>
 
             <ul class="nav navbar-nav me-auto nav-bar-1">
-                <li><a class="nav-link main-item" id="boton-inicio" href="">Inicio</a></li>
+                <li><a class="nav-link main-item" id="boton-inicio" href="{{ url('dashboard') }}">Inicio</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">Administración
                         <span class="caret"></span>

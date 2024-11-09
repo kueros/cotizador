@@ -88,8 +88,10 @@ use App\Models\Permiso_x_Rol;
 						@endforeach
 					</div>
 
-					<!-- Botón para guardar cambios -->
-					<button type="submit" class="btn btn-primary mt-4">Guardar cambios</button>
+					<div class="mt-4 d-flex">
+						<!-- Botón para guardar cambios -->
+						<button type="submit" class="btn btn-primary mt-4">Guardar cambios</button>
+					</div>
 				</form>
 			</div>
 		</div>
