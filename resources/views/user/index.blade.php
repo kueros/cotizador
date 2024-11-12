@@ -394,12 +394,12 @@
 				<div class="table-responsive">
 					<div class="float-left">
 						@if ($permiso_agregar_usuario)
-						<button id="agregar" class="btn btn-outline-success float-right" onclick="add_usuario()">
+						<button id="agregar" class="btn btn-success float-right" onclick="add_usuario()">
 							<i class="bi bi-plus"></i> {{ __('Agregar Usuario') }}
 						</button>
 						@endif
 						@if ($permiso_agregar_usuario)
-						<a href="#" class="btn btn-outline-primary float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px; ">
+						<a href="#" class="btn btn-primary float-right" data-placement="left" style="border-radius:20px;!important;margin-right:5px; ">
 							<i class="fas fa-file-import"></i> {{ __('Importar Usuarios') }}
 						</a>
 						@endif
