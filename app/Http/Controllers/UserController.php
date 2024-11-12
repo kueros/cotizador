@@ -138,7 +138,7 @@ class UserController extends Controller
 					'username.regex' => 'El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos.',
 					'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
 					'apellido.regex' => 'El apellido solo puede contener letras y espacios.',
-				'rol_id.required' => 'Debe seleccionar un rol para el usuario que va a crear.'
+					'rol_id.required' => 'Debe seleccionar un rol para el usuario que va a crear.',
 					'email.regex' => 'El correo electrónico debe tener un nombre de al menos 3 caracteres y un dominio válido.',
 				]);
 			// Verifica si la validación falla
