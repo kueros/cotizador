@@ -129,6 +129,7 @@ class UserController extends Controller
 					'string',
 					'email',
 					'max:255',
+					'regex:/^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', // Validar formato de email
 					Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
 				],
 				'rol_id' => 'required|exists:roles,rol_id',
@@ -138,6 +139,7 @@ class UserController extends Controller
 				'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
 				'apellido.regex' => 'El apellido solo puede contener letras y espacios.',
 				'rol_id.required' => 'Debe seleccionar un rol para el usuario que va a crear.'
+				'email.regex' => 'El correo electrónico debe tener un nombre de al menos 3 caracteres y un dominio válido.',
 			]);
 			// Verifica si la validación falla
 			if ($validatedData->fails()) {

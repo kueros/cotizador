@@ -151,17 +151,16 @@ public function loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado)
 				//Guardo el email antes de enviarlo
 				$clientIP = $_SERVER['REMOTE_ADDR'];
 				$userAgent = \Request::userAgent();
-				#dd($userAgent);
-				$message = Auth::user()->username." creó el email para ". $to . " con el asunto: ". $subject;
-				Log::info($message);
+				$message = 'Email enviado a: ' . $to . ' con asunto: ' . $subject;
 				$log = LogEmail::create([
-					'email' => Auth::user()->email,
+					'email' => $to,
 					'detalle' => $message,
 					'enviado' => 'Si',
 					'ip_address' => $_SERVER['REMOTE_ADDR'],
 					'user_agent' => json_encode($userAgent)
 				]);
 				$log->save();
+				Log::info($message);
 
 				#$id_log_email = $this->generic->save_on_table("log_emails", array("email" => $to, "subject" => $subject));
 
