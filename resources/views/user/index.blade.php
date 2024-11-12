@@ -551,7 +551,7 @@
 											<label class="col-form-label col-md-3">{{ __('Rol') }}</label>
 											<div class="col-md-9">
 												<select id="rol_id" name="rol_id" class="mt-1 block w-full form-control" required>
-													<option value="0" {{ old('rol_id', $user->rol_id) === null ? 'selected' : '' }}>
+													<option value="" {{ old('rol_id', $user->rol_id) === null ? 'selected' : '' }}>
 														{{ __('Elija un Rol') }}
 													</option>
 													@foreach($roles as $rol)
