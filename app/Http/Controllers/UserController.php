@@ -51,7 +51,7 @@ class UserController extends Controller
 		$users = User::withoutTrashed()
 			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
 			->select('users.*', 'roles.nombre as nombre_rol')
-			->paginate();
+			->paginate(100);
 		$roles = Rol::all();
 		return view('user.index', compact('users', 'permiso_agregar_usuario', 
 			'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario', 
