@@ -25,7 +25,7 @@ class TipoTransaccionController extends Controller
 			return false;
 		}
  */		$tipos_transacciones = TipoTransaccion::paginate();
-		return view('rol.index', compact('roles'))
+		return view('tipos_transacciones.index', compact('tipos_transacciones'))
 			->with('i', ($request->input('page', 1) - 1) * $tipos_transacciones->perPage());
 	}
 
