@@ -240,6 +240,31 @@
 
 						<div class="form-body">
 							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Orden en el Formulario') }}</label>
+								<div class="col-md-9">
+									<input name="orden_abm" placeholder="1"
+										id="orden_abm" class="form-control" type="number" required>
+									<span class="help-block"></span>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-body">
+							<div class="row mb-3">
+								<label class="col-md-3 col-form-label">{{ __('Es Obligatorio?') }}</label>
+								<div class="col-md-9">
+									<div class="form-check form-switch">
+										<input type="hidden" name="requerido" value="0">
+										<input class="form-check-input" name="requerido" id="requerido"
+											value="1" type="checkbox">
+										<label class="form-check-label" for="requerido"></label>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-body">
+							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Tipo de Campo') }}</label>
 								<div class="col-md-9">
 									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" required>
@@ -247,10 +272,9 @@
 											{{ __('Elija un Tipo de Campo') }}
 										</option>
 										@foreach($tipos_campos as $tipo_campo)
-										<option value="{{ $tipo_campo->nombre }}">
+										<option value="{{ $tipo_campo->id }}">
 											{{ $tipo_campo->nombre }}
 										</option>
-										<span class="help-block">{{ $tipo_campo->tipo_nombre }} v</span>
 										@endforeach
 									</select>
 									<span class="help-block"></span>
@@ -258,19 +282,13 @@
 							</div>
 						</div>
 
-						<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
-									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
-									 ya que el checkbox tiene prioridad sobre el hidden -->
 						<div class="form-body">
-							<div class="row mb-3">
-								<label class="col-md-3 col-form-label">{{ __('Es visible?') }}</label>
+							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Valor por Defecto') }}</label>
 								<div class="col-md-9">
-									<div class="form-check form-switch">
-										<input type="hidden" name="visible" value="0">
-										<input class="form-check-input" name="visible" id="visible"
-											value="1" type="checkbox">
-										<label class="form-check-label" for="visible"></label>
-									</div>
+									<input name="valor_default" minlength="3" maxlength="255" placeholder="Valor por defecto"
+										id="valor_default" class="form-control" type="text" required>
+									<span class="help-block"></span>
 								</div>
 							</div>
 						</div>

@@ -135,18 +135,33 @@ class TipoTransaccionCampoAdicionalController extends Controller
                 'min:3',
                 'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
                 Rule::unique('tipos_transacciones_campos_adicionales'),
+            ],'nombre_mostrar' => [
+                'string',
+                'max:255',
+                'min:3',
+                'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+            ],'visible' => [
+                'integer',
+            ],'requerido' => [
+                'integer',
+            ],'tipo' => [
+                'integer',
             ],
+            'valor_default' => [
+                'string',
+                'max:255',
+                'min:3',
+                'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
         ], [
             'nombre_campo.regex' => 'El nombre solo puede contener letras y espacios.',
-            'nombre_campo.unique' => 'Este nombre de tipo de transacción ya está en uso.',
-        ]);
+            'nombre_campo.unique' => 'Este nombre de tipo de transacción ya está en uso.',]]);
 
         /*         $tipoTransacciónExistente = CampoAdicionalTipoTransaccion::where('nombre', $request->input('nombre'))->first();
         if ($tipoTransacciónExistente) {
             return redirect()->back()->withErrors(['nombre' => 'Este nombre de tipo de transacción ya está en uso.'])->withInput();
         }
  */
-dd($validatedData);
+#dd($validatedData);
         TipoTransaccionCampoAdicional::create($validatedData);
 
         $clientIP = \Request::ip();
