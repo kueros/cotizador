@@ -48,8 +48,13 @@ class TipoTransaccionCampoAdicionalController extends Controller
             }
 
             $data[] = array(
-                $r->nombre,
-                $r->descripcion,
+                $r->nombre_campo,
+                $r->nombre_mostrar,
+                $r->visible,
+                $r->orden_listado,
+                $r->requerido,
+                $r->tipo_nombre,
+                $r->valor_default,
                 $accion
             );
         }

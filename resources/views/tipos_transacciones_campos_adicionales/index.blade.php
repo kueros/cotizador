@@ -8,7 +8,7 @@
 	@php
 	$user = Auth::user()->username;
 	$email = Auth::user()->email;
-	$permiso_agregar_roles = tiene_permiso('add_tipo_transaccion');
+	$permiso_agregar_roles = tiene_permiso('add_campo_adicional');
 	$permiso_editar_roles = tiene_permiso('edit_rol');
 	$permiso_eliminar_roles = tiene_permiso('del_rol');
 	@endphp
@@ -20,7 +20,7 @@
 		jQuery(document).ready(function($) {
 			table = $('#tipos_transacciones_table').DataTable({
 				"ajax": {
-					url: "{{ url('tipos_transacciones/ajax_listado') }}",
+					url: "{{ url('tipos_transacciones_campos_adicionales/ajax_listado') }}",
 					type: 'GET'
 				},
 				language: traduccion_datatable,
@@ -68,15 +68,15 @@
 			table.ajax.reload(null, false);
 		}
 
-		function add_tipo_transaccion() {
+		function add_campo_adicional() {
 			save_method = 'add';
 			$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#modal_form').modal('show');
-			$('.modal-title').text('Agregar tipos de transacciones');
+			$('.modal-title').text('Agregar campos adicionales');
 			$('#accion').val('add');
-			$('#form').attr('action', "{{ url('tipos_transacciones') }}");
+			$('#form').attr('action', "{{ url('tipos_transacciones_campos_adicionales') }}");
 			$('#method').val('POST');
 		}
 
@@ -158,14 +158,19 @@
 
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
-						<button id="agregar" class="btn btn-success mr-2" onclick="add_tipo_transaccion()">
+						<button id="agregar" class="btn btn-success mr-2" onclick="add_campo_adicional()">
 							<i class="bi bi-plus"></i> {{ __('Nuevo Campo Adicional') }}
 						</button>
 					</div>
 					<table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
 						<thead>
 							<th>Nombre</th>
-							<th>Descripción</th>
+							<th>Nombre a Mostrar</th>
+							<th>Es visible?</th>
+							<th>Orden</th>
+							<th>Es obligatorio?</th>
+							<th>Tipo</th>
+							<th>Default</th>
 							<th style="width:20%;" class="no-sort">Acción</th>
 						</thead>
 						<tbody>
