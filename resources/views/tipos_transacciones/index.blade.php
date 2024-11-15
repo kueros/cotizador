@@ -8,7 +8,7 @@
 	@php
 	$user = Auth::user()->username;
 	$email = Auth::user()->email;
-	$permiso_agregar_roles = tiene_permiso('add_rol');
+	$permiso_agregar_roles = tiene_permiso('add_tipo_transaccion');
 	$permiso_editar_roles = tiene_permiso('edit_rol');
 	$permiso_eliminar_roles = tiene_permiso('del_rol');
 	@endphp
@@ -68,15 +68,15 @@
 			table.ajax.reload(null, false);
 		}
 
-		function add_rol() {
+		function add_tipo_transaccion() {
 			save_method = 'add';
 			$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#modal_form').modal('show');
-			$('.modal-title').text('Agregar roles');
+			$('.modal-title').text('Agregar tipos de transacciones');
 			$('#accion').val('add');
-			$('#form').attr('action', "{{ url('roles') }}");
+			$('#form').attr('action', "{{ url('tipos_transacciones') }}");
 			$('#method').val('POST');
 		}
 
@@ -158,7 +158,7 @@
 
 				<div class="table-responsive">
 					<div class="float-right">
-						<button id="agregar" class="btn btn-success" onclick="add_rol()">
+						<button id="agregar" class="btn btn-success" onclick="add_tipo_transaccion()">
 							<i class="bi bi-plus"></i> {{ __('Nuevo Tipo de Transacción') }}
 						</button>
 					</div>
@@ -166,6 +166,7 @@
 					<table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
 						<thead>
 							<th>Nombre</th>
+							<th>Descripción</th>
 							<th style="width:20%;" class="no-sort">Acción</th>
 						</thead>
 						<tbody>

@@ -95,7 +95,7 @@ $permiso_configuraciones_software = tiene_permiso('setup_soft');
 						<span class="caret"></span>
 					</a>
 					<ul class="dropdown-menu">
-						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('tipo_transaccion') }}">ABM Tipos de transacciones</a></li>
+						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('tipos_transacciones') }}">ABM Tipos de transacciones</a></li>
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('conf_funciones') }}">ABM de Funciones</a></li>
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('conf_alertas') }}">ABM de Alertas</a></li>
 					</ul>

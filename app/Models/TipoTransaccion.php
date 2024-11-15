@@ -10,6 +10,7 @@ class TipoTransaccion extends Model
 
     protected $fillable = [
         'nombre',
+        'descripcion',
     ];
 
     protected $primaryKey = 'tipos_transacciones_id';

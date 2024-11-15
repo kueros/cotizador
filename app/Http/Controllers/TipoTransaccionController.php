@@ -33,7 +33,9 @@ class TipoTransaccionController extends Controller
 	*******************************************************************************************************************************/
 	public function ajax_listado(Request $request)
 	{
+		#dd($request);
 		$tipos_transacciones = TipoTransaccion::all();
+		#dd($tipos_transacciones);
 		$data = array();
         foreach($tipos_transacciones as $r) {
             $accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol('."'".$r->rol_id.
@@ -45,7 +47,8 @@ class TipoTransaccionController extends Controller
             }
 
             $data[] = array(
-                $r->nombre,
+				$r->nombre,
+				$r->descripcion,
                 $accion
             );
         }
