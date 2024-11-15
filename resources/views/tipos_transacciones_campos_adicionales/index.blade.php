@@ -12,6 +12,8 @@
 	$permiso_editar_roles = tiene_permiso('edit_rol');
 	$permiso_eliminar_roles = tiene_permiso('del_rol');
 	@endphp
+	<?php #dd($tipos_campos); 
+	?>
 
 	<script type="text/javascript">
 		var table;
@@ -73,6 +75,7 @@
 			$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
+			//$('#modal_form_campo_adicional').modal('show');
 			$('#modal_form').modal('show');
 			$('.modal-title').text('Agregar campos adicionales');
 			$('#accion').val('add');
@@ -103,7 +106,7 @@
 					//}
 					?>
 
-					$('#modal_form').modal('show');
+					$('#modal_form_campo_adicional').modal('show');
 					$('.modal-title').text('Editar tipo de transacción');
 					$('#form').attr('action', "{{ url('tipos_transacciones') }}" + "/" + id);
 					$('#method').val('PUT');
@@ -127,7 +130,7 @@
 					success: function(data) {
 						swal.fire("Aviso", "Tipo de transacción eliminado con éxito.", "success");
 
-						$('#modal_form').modal('hide');
+						$('#modal_form_campo_adicional').modal('hide');
 						reload_table();
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
@@ -138,7 +141,6 @@
 			}
 		}
 	</script>
-
 	<!--LISTADO-->
 	<div class="container">
 
@@ -199,13 +201,80 @@
 						<input name="accion" id="accion" class="form-control" type="hidden">
 						<div class="form-body">
 							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">Nombre</label>
+								<label class="col-form-label col-md-3">{{ __('Nombre') }}</label>
 								<div class="col-md-9">
-									<input name="nombre" maxlength="255" placeholder="Nombre del tipo de transacción" class="form-control" type="text">
+									<input name="nombre_campo" minlength="3" maxlength="255" placeholder="Nombre del tipo de transacción"
+										id="nombre_campo" class="form-control" type="text" required>
 									<span class="help-block"></span>
 								</div>
 							</div>
 						</div>
+
+						<div class="form-body">
+							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Nombre a Mostrar') }}</label>
+								<div class="col-md-9">
+									<input name="nombre_mostrar" minlength="3" maxlength="255" placeholder="Nombre a Mostrar"
+										id="nombre_mostrar" class="form-control" type="text" required>
+									<span class="help-block"></span>
+								</div>
+							</div>
+						</div>
+
+						<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
+									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
+									 ya que el checkbox tiene prioridad sobre el hidden -->
+						<div class="form-body">
+							<div class="row mb-3">
+								<label class="col-md-3 col-form-label">{{ __('Visibilidad en Formulario?') }}</label>
+								<div class="col-md-9">
+									<div class="form-check form-switch">
+										<input type="hidden" name="visible" value="0">
+										<input class="form-check-input" name="visible" id="visible"
+											value="1" type="checkbox">
+										<label class="form-check-label" for="visible"></label>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-body">
+							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Tipo de Campo') }}</label>
+								<div class="col-md-9">
+									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" required>
+										<option value="0">
+											{{ __('Elija un Tipo de Campo') }}
+										</option>
+										@foreach($tipos_campos as $tipo_campo)
+										<option value="{{ $tipo_campo->nombre }}">
+											{{ $tipo_campo->nombre }}
+										</option>
+										<span class="help-block">{{ $tipo_campo->tipo_nombre }} v</span>
+										@endforeach
+									</select>
+									<span class="help-block"></span>
+								</div>
+							</div>
+						</div>
+
+						<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
+									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
+									 ya que el checkbox tiene prioridad sobre el hidden -->
+						<div class="form-body">
+							<div class="row mb-3">
+								<label class="col-md-3 col-form-label">{{ __('Es visible?') }}</label>
+								<div class="col-md-9">
+									<div class="form-check form-switch">
+										<input type="hidden" name="visible" value="0">
+										<input class="form-check-input" name="visible" id="visible"
+											value="1" type="checkbox">
+										<label class="form-check-label" for="visible"></label>
+									</div>
+								</div>
+							</div>
+						</div>
+
 					</div>
 					<div class="modal-footer">
 						<button type="submit" class="btn btn-primary">Guardar</button>
@@ -216,4 +285,106 @@
 		</div>
 	</div>
 
+
+	<div class="modal fade" id="modal_form_campo_adicional" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Formulario campos adicionales</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<!--form id="form_campos_adicionales" method="POST" enctype="multipart/form-data" class="form-horizontal" action="{{ route('tipos_transacciones_campos_adicionales.store') }}"-->
+				<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
+					<input name="_method" type="hidden" id="method">
+					<input type="hidden" value="" name="accion" id="accion" />
+					<input type="hidden" value="" name="id" />
+					<div class="modal-body form">
+						@csrf
+						<div class="form-body">
+							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Nombre') }}</label>
+								<div class="col-md-9">
+									<input name="nombre_campo" minlength="3" maxlength="255" placeholder="Nombre del tipo de transacción"
+										id="nombre_campo" class="form-control" type="text" required>
+									<span class="help-block"></span>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-body">
+							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Nombre a Mostrar') }}</label>
+								<div class="col-md-9">
+									<input name="nombre_mostrar" minlength="3" maxlength="255" placeholder="Nombre a Mostrar"
+										id="nombre_mostrar" class="form-control" type="text" required>
+									<span class="help-block"></span>
+								</div>
+							</div>
+						</div>
+
+						<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
+									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
+									 ya que el checkbox tiene prioridad sobre el hidden -->
+						<div class="form-body">
+							<div class="row mb-3">
+								<label class="col-md-3 col-form-label">{{ __('Visibilidad en Formulario?') }}</label>
+								<div class="col-md-9">
+									<div class="form-check form-switch">
+										<input type="hidden" name="visible" value="0">
+										<input class="form-check-input" name="visible" id="visible"
+											value="1" type="checkbox">
+										<label class="form-check-label" for="visible"></label>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-body">
+							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Tipo de Campo') }}</label>
+								<div class="col-md-9">
+									<select id="id" name="id" class="mt-1 block w-full form-control" required>
+										<option value="0">
+											{{ __('Elija un Tipo de Campo') }}
+										</option>
+										@foreach($tipos_campos as $tipo_campo)
+										<option value="{{ $tipo_campo->nombre }}">
+											{{ $tipo_campo->nombre }}
+										</option>
+										<span class="help-block">{{ $tipo_campo->tipo_nombre }} v</span>
+										@endforeach
+									</select>
+									<span class="help-block"></span>
+								</div>
+							</div>
+						</div>
+
+						<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
+									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
+									 ya que el checkbox tiene prioridad sobre el hidden -->
+						<div class="form-body">
+							<div class="row mb-3">
+								<label class="col-md-3 col-form-label">{{ __('Es visible?') }}</label>
+								<div class="col-md-9">
+									<div class="form-check form-switch">
+										<input type="hidden" name="visible" value="0">
+										<input class="form-check-input" name="visible" id="visible"
+											value="1" type="checkbox">
+										<label class="form-check-label" for="visible"></label>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+					<div class="modal-footer">
+						<!--a onclick="guardar_datos()" class="btn btn-primary">{{ __('Guardar') }}</a-->
+						<a type="submit" class="btn btn-primary">{{ __('Guardar') }}</a>
+						<a class="btn btn-danger" data-bs-dismiss="modal">Cancelar</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </x-app-layout>

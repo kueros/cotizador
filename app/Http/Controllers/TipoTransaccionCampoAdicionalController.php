@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
 use App\Models\TipoTransaccionCampoAdicional;
+use App\Models\TipoCampo;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
@@ -25,8 +26,10 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			return false;
 		}
  */
+
+        $tipos_campos = TipoCampo::all();
         $campos_adicionales = TipoTransaccionCampoAdicional::paginate();
-        return view('tipos_transacciones_campos_adicionales.index', compact('campos_adicionales'))
+        return view('tipos_transacciones_campos_adicionales.index', compact('campos_adicionales', 'tipos_campos'))
             ->with('i', ($request->input('page', 1) - 1) * $campos_adicionales->perPage());
     }
 
@@ -116,7 +119,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 
     public function store(Request $request, MyController $myController): RedirectResponse
     {
-        #dd($request->input('nombre'));
+        #dd($request);
         /*     $permiso_agregar_roles = $myController->tiene_permiso('add_rol');
     if (!$permiso_agregar_roles) {
         abort(403, '.');
@@ -125,32 +128,33 @@ class TipoTransaccionCampoAdicionalController extends Controller
  */
         // Validar los datos del usuario
         $validatedData = $request->validate([
-            'nombre' => [
+            'nombre_campo' => [
                 'required',
                 'string',
                 'max:255',
                 'min:3',
                 'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-                Rule::unique('campos_adicionales'),
+                Rule::unique('tipos_transacciones_campos_adicionales'),
             ],
         ], [
-            'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-            'nombre.unique' => 'Este nombre de tipo de transacción ya está en uso.',
+            'nombre_campo.regex' => 'El nombre solo puede contener letras y espacios.',
+            'nombre_campo.unique' => 'Este nombre de tipo de transacción ya está en uso.',
         ]);
 
-        $tipoTransacciónExistente = CampoAdicionalTipoTransaccion::where('nombre', $request->input('nombre'))->first();
+        /*         $tipoTransacciónExistente = CampoAdicionalTipoTransaccion::where('nombre', $request->input('nombre'))->first();
         if ($tipoTransacciónExistente) {
             return redirect()->back()->withErrors(['nombre' => 'Este nombre de tipo de transacción ya está en uso.'])->withInput();
         }
-
-        CampoAdicionalTipoTransaccion::create($validatedData);
+ */
+dd($validatedData);
+        TipoTransaccionCampoAdicional::create($validatedData);
 
         $clientIP = \Request::ip();
         $userAgent = \Request::userAgent();
         $username = Auth::user()->username;
-        $message = $username . " creó el tipo de transacción " . $request->input('nombre');
+        $message = $username . " creó el campo adicional para tipo de transacción " . $request->input('nombre');
         $myController->loguear($clientIP, $userAgent, $username, $message);
 
-        return Redirect::route('campos_adicionales.index')->with('success', 'Tipo de transacción creado exitosamente.');
+        return Redirect::route('tipos_transacciones_campos_adicionales')->with('success', 'Campo adicional para tipo de transacción creado exitosamente.');
     }
 }
