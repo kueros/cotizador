@@ -7,13 +7,13 @@ use App\Models\Permiso;
 class Rol extends Model
 {
 
-	protected $table = 'roles'; // Asegúrate de que el nombre de la tabla es correcto
+	protected $table = 'roles';
 
 	protected $fillable = [
 		'nombre',
 	];
 
-    protected $primaryKey = 'rol_id'; // Cambia 'rol_id' por el nombre correcto de tu clave primaria
+    protected $primaryKey = 'rol_id';
 
     public function permisos()
     {
