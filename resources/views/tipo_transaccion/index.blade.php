@@ -1,7 +1,7 @@
-<x-app-layout title="Roles" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
+<x-app-layout title="Tipos de Transacciones" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
-			{{ __('Tipos de Transacciones') }}
+			{{ __('Roles') }}
 		</h2>
 	</x-slot>
 	<!-- Primary Navigation Menu -->
@@ -9,7 +9,7 @@
 	$user = Auth::user()->username;
 	$email = Auth::user()->email;
 	$permiso_agregar_roles = tiene_permiso('add_tipo_transaccion');
-	$permiso_editar_roles = tiene_permiso('edit_rol');
+	$permiso_editar_roles = tiene_permiso('edit_tipo_transaccion');
 	$permiso_eliminar_roles = tiene_permiso('del_rol');
 	@endphp
 
@@ -18,9 +18,9 @@
 		var save_method;
 
 		jQuery(document).ready(function($) {
-			table = $('#tipos_transacciones_table').DataTable({
+			table = $('#tipos-transacciones-table').DataTable({
 				"ajax": {
-					url: "{{ url('tipos_transacciones/ajax_listado') }}",
+					url: "{{ url('tipo_transaccion/ajax_listado') }}",
 					type: 'GET'
 				},
 				language: traduccion_datatable,
@@ -30,16 +30,16 @@
 					"orderable": false
 				}],
 				buttons: [{
+						"extend": 'copy',
+						"text": 'Export',
+						"className": 'btn btn-primary',
+						title: 'Roles'
+					},
+					{
 						"extend": 'pdf',
 						"text": 'Export',
 						"className": 'btn btn-danger',
 						"orientation": 'landscape',
-						title: 'Roles'
-					},
-					{
-						"extend": 'copy',
-						"text": 'Export',
-						"className": 'btn btn-primary',
 						title: 'Roles'
 					},
 					{
@@ -59,7 +59,9 @@
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
 					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
-					$('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
+					$('.buttons-print').html(
+						'<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir'
+					);
 				}
 			});
 		});
@@ -70,26 +72,25 @@
 
 		function add_tipo_transaccion() {
 			save_method = 'add';
-			$('#form')[0].reset();
+			$('#form_tt')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#modal_form').modal('show');
-			$('.modal-title').text('Agregar tipos de transacciones');
+			$('.modal-title').text('Agregar tipos de transacción');
 			$('#accion').val('add');
-			$('#form').attr('action', "{{ url('tipos_transacciones') }}");
+			$('#form_tt').attr('action', "{{ url('tipo_transaccion') }}");
 			$('#method').val('POST');
 		}
 
-		function edit_rol(id) {
+		function edit_tipo_transaccion(id) {
 			save_method = 'update';
-			$('#form')[0].reset();
+			$('#form_tt')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#accion').val('edit');
 
-
 			$.ajax({
-				url: "{{ url('tipos_transacciones/ajax_edit/') }}" + "/" + id,
+				url: "{{ url('tipo_transaccion/ajax_edit/') }}" + "/" + id,
 				type: "GET",
 				dataType: "JSON",
 				success: function(data) {
@@ -105,7 +106,7 @@
 
 					$('#modal_form').modal('show');
 					$('.modal-title').text('Editar tipo de transacción');
-					$('#form').attr('action', "{{ url('tipos_transacciones') }}" + "/" + id);
+					$('#form_tt').attr('action', "{{ url('tipo_transaccion') }}" + "/" + id);
 					$('#method').val('PUT');
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -114,11 +115,11 @@
 			});
 		}
 
-		function delete_rol(id) {
+		function delete_tipo_transaccion(id) {
 			if (confirm('¿Desea borrar el tipo de transacción?')) {
 
 				$.ajax({
-					url: "{{ url('tipos_transacciones/ajax_delete') }}" + "/" + id,
+					url: "{{ url('tipo_transaccion/ajax_delete') }}" + "/" + id,
 					type: "POST",
 					dataType: "JSON",
 					headers: {
@@ -137,37 +138,107 @@
 
 			}
 		}
+
+		function cambiar_tipo_campo(selector) {
+			var tipo_campo = $(selector).val();
+
+			switch (tipo_campo) {
+				case '2':
+					$('#div_valores_selector').show();
+					$('#div_modelo_selector').hide();
+					break;
+				case '5':
+					$('#div_valores_selector').hide();
+					$('#div_modelo_selector').show();
+					break;
+				default:
+					$('#div_valores_selector').hide();
+					$('#div_modelo_selector').hide();
+					break;
+			}
+		}
+
+		function guardar_datos() {
+			let form_data = $('#form_tt').serializeArray();
+			let url_guarda_datos = "{{ url('tipo_transaccion') }}";
+			let type_guarda_datos = "POST";
+
+			if (!validar_campos_requeridos('form_tt')) {
+				$('#form_tt')[0].reportValidity();
+				//swal("Aviso", "Complete los campos obligatorios", "warning");
+				return false;
+			}
+
+			if ($('#accion').val() != "add") {
+				url_guarda_datos = "{{ url('tipo_transaccion') }}" + "/" + $('[name="id"]').val();
+				type_guarda_datos = "PUT";
+			}
+
+			//show_loading();
+			$.ajax({
+				url: url_guarda_datos,
+				type: type_guarda_datos,
+				data: {
+					form_data: form_data
+				},
+				dataType: "JSON",
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				success: function(data) {
+					hide_loading();
+					if (data.status == 0) {
+						let errorMessage = data.message + "</br>";
+						if (data.errors && Object.keys(data.errors).length > 0) {
+							// Recorre cada campo y sus mensajes de error
+							for (let field in data.errors) {
+								if (data.errors.hasOwnProperty(field)) {
+									errorMessage += `${field}: ${data.errors[field].join(", ")}</br>`;
+								}
+							}
+						} else {
+							errorMessage += "No se encontraron errores específicos para los campos.";
+						}
+
+						swal.fire("Aviso", errorMessage, "warning");
+						return false;
+					} else {
+						swal.fire({
+							title: "Aviso",
+							text: data.message,
+							icon: "success"
+						}).then(() => {
+							// Recargar la tabla DataTables al cerrar el modal de éxito
+							location.reload();
+						});
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					show_ajax_error_message(jqXHR, textStatus, errorThrown);
+				}
+			});
+		}
 	</script>
 
 	<!--LISTADO-->
 	<div class="container">
-
 		<div class="row">
 			<div class="col-md-12">
 				<h2>Tipos de Transacciones</h2>
 				@include('layouts.partials.message')
-				@if ($errors->any())
-				<div class="alert alert-danger">
-					<ul>
-						@foreach ($errors->all() as $error)
-						<li>{{ $error }}</li>
-						@endforeach
-					</ul>
-				</div>
-				@endif
 
 				<div class="table-responsive">
-					<div class="float-right">
-						<button id="agregar" class="btn btn-success" onclick="add_tipo_transaccion()">
+					<div class="d-flex mb-2">
+						<button id="agregar" class="btn btn-success mr-2" onclick="add_tipo_transaccion()">
 							<i class="bi bi-plus"></i> {{ __('Nuevo Tipo de Transacción') }}
 						</button>
+						<a id="agregar_campos_adicionales" class="btn btn-success ml-auto"
+							href="<?= route('tipo_transaccion.index_tipo_campo') ?>">
+							<i class="bi bi-plus"></i> {{ __('Agregar Campos Adicionales') }}
+						</a>
 					</div>
-					<a id="agregar_campos_adicionales" class="btn btn-success ml-auto"
-						href="<?php #route('tipo_transaccion.index_tipo_campo') ?>">
-						<i class="bi bi-plus"></i> {{ __('Agregar Campos Adicionales') }}
-					</a>
-					<br>
-					<table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+					<table id="tipos-transacciones-table" class="table table-striped table-bordered" cellspacing="0"
+						width="100%">
 						<thead>
 							<th>Nombre</th>
 							<th>Descripción</th>
@@ -177,10 +248,8 @@
 						</tbody>
 					</table>
 				</div>
-
 			</div>
 		</div>
-
 	</div>
 
 
@@ -188,10 +257,11 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title">Formulario tipos de transacciones</h5>
+					<h5 class="modal-title">Formulario tipos de transacción</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
+
+				<form id="form_tt" method="POST" enctype="multipart/form-data" class="form-horizontal" action="{{ route('tipo_transaccion.store') }}">
 					@csrf
 					<input name="_method" type="hidden" id="method">
 					<div class="modal-body form">
@@ -201,7 +271,8 @@
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">Nombre</label>
 								<div class="col-md-9">
-									<input name="nombre" maxlength="255" placeholder="Nombre del tipo de transacción" class="form-control" type="text">
+									<input name="nombre" maxlength="255" placeholder="Nombre del tipo de transacción"
+										class="form-control" type="text">
 									<span class="help-block"></span>
 								</div>
 							</div>
@@ -215,5 +286,8 @@
 			</div>
 		</div>
 	</div>
+
+
+
 
 </x-app-layout>
