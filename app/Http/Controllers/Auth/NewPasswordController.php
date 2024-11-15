@@ -41,7 +41,6 @@ class NewPasswordController extends Controller
     public function blank_pass($token, $email)
     {
 		#dd($email);
-		echo $email;
 		#return view('auth.reset_password', ['token' => $token, 'email' => $email]);    
 		return view('auth.blank_password', ['token' => $token, 'email' => $email]);    
 	}

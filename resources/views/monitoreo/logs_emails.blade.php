@@ -34,7 +34,7 @@
 					type : 'GET'
 				},
 				"order": [[ 3, "desc" ]],
-				"ordering": false,
+				"ordering": true,
 				bAutoWidth: false, 
 				aoColumns : [
 					{ sWidth: '5%' },

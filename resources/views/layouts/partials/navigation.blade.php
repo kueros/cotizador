@@ -82,9 +82,9 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
+                        <li><a class="dropdown-item hover-aleph-buttons" href="{{ url('permisos_x_rol') }}">Asignación de Permisos</a></li>
                         <li><a class="dropdown-item hover-aleph-buttons" href="{{ url('configuracion') }}">Configuraciones</a></li>
                         <li><a class="dropdown-item hover-aleph-buttons" href="{{ url('monitoreo') }}">Monitoreo</a></li>
-                        <li><a class="dropdown-item hover-aleph-buttons" href="{{ url('permisos_x_rol') }}">Asignación de Permisos</a></li>
                         <li><a class="dropdown-item hover-aleph-buttons" href="{{ url('roles') }}">Roles</a></li>
                         <li><a class="dropdown-item hover-aleph-buttons" href="{{ url('users') }}">Usuarios</a></li>
                     </ul>
