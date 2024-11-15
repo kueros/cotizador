@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tipo_transaccions', function (Blueprint $table) {
+        Schema::create('tipos_campos', function (Blueprint $table) {
             $table->id();
+            $table->string('nombre')->default('nombre');
             $table->timestamps();
         });
     }
@@ -22,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tipo_transaccions');
+        Schema::dropIfExists('tipo_campos');
     }
 };

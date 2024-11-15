@@ -12,7 +12,7 @@ class TipoTransaccion extends Model
         'nombre',
     ];
 
-    protected $primaryKey = 'rol_id';
+    protected $primaryKey = 'tipos_transacciones_id';
 }
 
 
