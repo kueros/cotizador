@@ -4,13 +4,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\Permiso_x_RolController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MonitoreoController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\OrderShipmentController;
 use App\Http\Controllers\MyController;
 use App\Http\Controllers\PermisoController;
+use App\Http\Controllers\TipoTransaccionController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
@@ -158,6 +159,18 @@ Route::middleware('auth')->group(
 	}
 );
 
+Route::middleware('auth')->group(
+	function () {
+		Route::get('/tipo_transaccion', [TipoTransaccionController::class, 'index'])->name('tipo_transaccion');
+		Route::get('/tipo_transaccion', [TipoTransaccionController::class, 'index'])->name('tipo_transaccion.index');
+		Route::get('/tipo_transaccion/ajax_listado', [TipoTransaccionController::class, 'ajax_listado'])->name('tipo_transaccion/ajax_listado');
+		Route::get('/tipo_transaccion/create', [TipoTransaccionController::class, 'create'])->name('tipo_transaccion.create');
+		Route::post('/tipo_transaccion', [TipoTransaccionController::class, 'store'])->name('tipo_transaccion.store');
+		Route::get('/tipo_transaccion/ajax_edit/{tipo_transaccion}', [TipoTransaccionController::class, 'ajax_edit'])->name('tipo_transaccion.ajax_edit');
+		Route::put('/tipo_transaccion/{tipo_transaccion}', [TipoTransaccionController::class, 'update'])->name('tipo_transaccion.update');
+		Route::post('/tipo_transaccion/ajax_delete/{id}', [TipoTransaccionController::class, 'ajax_delete'])->name('tipo_transaccion.ajax_delete');
+	}
+);
 
 require __DIR__ . '/auth.php';
 

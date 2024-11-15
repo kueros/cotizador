@@ -13,7 +13,7 @@ use App\Models\TipoTransaccion;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
-class RolController extends Controller
+class TipoTransaccionController extends Controller
 {
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
