@@ -144,7 +144,7 @@
 
 		<div class="row">
 			<div class="col-md-12">
-				<h2>Tipos de Transacciones</h2>
+				<h2>Campos Adicionales</h2>
 				@include('layouts.partials.message')
 				@if ($errors->any())
 				<div class="alert alert-danger">
@@ -159,11 +159,8 @@
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
 						<button id="agregar" class="btn btn-success mr-2" onclick="add_tipo_transaccion()">
-							<i class="bi bi-plus"></i> {{ __('Nuevo Tipo de Transacción') }}
+							<i class="bi bi-plus"></i> {{ __('Nuevo Campo Adicional') }}
 						</button>
-						<a id="agregar_campos_adicionales" class="btn btn-success ml-auto" href="{{ route('tipos_transacciones_campos_adicionales') }}">
-							<i class="bi bi-plus"></i> {{ __('Agregar Campos Adicionales') }}
-						</a>
 					</div>
 					<table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
 						<thead>

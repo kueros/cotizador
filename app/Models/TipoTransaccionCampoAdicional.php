@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CampoAdicionalTipoTransaccion extends Model
+class TipoTransaccionCampoAdicional extends Model
 {
-    protected $table = 'campos_adicionales_tipos_transacciones';
+    protected $table = 'tipos_transacciones_campos_adicionales';
 
     protected $fillable = [
         'nombre_campo',
@@ -26,5 +26,5 @@ class CampoAdicionalTipoTransaccion extends Model
 
     ];
 
-    protected $primaryKey = 'campos_adicionales_tipos_transacciones_id';
+    protected $primaryKey = 'TipoTransaccionCampoAdicionalController_id';
 }

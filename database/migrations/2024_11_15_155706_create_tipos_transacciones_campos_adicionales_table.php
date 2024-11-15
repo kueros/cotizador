@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campos_adicionales_tipos_transacciones', function (Blueprint $table) {
+        Schema::create('tipos_transacciones_campos_adicionales', function (Blueprint $table) {
             $table->id();
             $table->string('nombre_campo')->default('nombre_campo');
             $table->string('nombre_mostrar')->default('nombre_mostrar');
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campo_adicional_tipo_transaccions');
+        Schema::dropIfExists('tipos_transacciones_campos_adicionales');
     }
 };
