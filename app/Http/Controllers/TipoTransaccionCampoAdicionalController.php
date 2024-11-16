@@ -16,160 +16,203 @@ use Illuminate\Support\Facades\Validator;
 
 class TipoTransaccionCampoAdicionalController extends Controller
 {
-    /*******************************************************************************************************************************
-     *******************************************************************************************************************************/
-    public function index(Request $request, MyController $myController): View
-    {
-        /* 		$permiso_listar_roles = $myController->tiene_permiso('list_roles');
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
+	public function index(Request $request, MyController $myController): View
+	{
+		/* 		$permiso_listar_roles = $myController->tiene_permiso('list_roles');
 		if (!$permiso_listar_roles) {
 			abort(403, '.');
 			return false;
 		}
  */
 
-        $tipos_campos = TipoCampo::all();
-        $campos_adicionales = TipoTransaccionCampoAdicional::paginate();
-        return view('tipos_transacciones_campos_adicionales.index', compact('campos_adicionales', 'tipos_campos'))
-            ->with('i', ($request->input('page', 1) - 1) * $campos_adicionales->perPage());
-    }
 
-    /*******************************************************************************************************************************
-     *******************************************************************************************************************************/
-    public function ajax_listado(Request $request)
-    {
-        #dd($request);
-        $campos_adicionales = TipoTransaccionCampoAdicional::all();
-        #dd($campos_adicionales);
-        $data = array();
-        foreach ($campos_adicionales as $r) {
-            $accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol(' . "'" . $r->rol_id .
-                "'" . ')"><i class="bi bi-pencil"></i></a>';
 
-            if ($r->id != 1) {
-                $accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_rol(' . "'" . $r->rol_id .
-                    "'" . ')"><i class="bi bi-trash"></i></a>';
-            }
+		$tipos_campos = TipoCampo::all();
+		$campos_adicionales = TipoTransaccionCampoAdicional::leftJoin('tipos_campos', 'tipos_transacciones_campos_adicionales.tipo', '=', 'tipos_campos.id')
+			->select('tipos_campos.nombre as tipo_nombre', 'tipos_transacciones_campos_adicionales.*')
+			->paginate();
+		return view('tipos_transacciones_campos_adicionales.index', compact('campos_adicionales', 'tipos_campos'))
+			->with('i', ($request->input('page', 1) - 1) * $campos_adicionales->perPage());
+	}
 
-            $data[] = array(
-                $r->nombre_campo,
-                $r->nombre_mostrar,
-                $r->visible,
-                $r->orden_listado,
-                $r->requerido,
-                $r->tipo_nombre,
-                $r->valor_default,
-                $accion
-            );
-        }
-        $output = array(
-            "recordsTotal" => $campos_adicionales->count(),
-            "recordsFiltered" => $campos_adicionales->count(),
-            "data" => $data
-        );
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
+	public function ajax_listado(Request $request)
+	{
+		#dd($request);
+		$campos_adicionales = TipoTransaccionCampoAdicional::leftJoin('tipos_campos', 'tipos_transacciones_campos_adicionales.tipo', '=', 'tipos_campos.id')
+		->select('tipos_campos.nombre as tipo_nombre', 'tipos_transacciones_campos_adicionales.*')
+		->get();
 
-        return response()->json($output);
-    }
+		$data = array();
+		foreach ($campos_adicionales as $r) {
+			$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_campos_adicionales(' . "'" . $r->id .
+				"'" . ')"><i class="bi bi-pencil"></i></a>';
 
-    /*******************************************************************************************************************************
-     *******************************************************************************************************************************/
-    public function ajax_edit($id)
-    {
+			if ($r->id != 1) {
+				$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_campos_adicionales(' . "'" . $r->id .
+					"'" . ')"><i class="bi bi-trash"></i></a>';
+			}
 
-        $data = TipoTransaccionCampoAdicional::find($id);
-        return response()->json($data);
-    }
+			$data[] = array(
+				$r->nombre_campo,
+				$r->nombre_mostrar,
+				$r->visible,
+				$r->orden_listado,
+				$r->requerido,
+				$r->tipo_nombre,
+				$r->valor_default,
+				$accion
+			);
+		}
+		$output = array(
+			"recordsTotal" => $campos_adicionales->count(),
+			"recordsFiltered" => $campos_adicionales->count(),
+			"data" => $data
+		);
 
-    /*******************************************************************************************************************************
-     *******************************************************************************************************************************/
-    public function ajax_delete($id, MyController $myController)
-    {
-        /*$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
+		return response()->json($output);
+	}
+
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
+	public function ajax_edit($id)
+	{
+		#dd($id);
+		#$data = TipoTransaccionCampoAdicional::where('id',$id)->first();
+		$data = TipoTransaccionCampoAdicional::find($id);
+
+		if (!$data) {
+			return response()->json(['error' => 'Registro no encontrado'], 404);
+		}
+
+		return response()->json($data);
+	}
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
+	public function ajax_delete($id, MyController $myController)
+	{
+		/*$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
          		if (!$permiso_eliminar_roles) {
 			abort(403, '.');
 			return false;
 		} */
-        $campos_adicionales = CampoAdicionalTipoTransaccion::find($id);
-        $nombre = $campos_adicionales->nombre;
-        $clientIP = \Request::ip();
-        $userAgent = \Request::userAgent();
-        $username = Auth::user()->username;
-        $message = $username . " borró el tipo de transacción " . $nombre;
-        $myController->loguear($clientIP, $userAgent, $username, $message);
+		$campos_adicionales = CampoAdicionalTipoTransaccion::find($id);
+		$nombre = $campos_adicionales->nombre;
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		$username = Auth::user()->username;
+		$message = $username . " borró el tipo de transacción " . $nombre;
+		$myController->loguear($clientIP, $userAgent, $username, $message);
 
-        $campos_adicionales->delete();
-        return response()->json(["status" => true]);
-    }
+		$campos_adicionales->delete();
+		return response()->json(["status" => true]);
+	}
 
-    /*******************************************************************************************************************************
-     *******************************************************************************************************************************/
-    public function create(MyController $myController): View
-    {
-        /* 		$permiso_agregar_roles = $myController->tiene_permiso('add_rol');
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
+	public function create(MyController $myController): View
+	{
+		/* 		$permiso_agregar_roles = $myController->tiene_permiso('add_rol');
 		if (!$permiso_agregar_roles) {
 			abort(403, '.');
 			return false;
 		} */
-        $campos_adicionales = new CampoAdicionalTipoTransaccion();
-        return view('rol.create', compact('roles'));
-    }
+		$campos_adicionales = new CampoAdicionalTipoTransaccion();
+		return view('rol.create', compact('roles'));
+	}
 
-    /*******************************************************************************************************************************
-     * 
-     ********************************************************************************************************************************/
+	/*******************************************************************************************************************************
+	 * 
+	 ********************************************************************************************************************************/
 
-    public function store(Request $request, MyController $myController): RedirectResponse
-    {
-        #dd($request);
-        /*     $permiso_agregar_roles = $myController->tiene_permiso('add_rol');
+	public function store(Request $request, MyController $myController): RedirectResponse
+	{
+		#dd($request);
+		/*     $permiso_agregar_roles = $myController->tiene_permiso('add_rol');
     if (!$permiso_agregar_roles) {
         abort(403, '.');
         return false;
     }
  */
-        // Validar los datos del usuario
-        $validatedData = $request->validate([
-            'nombre_campo' => [
-                'required',
-                'string',
-                'max:255',
-                'min:3',
-                'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-                Rule::unique('tipos_transacciones_campos_adicionales'),
-            ],'nombre_mostrar' => [
-                'string',
-                'max:255',
-                'min:3',
-                'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-            ],'visible' => [
-                'integer',
-            ],'requerido' => [
-                'integer',
-            ],'tipo' => [
-                'integer',
-            ],
-            'valor_default' => [
-                'string',
-                'max:255',
-                'min:3',
-                'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-        ], [
-            'nombre_campo.regex' => 'El nombre solo puede contener letras y espacios.',
-            'nombre_campo.unique' => 'Este nombre de tipo de transacción ya está en uso.',]]);
+		// Validar los datos del usuario
+		$validatedData = $request->validate([
+			'nombre_campo' => [
+				'required',
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				Rule::unique('tipos_transacciones_campos_adicionales'),
+			],
+			'nombre_mostrar' => [
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+			],
+			'visible' => [
+				'integer',
+			],
+			'requerido' => [
+				'integer',
+			],
+			'tipo' => [
+				'integer',
+			],
+			'valor_default' => [
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+			],
+			[
+				'nombre_campo.regex' => 'El nombre solo puede contener letras y espacios.',
+				'nombre_campo.unique' => 'Este nombre de tipo de transacción ya está en uso.',
+			]
+		]);
 
-        /*         $tipoTransacciónExistente = CampoAdicionalTipoTransaccion::where('nombre', $request->input('nombre'))->first();
+		/*         $tipoTransacciónExistente = CampoAdicionalTipoTransaccion::where('nombre', $request->input('nombre'))->first();
         if ($tipoTransacciónExistente) {
             return redirect()->back()->withErrors(['nombre' => 'Este nombre de tipo de transacción ya está en uso.'])->withInput();
         }
  */
-#dd($validatedData);
-        TipoTransaccionCampoAdicional::create($validatedData);
+		#dd($validatedData);
+		TipoTransaccionCampoAdicional::create($validatedData);
 
-        $clientIP = \Request::ip();
-        $userAgent = \Request::userAgent();
-        $username = Auth::user()->username;
-        $message = $username . " creó el campo adicional para tipo de transacción " . $request->input('nombre');
-        $myController->loguear($clientIP, $userAgent, $username, $message);
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		$username = Auth::user()->username;
+		$message = $username . " creó el campo adicional para tipo de transacción " . $request->input('nombre');
+		$myController->loguear($clientIP, $userAgent, $username, $message);
 
-        return Redirect::route('tipos_transacciones_campos_adicionales')->with('success', 'Campo adicional para tipo de transacción creado exitosamente.');
-    }
+		return Redirect::route('tipos_transacciones_campos_adicionales')->with('success', 'Campo adicional para tipo de transacción creado exitosamente.');
+	}
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
+	public function update(Request $request,  $campo_adicional, MyController $myController): RedirectResponse
+	{
+		#dd($request);
+/* 		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
+		if (!$permiso_editar_roles) {
+			abort(403, '.');
+			return false;
+		}
+ */		// Validar los datos del usuario
+		$validatedData = $request->validate([
+			'nombre_campo' => 'required|string|max:255|unique:tipos_transacciones_campos_adicionales,nombre_campo',
+		]);
+		#dd($validatedData);
+		$campo_adicional->update($validatedData);
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		$username = Auth::user()->username;
+		$message = $username . " actualizó el campo adicional " . $_POST['nombre_campo'];
+		$myController->loguear($clientIP, $userAgent, $username, $message);
+		return Redirect::route('tipos_transacciones_campos_adicionales.index')
+		->with('success', 'Campo adicional updated successfully');
+	}
+
 }

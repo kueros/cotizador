@@ -26,5 +26,5 @@ class TipoTransaccionCampoAdicional extends Model
 
     ];
 
-    protected $primaryKey = 'TipoTransaccionCampoAdicionalController_id';
+    protected $primaryKey = 'id';
 }

@@ -1,4 +1,4 @@
-<x-app-layout title="Roles" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
+<x-app-layout title="Campos adicionales" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
 			{{ __('Tipos de Transacciones') }}
@@ -83,7 +83,9 @@
 			$('#method').val('POST');
 		}
 
-		function edit_rol(id) {
+		function edit_campos_adicionales(id) {
+
+			//console.log('edit_campos_adicionales '+id);
 			save_method = 'update';
 			$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
@@ -92,27 +94,31 @@
 
 
 			$.ajax({
-				url: "{{ url('tipos_transacciones/ajax_edit/') }}" + "/" + id,
+				url: "{{ route('tipos_transacciones_campos_adicionales.ajax_edit', ':id') }}".replace(':id', id),
 				type: "GET",
 				dataType: "JSON",
 				success: function(data) {
 					$('[name="id"]').val(data.id);
-					$('[name="nombre"]').val(data.nombre);
+					$('[name="nombre_campo"]').val(data.nombre_campo);
+					$('[name="nombre_mostrar"]').val(data.nombre_mostrar);
+					$('[name="visible"]').val(data.visible);
+					$('[name="orden_listado"]').val(data.orden_listado);
+					$('[name="requerido"]').val(data.requerido);
+					$('[name="tipo"]').val(data.tipo);
+					$('[name="valor_default"]').val(data.valor_default);
 
-					<?php //if($utilizar_id_grupo){
-					?>
-					$('[name="id_grupo"]').val(data.id_grupo);
-					<?php
-					//}
-					?>
 
 					$('#modal_form_campo_adicional').modal('show');
-					$('.modal-title').text('Editar tipo de transacción');
-					$('#form').attr('action', "{{ url('tipos_transacciones') }}" + "/" + id);
-					$('#method').val('PUT');
+					$('.modal-title').text('Editar campo adicional de tipo de transacción');
+					//$('#form').attr('action', "{{ url('tipos_transacciones_campos_adicionales') }}" + "/" + id);
+					//$('#method').val('PUT');
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					show_ajax_error_message(jqXHR, textStatus, errorThrown);
+					if (jqXHR.status === 404) {
+						alert("El registro no fue encontrado.");
+					} else {
+						show_ajax_error_message(jqXHR, textStatus, errorThrown);
+					}
 				}
 			});
 		}
@@ -139,6 +145,62 @@
 				});
 
 			}
+		}
+
+
+		function guardar_datos() {
+			let form_data = $('#form').serializeArray();
+			let url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales') }}";
+			let type_guarda_datos = "POST";
+
+			if ($('#accion').val() != "add") {
+				url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales') }}" + "/" + $('[name="id"]').val();
+				type_guarda_datos = "PUT";
+			}
+
+			show_loading();
+			$.ajax({
+				url: url_guarda_datos,
+				type: type_guarda_datos,
+				data: {
+					form_data: form_data
+				},
+				dataType: "JSON",
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				success: function(data) {
+					hide_loading();
+					if (data.status == 0) {
+						let errorMessage = data.message + "</br>";
+						if (data.errors && Object.keys(data.errors).length > 0) {
+							// Recorre cada campo y sus mensajes de error
+							for (let field in data.errors) {
+								if (data.errors.hasOwnProperty(field)) {
+									errorMessage += `${field}: ${data.errors[field].join(", ")}</br>`;
+								}
+							}
+						} else {
+							errorMessage += "No se encontraron errores específicos para los campos.";
+						}
+
+						swal.fire("Aviso", errorMessage, "warning");
+						return false;
+					} else {
+						swal.fire({
+							title: "Aviso",
+							text: data.message,
+							icon: "success"
+						}).then(() => {
+							// Recargar la tabla DataTables al cerrar el modal de éxito
+							location.reload();
+						});
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					show_ajax_error_message(jqXHR, textStatus, errorThrown);
+				}
+			});
 		}
 	</script>
 	<!--LISTADO-->
@@ -185,7 +247,10 @@
 
 	</div>
 
-
+	<?php
+	#dd($campos_adicionales);
+	#dd($tipos_campos);
+	?>
 	<div class="modal fade" id="modal_form" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -313,11 +378,11 @@
 				</div>
 				<!--form id="form_campos_adicionales" method="POST" enctype="multipart/form-data" class="form-horizontal" action="{{ route('tipos_transacciones_campos_adicionales.store') }}"-->
 				<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
+					@csrf
 					<input name="_method" type="hidden" id="method">
-					<input type="hidden" value="" name="accion" id="accion" />
-					<input type="hidden" value="" name="id" />
 					<div class="modal-body form">
-						@csrf
+						<input type="hidden" value="" name="accion" id="accion" />
+						<input type="hidden" value="" name="id" />
 						<div class="form-body">
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Nombre') }}</label>
@@ -340,6 +405,7 @@
 							</div>
 						</div>
 
+
 						<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
 									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
 									 ya que el checkbox tiene prioridad sobre el hidden -->
@@ -359,17 +425,41 @@
 
 						<div class="form-body">
 							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Orden en el Formulario') }}</label>
+								<div class="col-md-9">
+									<input name="orden_abm" placeholder="1"
+										id="orden_abm" class="form-control" type="number" required>
+									<span class="help-block"></span>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-body">
+							<div class="row mb-3">
+								<label class="col-md-3 col-form-label">{{ __('Es Obligatorio?') }}</label>
+								<div class="col-md-9">
+									<div class="form-check form-switch">
+										<input type="hidden" name="requerido" value="0">
+										<input class="form-check-input" name="requerido" id="requerido"
+											value="1" type="checkbox">
+										<label class="form-check-label" for="requerido"></label>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-body">
+							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Tipo de Campo') }}</label>
 								<div class="col-md-9">
-									<select id="id" name="id" class="mt-1 block w-full form-control" required>
+									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" required>
 										<option value="0">
 											{{ __('Elija un Tipo de Campo') }}
 										</option>
 										@foreach($tipos_campos as $tipo_campo)
-										<option value="{{ $tipo_campo->nombre }}">
+										<option value="{{ $tipo_campo->id }}">
 											{{ $tipo_campo->nombre }}
 										</option>
-										<span class="help-block">{{ $tipo_campo->tipo_nombre }} v</span>
 										@endforeach
 									</select>
 									<span class="help-block"></span>
@@ -377,19 +467,13 @@
 							</div>
 						</div>
 
-						<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
-									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
-									 ya que el checkbox tiene prioridad sobre el hidden -->
 						<div class="form-body">
-							<div class="row mb-3">
-								<label class="col-md-3 col-form-label">{{ __('Es visible?') }}</label>
+							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Valor por Defecto') }}</label>
 								<div class="col-md-9">
-									<div class="form-check form-switch">
-										<input type="hidden" name="visible" value="0">
-										<input class="form-check-input" name="visible" id="visible"
-											value="1" type="checkbox">
-										<label class="form-check-label" for="visible"></label>
-									</div>
+									<input name="valor_default" minlength="3" maxlength="255" placeholder="Valor por defecto"
+										id="valor_default" class="form-control" type="text" required>
+									<span class="help-block"></span>
 								</div>
 							</div>
 						</div>
@@ -397,8 +481,8 @@
 
 					</div>
 					<div class="modal-footer">
-						<!--a onclick="guardar_datos()" class="btn btn-primary">{{ __('Guardar') }}</a-->
-						<a type="submit" class="btn btn-primary">{{ __('Guardar') }}</a>
+						<a onclick="guardar_datos()" class="btn btn-primary">{{ __('Guardar') }}</a>
+						<!--a type="submit" class="btn btn-primary">{{ __('Guardar') }}</a-->
 						<a class="btn btn-danger" data-bs-dismiss="modal">Cancelar</a>
 					</div>
 				</form>
