@@ -13,7 +13,7 @@ class TipoTransaccion extends Model
         'descripcion',
     ];
 
-    protected $primaryKey = 'tipos_transacciones_id';
+    protected $primaryKey = 'id';
 }
 
 

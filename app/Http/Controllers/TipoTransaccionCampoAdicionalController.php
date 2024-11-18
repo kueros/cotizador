@@ -190,29 +190,49 @@ class TipoTransaccionCampoAdicionalController extends Controller
 
 		return Redirect::route('tipos_transacciones_campos_adicionales')->with('success', 'Campo adicional para tipo de transacción creado exitosamente.');
 	}
+
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
-	public function update(Request $request,  $campo_adicional, MyController $myController): RedirectResponse
+
+	public function update(Request $request, $id)
 	{
 		#dd($request);
-/* 		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
+		// Validar los datos
+		$validatedData = $request->validate([
+
+			'nombre_campo' => 'required|string|max:255',
+			'nombre_mostrar' => 'required|string|max:255',
+			'visible' => 'required|integer',
+			'requerido' => 'required|integer',
+			'tipo' => 'required|integer',
+			'valor_default' => 'required|string|max:255',
+
+		]);
+dd($validatedData);
+		// Obtener el modelo
+		$tipo_transaccion_campo_adicional = TipoTransaccionCampoAdicional::findOrFail($id);
+dd($tipo_transaccion_campo_adicional);
+		// Actualizar el modelo con los datos validados
+		$tipo_transaccion_campo_adicional->update($validatedData);
+
+		return redirect()->route('tipos_transacciones_campos_adicionales.index')->with('success', 'Campo adicional de tipo de transacción actualizado correctamente.');
+	}
+
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
+	public function edit($id, MyController $myController): View
+	{
+		#dd($id);
+		/* 		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
 		if (!$permiso_editar_roles) {
 			abort(403, '.');
 			return false;
 		}
- */		// Validar los datos del usuario
-		$validatedData = $request->validate([
-			'nombre_campo' => 'required|string|max:255|unique:tipos_transacciones_campos_adicionales,nombre_campo',
-		]);
-		#dd($validatedData);
-		$campo_adicional->update($validatedData);
-		$clientIP = \Request::ip();
-		$userAgent = \Request::userAgent();
-		$username = Auth::user()->username;
-		$message = $username . " actualizó el campo adicional " . $_POST['nombre_campo'];
-		$myController->loguear($clientIP, $userAgent, $username, $message);
-		return Redirect::route('tipos_transacciones_campos_adicionales.index')
-		->with('success', 'Campo adicional updated successfully');
+ */
+		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::find($id);
+		#dd($roles);
+		return view('tipos_transacciones_campos_adicionales.edit', compact('tipos_transacciones_campos_adicionales'));
 	}
+
 
 }

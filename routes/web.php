@@ -166,9 +166,9 @@ Route::middleware('auth')->group(
 		#Route::get('/show/{id}', [TipoTransaccionController::class, 'show'])->name('tipos_transacciones.show');
 		Route::get('/tipos_transacciones/create', [TipoTransaccionController::class, 'create'])->name('tipos_transacciones.create');
 		Route::post('/tipos_transacciones', [TipoTransaccionController::class, 'store'])->name('tipos_transacciones.store');
-		Route::get('/tipos_transacciones/{rol}/edit', [TipoTransaccionController::class, 'edit'])->name('tipos_transacciones.edit');
-		Route::put('/tipos_transacciones/{rol}', [TipoTransaccionController::class, 'update'])->name('tipos_transacciones.update');
-		Route::delete('/tipos_transacciones/{rol}', [TipoTransaccionController::class, 'destroy'])->name('tipos_transacciones.destroy');
+		Route::get('/tipos_transacciones/{id}/edit', [TipoTransaccionController::class, 'edit'])->name('tipos_transacciones.edit');
+		Route::patch('/tipos_transacciones/{id}', [TipoTransaccionController::class, 'update'])->name('tipos_transacciones.update');
+		Route::delete('/tipos_transacciones/{id}', [TipoTransaccionController::class, 'destroy'])->name('tipos_transacciones.destroy');
 		Route::post('/tipos_transacciones/options', [TipoTransaccionController::class, 'options'])->name('tipos_transacciones.options');
 		Route::get('/tipos_transacciones/fields', [TipoTransaccionController::class, 'fields'])->name('tipos_transacciones.fields');
 		Route::get('/tipos_transacciones/ajax_listado', [TipoTransaccionController::class, 'ajax_listado'])->name('tipos_transacciones.ajax_listado');
@@ -183,8 +183,8 @@ Route::middleware('auth')->group(
 		Route::get('/tipos_transacciones_campos_adicionales/create', [TipoTransaccionCampoAdicionalController::class, 'create'])->name('tipos_transacciones_campos_adicionales.create');
 		Route::post('/tipos_transacciones_campos_adicionales', [TipoTransaccionCampoAdicionalController::class, 'store'])->name('tipos_transacciones_campos_adicionales.store');
 		Route::get('/tipos_transacciones_campos_adicionales/{campo_adicional}/edit', [TipoTransaccionCampoAdicionalController::class, 'edit'])->name('tipos_transacciones_campos_adicionales.edit');
-		Route::put('/tipos_transacciones_campos_adicionales/{id}', [TipoTransaccionCampoAdicionalController::class, 'update'])->name('tipos_transacciones_campos_adicionales.update');
-		#Route::delete('/tipos_transacciones_campos_adicionales/{rol}', [TipoTransaccionCampoAdicionalController::class, 'destroy'])->name('tipos_transacciones_campos_adicionales.destroy');
+		Route::patch('/tipos_transacciones_campos_adicionales/{id}', [TipoTransaccionCampoAdicionalController::class, 'update'])->name('tipos_transacciones_campos_adicionales.update');
+		Route::delete('/tipos_transacciones_campos_adicionales/{rol}', [TipoTransaccionCampoAdicionalController::class, 'destroy'])->name('tipos_transacciones_campos_adicionales.destroy');
 		#Route::post('/tipos_transacciones_campos_adicionales/options', [TipoTransaccionCampoAdicionalController::class, 'options'])->name('tipos_transacciones_campos_adicionales.options');
 		#Route::get('/tipos_transacciones_campos_adicionales/fields', [TipoTransaccionCampoAdicionalController::class, 'fields'])->name('tipos_transacciones_campos_adicionales.fields');
 		Route::get('/tipos_transacciones_campos_adicionales/ajax_listado', [TipoTransaccionCampoAdicionalController::class, 'ajax_listado'])->name('tipos_transacciones_campos_adicionales.ajax_listado');

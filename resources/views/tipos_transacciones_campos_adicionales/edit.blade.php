@@ -10,7 +10,7 @@
 
 			<div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
 				<div class="max-w-xl">
-					@include('rol.partials.edit-rol-form')
+					@include('tipos_transacciones_campos_adicionales.partials.edit-tipos_transacciones_campos_adicionales-form')
 				</div>
 			</div>
 

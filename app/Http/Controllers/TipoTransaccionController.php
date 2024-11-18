@@ -170,39 +170,33 @@ class TipoTransaccionController extends Controller
 	public function edit($id, MyController $myController): View
 	{
 		#dd($id);
-		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
+/* 		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
 		if (!$permiso_editar_roles) {
 			abort(403, '.');
 			return false;
 		}
-		$roles = Rol::find($id);
+ */		$tipos_transacciones = TipoTransaccion::find($id);
 		#dd($roles);
-		return view('rol.edit', compact('roles'));
+		return view('tipos_transacciones.edit', compact('tipos_transacciones'));
 	}
 
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
-	public function update(Request $request, Rol $rol, MyController $myController): RedirectResponse
+
+	public function update(Request $request, $id)
 	{
-		#dd($request);
-		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
-		if (!$permiso_editar_roles) {
-			abort(403, '.');
-			return false;
-		}
-		// Validar los datos del usuario
+		// Validar los datos
 		$validatedData = $request->validate([
-			'nombre' => 'required|string|max:255|unique:roles,nombre',
+			'nombre' => 'required|string|max:255',
 		]);
-		#dd($validatedData);
-		$rol->update($validatedData);
-		$clientIP = \Request::ip();
-		$userAgent = \Request::userAgent();
-		$username = Auth::user()->username;
-		$message = $username . " actualizó el rol " . $_POST['nombre'];
-		$myController->loguear($clientIP, $userAgent, $username, $message);
-		return Redirect::route('roles.index')
-			->with('success', 'Rol updated successfully');
+
+		// Obtener el modelo
+		$tipo_transaccion = TipoTransaccion::findOrFail($id);
+
+		// Actualizar el modelo con los datos validados
+		$tipo_transaccion->update($validatedData);
+
+		return redirect()->route('tipos_transacciones.index')->with('success', 'Tipo de transacción actualizado correctamente.');
 	}
 
 	/*******************************************************************************************************************************

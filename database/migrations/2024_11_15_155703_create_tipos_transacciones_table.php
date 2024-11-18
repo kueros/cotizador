@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tipos_transacciones', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->string('nombre')->nullable();
             $table->string('descripcion')->nullable();
             $table->timestamps();
         });

@@ -226,20 +226,57 @@
 							<i class="bi bi-plus"></i> {{ __('Nuevo Campo Adicional') }}
 						</button>
 					</div>
-					<table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
-						<thead>
-							<th>Nombre</th>
-							<th>Nombre a Mostrar</th>
-							<th>Es visible?</th>
-							<th>Orden</th>
-							<th>Es obligatorio?</th>
-							<th>Tipo</th>
-							<th>Default</th>
-							<th style="width:20%;" class="no-sort">Acción</th>
+
+					<table id="example" class="cell-border" style="width:100%">
+						<thead class="thead">
+							<tr>
+								<th>Nombre</th>
+								<th>Nombre a Mostrar</th>
+								<th>Es visible?</th>
+								<th>Orden</th>
+								<th>Es obligatorio?</th>
+								<th>Tipo</th>
+								<th>Default</th>
+								<th colspan="2" class="text-center">Acciones</th>
+							</tr>
 						</thead>
 						<tbody>
+							<?php
+							#dd($campos_adicionales);
+							#dd($tipos_campos); 
+
+							?>
+							@foreach ($campos_adicionales as $campo_adicional)
+							<tr>
+								<td>{{ $campo_adicional->nombre_campo }}</td>
+								<td>{{ $campo_adicional->nombre_mostrar }}</td>
+								<td>{{ $campo_adicional->visible }}</td>
+								<td>{{ $campo_adicional->orden_listado }}</td>
+								<td>{{ $campo_adicional->requerido }}</td>
+								<td>{{ $campo_adicional->tipo }}</td>
+								<td>{{ $campo_adicional->default }}</td>
+								<td>
+									<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('tipos_transacciones_campos_adicionales.edit', $campo_adicional->id) }}">
+										<i class="fas fa-pencil-alt"></i>
+									</a>
+
+									<form action="{{ route('tipos_transacciones_campos_adicionales.destroy', $campo_adicional->id) }}" method="POST" style="display:inline;">
+										@csrf
+										@method('DELETE')
+										<button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar este campo adicional?')">
+											<i class="fas fa-trash"></i>
+										</button>
+									</form>
+								</td>
+								</form>
+
+								</td>
+							</tr>
+							@endforeach
 						</tbody>
 					</table>
+
+
 				</div>
 
 			</div>

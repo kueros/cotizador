@@ -165,13 +165,46 @@
 							<i class="bi bi-plus"></i> {{ __('Agregar Campos Adicionales') }}
 						</a>
 					</div>
-					<table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+					<!--table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
 						<thead>
 							<th>Nombre</th>
 							<th>Descripción</th>
 							<th style="width:20%;" class="no-sort">Acción</th>
 						</thead>
 						<tbody>
+						</tbody>
+					</table-->
+					<table id="example" class="cell-border" style="width:100%">
+						<thead class="thead">
+							<tr>
+								<th>Nombre</th>
+								<th>Descripción</th>
+								<th colspan="2" class="text-center">Acciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach ($tipos_transacciones as $tipo_transaccion)
+							<tr>
+								<td>{{ $tipo_transaccion->nombre }}</td>
+								<td>{{ $tipo_transaccion->descripcion }}</td>
+								<td>
+									<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('tipos_transacciones.edit', $tipo_transaccion->id) }}">
+										<i class="fas fa-pencil-alt"></i>
+									</a>
+
+									<form action="{{ route('tipos_transacciones.destroy', $tipo_transaccion->id) }}" method="POST" style="display:inline;">
+										@csrf
+										@method('DELETE')
+										<button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar este usuario?')">
+											<i class="fas fa-trash"></i>
+										</button>
+									</form>
+								</td>
+								</form>
+
+								</td>
+							</tr>
+							@endforeach
 						</tbody>
 					</table>
 				</div>
