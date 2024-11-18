@@ -198,29 +198,30 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	{
 		#dd($request);
 		// Validar los datos
+		$request->merge([
+			'visible' => $request->has('visible') ? 1 : 0,
+			'requerido' => $request->has('requerido') ? 1 : 0,
+		]);
 		$validatedData = $request->validate([
-
 			'nombre_campo' => 'required|string|max:255',
 			'nombre_mostrar' => 'required|string|max:255',
 			'visible' => 'required|integer',
 			'requerido' => 'required|integer',
 			'tipo' => 'required|integer',
 			'valor_default' => 'required|string|max:255',
-
-		]);
-dd($validatedData);
-		// Obtener el modelo
+		]);		// Obtener el modelo
+		#dd($validatedData);
 		$tipo_transaccion_campo_adicional = TipoTransaccionCampoAdicional::findOrFail($id);
-dd($tipo_transaccion_campo_adicional);
 		// Actualizar el modelo con los datos validados
 		$tipo_transaccion_campo_adicional->update($validatedData);
 
-		return redirect()->route('tipos_transacciones_campos_adicionales.index')->with('success', 'Campo adicional de tipo de transacción actualizado correctamente.');
+		return redirect()->route('tipos_transacciones_campos_adicionales')->with('success', 'Campo adicional de tipo de transacción actualizado correctamente.');
 	}
 
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
-	public function edit($id, MyController $myController): View
+
+	 public function edit($id, MyController $myController): View
 	{
 		#dd($id);
 		/* 		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
@@ -229,9 +230,38 @@ dd($tipo_transaccion_campo_adicional);
 			return false;
 		}
  */
-		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::find($id);
+/* 		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::find($id);
 		#dd($roles);
 		return view('tipos_transacciones_campos_adicionales.edit', compact('tipos_transacciones_campos_adicionales'));
+ */
+		$tipos_campos = TipoCampo::all();
+		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::
+			where('tipos_transacciones_campos_adicionales.id', $id)
+			->leftJoin('tipos_campos', 'tipos_transacciones_campos_adicionales.tipo', '=', 'tipos_campos.id')
+			->select('tipos_campos.nombre as tipo_nombre', 'tipos_transacciones_campos_adicionales.*')
+			->first();
+		return view('tipos_transacciones_campos_adicionales.edit', compact('tipos_transacciones_campos_adicionales', 'tipos_campos'));
+	}
+
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
+	public function destroy($id, MyController $myController): RedirectResponse
+	{
+		/* 		$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
+		if (!$permiso_eliminar_roles) {
+			abort(403, '.');
+			return false;
+		}
+ */
+		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::find($id);
+		// Almacena el nombre de rol antes de eliminarlo
+		$nombre = $tipos_transacciones_campos_adicionales->nombre_campo;
+		// Elimina el rol
+		$tipos_transacciones_campos_adicionales->delete();
+		$message = Auth::user()->username . " borró el campo adicional de tipo de transacción " . $nombre;
+		Log::info($message);
+		return Redirect::route('tipos_transacciones_campos_adicionales')
+			->with('success', 'Campo adicional de tipo de transacción exitosamente borrado');
 	}
 
 

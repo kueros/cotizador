@@ -21,6 +21,12 @@
 			<x-input-error :messages="$errors->get('nombre')" class="mt-2" />
 		</div>
 
+		<div>
+			<x-input-label for="descripcion" :value="__('Descripción')" />
+			<x-text-input id="descripcion" value="{{ $tipos_transacciones->descripcion }}" name="descripcion" type="text" class="mt-1 block w-full" autocomplete="descripcion" />
+			<x-input-error :messages="$errors->get('descripcion')" class="mt-2" />
+		</div>
+
 
 		<div class="flex items-center gap-4">
 			<x-primary-button>{{ __('Save') }}</x-primary-button>

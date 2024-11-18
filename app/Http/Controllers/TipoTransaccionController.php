@@ -188,6 +188,7 @@ class TipoTransaccionController extends Controller
 		// Validar los datos
 		$validatedData = $request->validate([
 			'nombre' => 'required|string|max:255',
+			'descripcion' => 'required|string|max:255',
 		]);
 
 		// Obtener el modelo
@@ -203,20 +204,21 @@ class TipoTransaccionController extends Controller
 	*******************************************************************************************************************************/
 	public function destroy($id, MyController $myController): RedirectResponse
 	{
-		$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
+		/* 		$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
 		if (!$permiso_eliminar_roles) {
 			abort(403, '.');
 			return false;
 		}
-		$rol = Rol::find($id);
+ */
+		$tipos_transacciones = TipoTransaccion::find($id);
 		// Almacena el nombre de rol antes de eliminarlo
-		$nombre = $rol->nombre;
+		$nombre = $tipos_transacciones->nombre;
 		// Elimina el rol
-		$rol->delete();
-		$message = Auth::user()->username . " borró el rol " . $nombre;
+		$tipos_transacciones->delete();
+		$message = Auth::user()->username . " borró el tipo de transacción " . $nombre;
 		Log::info($message);
-		return Redirect::route('roles.index')
-			->with('success', 'Rol deleted successfully');
+		return Redirect::route('tipos_transacciones.index')
+			->with('success', 'Tipo de transacción exitosamente borrado');
 	}
 
 }

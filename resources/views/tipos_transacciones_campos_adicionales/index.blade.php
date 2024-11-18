@@ -253,8 +253,8 @@
 								<td>{{ $campo_adicional->visible }}</td>
 								<td>{{ $campo_adicional->orden_listado }}</td>
 								<td>{{ $campo_adicional->requerido }}</td>
-								<td>{{ $campo_adicional->tipo }}</td>
-								<td>{{ $campo_adicional->default }}</td>
+								<td>{{ $campo_adicional->tipo_nombre }}</td>
+								<td>{{ $campo_adicional->valor_default }}</td>
 								<td>
 									<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('tipos_transacciones_campos_adicionales.edit', $campo_adicional->id) }}">
 										<i class="fas fa-pencil-alt"></i>
