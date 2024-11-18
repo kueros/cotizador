@@ -41,10 +41,13 @@ class TipoTransaccionController extends Controller
 
 
 
-			$accion = '<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route(\"tipos_transacciones_campos_adicionales.edit\", ' . $r->id . ') }}">
-						<i class="fas fa-pencil-alt"></i>
-						</a>';
-			#$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol(' . "'" . $r->rol_id .
+			$accion = "<a class=\"btn btn-sm btn-outline-primary\" title=\"Editar\" href=\"{{ route(\"tipos_transacciones_campos_adicionales.edit\", \" . $r->id . \") }}\">
+						<i class=\"fas fa-pencil-alt\"></i>
+						</a>";
+
+
+
+						#$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol(' . "'" . $r->rol_id .
 			#	"'" . ')"><i class="bi bi-pencil"></i></a>';
 
 
