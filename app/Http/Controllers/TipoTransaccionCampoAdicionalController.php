@@ -53,10 +53,9 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		foreach ($campos_adicionales as $r) {
 
 			$definirCamposUrl = route('tipos_transacciones_campos_adicionales.edit', $r->id);
-			$accion = '<a class="btn btn-sm btn-primary" href="' . $definirCamposUrl . '" title="Definir Campos"><i class="bi bi-pencil"></i></a>';
+			$accion = '<a class="btn btn-sm btn-primary" href="' . $definirCamposUrl . '" title="Definir Campos">Definir Campos</a>';
 
-			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_campos_adicionales(' . "'" . $r->id .
-				"'" . ')"><i class="bi bi-trash"></i></a>';
+			#$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_campos_adicionales(' . "'" . $r->id . "'" . ')"><i class="bi bi-trash"></i></a>';
 			$data[] = array(
 				$r->nombre_campo,
 				$r->nombre_mostrar,
@@ -99,7 +98,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			abort(403, '.');
 			return false;
 		} */
-		$campos_adicionales = CampoAdicionalTipoTransaccion::find($id);
+		$campos_adicionales = TipoTransaccionCampoAdicional::find($id);
 		$nombre = $campos_adicionales->nombre;
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
@@ -166,7 +165,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		#$this->compliance->get_by_id($norma_id);
 
 		$tabla = 'transacciones';
-		$columna = 'dolares';
+		$columna = $nombre_campo;
 
 		if($inserted_id){
 
@@ -189,26 +188,6 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		}else{
 			return false;
 		}
-
-
-
-
-
-
-
-/* 
-Para preguntar a Adrián.
-YO tengo la tabla tipos_transacciones y tipos_transacciones_campos_adicionales. En la primera guardo los tipos de transacciones y en la segunda la información
-de los campos adicionales que se van creando.
-Pero yo entiendo que hay una tercera tabla que es la que se va modificando a nivel de estructura con los datos que se cargan en la tabla tipos_transacciones_campos_adicionales.
-Esto es asi?
-Porque si es asi, entonces debería hacer un insert en la tabla tipos_transacciones_campos_adicionales y luego hacer un alter table en la tabla que se va modificando.
-Pero si no es asi, entonces no entiendo como se va a guardar la información de los campos adicionales.
-Porque si yo hago un insert en la tabla tipos_transacciones_campos_adicionales, pero no hago un alter table en la tabla que se va modificando, entonces no se va a guardar la información de los campos adicionales.
-
-me explico?
-
-*/
 
 
 

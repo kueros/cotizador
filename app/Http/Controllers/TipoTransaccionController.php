@@ -39,9 +39,7 @@ class TipoTransaccionController extends Controller
 		$data = array();
         foreach($tipos_transacciones as $r) {
 			$definirCamposUrl = route('tipos_transacciones_campos_adicionales');
-			$accion = '<a class="btn btn-sm btn-info" href="' . $definirCamposUrl . '" title="Definir Campos"><i class="bi bi-pencil"></i></a>';
-
-#			$accion = '<a class="btn btn-sm btn-info" href="javascript:void(0)" title="Definir Campos" onclick="{{ route(\"tipos_transacciones_campos_adicionales\") }}"><i class="bi bi-pencil"></i></a>';
+			$accion = '<a class="btn btn-sm btn-info" href="' . $definirCamposUrl . '" title="Definir Campos">Definir Campos</a>';
 
 			$accion .= '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_tipos_transacciones(' . "'" . $r->id .
 			"'" . ')"><i class="bi bi-pencil"></i></a>';
@@ -75,7 +73,7 @@ class TipoTransaccionController extends Controller
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
 	public function ajax_delete($id, MyController $myController){
-        $permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
+        #$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
 		/* 		if (!$permiso_eliminar_roles) {
 			abort(403, '.');
 			return false;

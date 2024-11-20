@@ -12,7 +12,7 @@
 	$permiso_editar_roles = tiene_permiso('edit_rol');
 	$permiso_eliminar_roles = tiene_permiso('del_rol');
 	@endphp
-	<?php 
+	<?php
 	#dd($valores); 
 	?>
 
@@ -20,11 +20,9 @@
 		var table;
 		var save_method;
 
-		jQuery(document).ready(function($) 
-		{
+		jQuery(document).ready(function($) {
 
-			$("#form").submit(function(e) 
-			{
+			$("#form").submit(function(e) {
 				e.preventDefault();
 				var formData = new FormData(this);
 
@@ -173,7 +171,7 @@
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		function delete_rol(id) {
+		function delete_campos_adicionales(id) {
 			if (confirm('¿Desea borrar el tipo de transacción?')) {
 
 				$.ajax({
@@ -256,24 +254,22 @@
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		function cambiar_tipo_campo(selector)
-		{
+		function cambiar_tipo_campo(selector) {
 			//alert(selector);
-	        var tipo_campo = $(selector).val();
-			switch(tipo_campo){
+			var tipo_campo = $(selector).val();
+			switch (tipo_campo) {
 				case '4':
 					$('#div_valores_selector').show();
 					break;
 				default:
 					$('#div_valores_selector').hide();
 					break;
-        	}
-    	}
+			}
+		}
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		function agregar_valor_selector() 
-		{
+		function agregar_valor_selector() {
 			var td = '<tr><td><input class="form-control" type="text" maxlength="255" minlength="1" required name="valores[]"/></td><td><a class="btn btn-danger" onclick="eliminar_valor(this)"><span class="glyphicon glyphicon-trash"></a></td></tr>';
 			$('#valores_selector tbody').append(td);
 		}
@@ -403,20 +399,20 @@
 							</div>
 						</div>
 
-                        <div id="div_valores_selector" class="form-group" style="display:none">
-                            <hr>
-                            <a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
-                            <div class="table-responsive">
-                                <table class="table" id="valores_selector">
-                                    <thead>
-                                        <th>Valor</th>
-                                        <th>Acción</th>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+						<div id="div_valores_selector" class="form-group" style="display:none">
+							<hr>
+							<a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
+							<div class="table-responsive">
+								<table class="table" id="valores_selector">
+									<thead>
+										<th>Valor</th>
+										<th>Acción</th>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+							</div>
+						</div>
 
 					</div>
 					<div class="modal-footer">
