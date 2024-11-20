@@ -1,4 +1,4 @@
-<x-app-layout title="Roles" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
+<x-app-layout title="Tipos de Transacciones" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
 			{{ __('Tipos de Transacciones') }}
@@ -80,7 +80,7 @@
 			$('#method').val('POST');
 		}
 
-		function edit_rol(id) {
+		function edit_tipos_transacciones(id) {
 			save_method = 'update';
 			$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
@@ -106,7 +106,7 @@
 					$('#modal_form').modal('show');
 					$('.modal-title').text('Editar tipo de transacción');
 					$('#form').attr('action', "{{ url('tipos_transacciones') }}" + "/" + id);
-					$('#method').val('PUT');
+					$('#method').val('PATCH');
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					show_ajax_error_message(jqXHR, textStatus, errorThrown);
@@ -141,7 +141,6 @@
 
 	<!--LISTADO-->
 	<div class="container">
-
 		<div class="row">
 			<div class="col-md-12">
 				<h2>Tipos de Transacciones</h2>
@@ -155,63 +154,23 @@
 					</ul>
 				</div>
 				@endif
-
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
 						<button id="agregar" class="btn btn-success mr-2" onclick="add_tipo_transaccion()">
 							<i class="bi bi-plus"></i> {{ __('Nuevo Tipo de Transacción') }}
 						</button>
-						<a id="agregar_campos_adicionales" class="btn btn-success ml-auto" href="{{ route('tipos_transacciones_campos_adicionales') }}">
-							<i class="bi bi-plus"></i> {{ __('Agregar Campos Adicionales') }}
-						</a>
 					</div>
-					<!--table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+					<table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
 						<thead>
 							<th>Nombre</th>
-							<th>Descripción</th>
 							<th style="width:20%;" class="no-sort">Acción</th>
 						</thead>
 						<tbody>
 						</tbody>
-					</table-->
-					<table id="example" class="cell-border" style="width:100%">
-						<thead class="thead">
-							<tr>
-								<th>Nombre</th>
-								<th>Descripción</th>
-								<th colspan="2" class="text-center">Acciones</th>
-							</tr>
-						</thead>
-						<tbody>
-							@foreach ($tipos_transacciones as $tipo_transaccion)
-							<tr>
-								<td>{{ $tipo_transaccion->nombre }}</td>
-								<td>{{ $tipo_transaccion->descripcion }}</td>
-								<td>
-									<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('tipos_transacciones.edit', $tipo_transaccion->id) }}">
-										<i class="fas fa-pencil-alt"></i>
-									</a>
-
-									<form action="{{ route('tipos_transacciones.destroy', $tipo_transaccion->id) }}" method="POST" style="display:inline;">
-										@csrf
-										@method('DELETE')
-										<button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar este usuario?')">
-											<i class="fas fa-trash"></i>
-										</button>
-									</form>
-								</td>
-								</form>
-
-								</td>
-							</tr>
-							@endforeach
-						</tbody>
 					</table>
 				</div>
-
 			</div>
 		</div>
-
 	</div>
 
 

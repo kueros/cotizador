@@ -16,6 +16,32 @@ return new class extends Migration
             $table->string('nombre')->default('nombre');
             $table->timestamps();
         });
+        DB::table('tipos_campos')->insert([
+			[
+				'id' => 1,
+				'nombre' => 'Texto',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'id' => 2,
+				'nombre' => 'Número',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'id' => 3,
+				'nombre' => 'Fecha',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+			[
+				'id' => 4,
+				'nombre' => 'Selector',
+				'created_at' => now(),
+				'updated_at' => now()
+			],
+        ]);
     }
 
     /**

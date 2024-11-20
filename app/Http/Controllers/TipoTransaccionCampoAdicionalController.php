@@ -11,8 +11,11 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
 use App\Models\TipoTransaccionCampoAdicional;
 use App\Models\TipoCampo;
+use App\Models\Transaccion;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 class TipoTransaccionCampoAdicionalController extends Controller
 {
@@ -48,22 +51,19 @@ class TipoTransaccionCampoAdicionalController extends Controller
 
 		$data = array();
 		foreach ($campos_adicionales as $r) {
-			$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_campos_adicionales(' . "'" . $r->id .
-				"'" . ')"><i class="bi bi-pencil"></i></a>';
 
-			if ($r->id != 1) {
-				$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_campos_adicionales(' . "'" . $r->id .
-					"'" . ')"><i class="bi bi-trash"></i></a>';
-			}
+			$definirCamposUrl = route('tipos_transacciones_campos_adicionales.edit', $r->id);
+			$accion = '<a class="btn btn-sm btn-primary" href="' . $definirCamposUrl . '" title="Definir Campos"><i class="bi bi-pencil"></i></a>';
 
+			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_campos_adicionales(' . "'" . $r->id .
+				"'" . ')"><i class="bi bi-trash"></i></a>';
 			$data[] = array(
 				$r->nombre_campo,
 				$r->nombre_mostrar,
-				$r->visible,
 				$r->orden_listado,
 				$r->requerido,
 				$r->tipo_nombre,
-				$r->valor_default,
+				$r->valores,
 				$accion
 			);
 		}
@@ -113,6 +113,185 @@ class TipoTransaccionCampoAdicionalController extends Controller
 
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
+	public function ajax_guardar_columna()
+	{
+		$nombre_campo = str_replace(' ','_',strtolower($_POST['nombre_campo']));
+		$nombre_campo = substr($nombre_campo, 0, 60);
+		#$tipo_trasaccion_id = $_POST['tipo_trasaccion_id'];
+		$existe = Transaccion::where('nombre', $nombre_campo)->first();
+		#$existe = $this->generic->get_row_from_table("compliance_secciones_campos",array("norma_id" => $norma_id, "nombre_mostrar" => $_POST['nombre']));
+		if($existe){
+			echo "El campo ya existe";
+			return false;
+		}
+#print_r($_POST);
+		switch($_POST['tipo']){
+			case '2'://Verifico que tenga valores
+				if(!isset($_POST['valores']) || empty($_POST['valores'])){
+					echo "Se deben agregar valores para el selector";
+					return false;
+				}
+				break;
+			default:
+				break;
+		}
+
+		if(isset($_POST['requerido'])){
+			$requerido = 1;
+		}else{
+			$requerido = 0;
+		}
+
+		//Creo el campo si no existe
+		$data_campo = array(
+			'nombre_campo' => $nombre_campo,
+			'nombre_mostrar' => $_POST['nombre_mostrar'],
+			'tipo' => $_POST['tipo'],
+			'requerido' => $requerido,
+			'posicion' => $_POST['posicion']#,
+			#'tipo_trasaccion_id' => $tipo_trasaccion_id
+		);
+
+		if(!empty($_POST['valores']) && $_POST['tipo'] == 4){
+			$data_campo['valores_campo'] = json_encode($_POST['valores']);
+		}
+
+/* 			if($_POST['tipo_campo'] == 5){
+			$data_campo['nivel_id'] = $_POST['nivel_modelo_id'];
+		}
+*/
+		$inserted_id = TipoTransaccionCampoAdicional::create($data_campo);
+		#$inserted_id = $this->generic->save_on_table("compliance_secciones_campos",$data_campo);
+		#$datos_transaccion = TipoTransaccionCampoAdicional::find($tipo_trasaccion_id);
+		#$this->compliance->get_by_id($norma_id);
+
+		$tabla = 'transacciones';
+		$columna = 'dolares';
+
+		if($inserted_id){
+
+			if(!Schema::hasColumn($tabla, $columna)){
+				Schema::table($tabla, function(Blueprint $table) use ($columna){
+					$table->string($columna)->nullable()->after('nombre');
+				});
+			}
+
+/* 			if(!$this->generic->check_field_exist($nombre_campo, "compliance_secciones")){
+				$query_update = "ALTER TABLE compliance_secciones ADD COLUMN ".$nombre_campo." TEXT";
+				$this->generic->run_query($query_update);
+			}
+ */
+/* 			$this->guardar_log('Creó el campo con el nombre "'.$_POST['nombre'].'" para las secciones de la Norma Compliance "'.$datos_norma->nombre.'"');
+			$this->session->set_flashdata('success_message', 'Columna creada.');
+ */
+			#echo "true";
+			return true;
+		}else{
+			return false;
+		}
+
+
+
+
+
+
+
+/* 
+Para preguntar a Adrián.
+YO tengo la tabla tipos_transacciones y tipos_transacciones_campos_adicionales. En la primera guardo los tipos de transacciones y en la segunda la información
+de los campos adicionales que se van creando.
+Pero yo entiendo que hay una tercera tabla que es la que se va modificando a nivel de estructura con los datos que se cargan en la tabla tipos_transacciones_campos_adicionales.
+Esto es asi?
+Porque si es asi, entonces debería hacer un insert en la tabla tipos_transacciones_campos_adicionales y luego hacer un alter table en la tabla que se va modificando.
+Pero si no es asi, entonces no entiendo como se va a guardar la información de los campos adicionales.
+Porque si yo hago un insert en la tabla tipos_transacciones_campos_adicionales, pero no hago un alter table en la tabla que se va modificando, entonces no se va a guardar la información de los campos adicionales.
+
+me explico?
+
+*/
+
+
+
+
+		return true;
+		#$this->asignar_permiso();
+
+		//Verifico que la columna no exista
+		#$nombre_sin_caracteres = $this->eliminar_caracteres_invalidos($_POST['nombre']);
+		$nombre_campo = str_replace(' ','_',strtolower($nombre_sin_caracteres));
+		$nombre_campo = substr($nombre_campo, 0, 60);
+		$tipo_trasaccion_id = $_POST['tipo_trasaccion_id'];
+
+		$existe = $this->generic->get_row_from_table("transacciones",array("tipo_trasaccion_id" => $tipo_trasaccion_id, "nombre_mostrar" => $_POST['nombre']));
+		if($existe){
+			echo "El campo ya existe";
+			return false;
+		}
+
+		switch($_POST['tipo_campo']){
+			case '2'://Verifico que tenga valores
+				if(!isset($_POST['valores']) || empty($_POST['valores'])){
+					echo "Se deben agregar valores para el selector";
+					return false;
+				}
+				break;
+			case '5':
+				if(!isset($_POST['nivel_modelo_id']) || $_POST['nivel_modelo_id'] == ''){
+					echo "Se debe seleccionar un nivel del modelo de negocio";
+					return false;
+				}
+				break;
+			default:
+				break;
+		}
+
+		if(isset($_POST['requerido'])){
+			$requerido = 1;
+		}else{
+			$requerido = 0;
+		}
+
+		//Creo el campo si no existe
+		$data_campo = array(
+			'nombre_campo' => $nombre_campo,
+			'nombre_mostrar' => $_POST['nombre_mostrar'],
+			'tipo_campo' => $_POST['tipo'],
+			'requerido' => $requerido,
+			'posicion' => $_POST['posicion'],
+			'tipo_trasaccion_id' => $tipo_trasaccion_id
+		);
+
+		if(!empty($_POST['valores']) && $_POST['tipo_campo'] == 2){
+			$data_campo['valores_campo'] = json_encode($_POST['valores']);
+		}
+
+		if($_POST['tipo_campo'] == 5){
+			$data_campo['nivel_id'] = $_POST['nivel_modelo_id'];
+		}
+
+		$inserted_id = $this->generic->save_on_table("compliance_secciones_campos",$data_campo);
+
+		$datos_norma = $this->compliance->get_by_id($norma_id);
+
+		if($inserted_id){
+			if(!$this->generic->check_field_exist($nombre_campo, "compliance_secciones")){
+				$query_update = "ALTER TABLE compliance_secciones ADD COLUMN ".$nombre_campo." TEXT";
+				$this->generic->run_query($query_update);
+			}
+
+			$this->guardar_log('Creó el campo con el nombre "'.$_POST['nombre'].'" para las secciones de la Norma Compliance "'.$datos_norma->nombre.'"');
+			$this->session->set_flashdata('success_message', 'Columna creada.');
+
+			echo "true";
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
 	public function create(MyController $myController): View
 	{
 		/* 		$permiso_agregar_roles = $myController->tiene_permiso('add_rol');
@@ -130,13 +309,15 @@ class TipoTransaccionCampoAdicionalController extends Controller
 
 	public function store(Request $request, MyController $myController): RedirectResponse
 	{
-		#dd($request);
+		#dd($request->valores);
 		/*     $permiso_agregar_roles = $myController->tiene_permiso('add_rol');
     if (!$permiso_agregar_roles) {
         abort(403, '.');
         return false;
     }
  */
+		#dd($request->valores);
+
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
 			'nombre_campo' => [
@@ -162,12 +343,6 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			'tipo' => [
 				'integer',
 			],
-			'valor_default' => [
-				'string',
-				'max:255',
-				'min:3',
-				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-			],
 			[
 				'nombre_campo.regex' => 'El nombre solo puede contener letras y espacios.',
 				'nombre_campo.unique' => 'Este nombre de tipo de transacción ya está en uso.',
@@ -178,10 +353,12 @@ class TipoTransaccionCampoAdicionalController extends Controller
         if ($tipoTransacciónExistente) {
             return redirect()->back()->withErrors(['nombre' => 'Este nombre de tipo de transacción ya está en uso.'])->withInput();
         }
- */
-		#dd($validatedData);
-		TipoTransaccionCampoAdicional::create($validatedData);
+		 */
 
+		$campo = TipoTransaccionCampoAdicional::create($validatedData);
+		$valores = implode(',', $request->valores);
+		$campo->valores = $valores;
+		$campo->save();
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
@@ -205,10 +382,9 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		$validatedData = $request->validate([
 			'nombre_campo' => 'required|string|max:255',
 			'nombre_mostrar' => 'required|string|max:255',
-			'visible' => 'required|integer',
 			'requerido' => 'required|integer',
 			'tipo' => 'required|integer',
-			'valor_default' => 'required|string|max:255',
+			'valor_default' => 'max:255',
 		]);		// Obtener el modelo
 		#dd($validatedData);
 		$tipo_transaccion_campo_adicional = TipoTransaccionCampoAdicional::findOrFail($id);

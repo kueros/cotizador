@@ -38,28 +38,19 @@ class TipoTransaccionController extends Controller
 		#dd($tipos_transacciones);
 		$data = array();
         foreach($tipos_transacciones as $r) {
+			$definirCamposUrl = route('tipos_transacciones_campos_adicionales');
+			$accion = '<a class="btn btn-sm btn-info" href="' . $definirCamposUrl . '" title="Definir Campos"><i class="bi bi-pencil"></i></a>';
 
+#			$accion = '<a class="btn btn-sm btn-info" href="javascript:void(0)" title="Definir Campos" onclick="{{ route(\"tipos_transacciones_campos_adicionales\") }}"><i class="bi bi-pencil"></i></a>';
 
+			$accion .= '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_tipos_transacciones(' . "'" . $r->id .
+			"'" . ')"><i class="bi bi-pencil"></i></a>';
 
-			$accion = "<a class=\"btn btn-sm btn-outline-primary\" title=\"Editar\" href=\"{{ route(\"tipos_transacciones_campos_adicionales.edit\", \" . $r->id . \") }}\">
-						<i class=\"fas fa-pencil-alt\"></i>
-						</a>";
-
-
-
-						#$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol(' . "'" . $r->rol_id .
-			#	"'" . ')"><i class="bi bi-pencil"></i></a>';
-
-
-
-            if($r->id != 1){
-                $accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_rol('."'".$r->rol_id.
-					"'".')"><i class="bi bi-trash"></i></a>';
-            }
+			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_tipos_transacciones(' . "'" . $r->id .
+				"'" . ')"><i class="bi bi-trash"></i></a>';
 
             $data[] = array(
 				$r->nombre,
-				$r->descripcion,
                 $accion
             );
         }
@@ -188,7 +179,6 @@ class TipoTransaccionController extends Controller
 		// Validar los datos
 		$validatedData = $request->validate([
 			'nombre' => 'required|string|max:255',
-			'descripcion' => 'required|string|max:255',
 		]);
 
 		// Obtener el modelo

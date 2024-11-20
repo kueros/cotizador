@@ -1,4 +1,4 @@
-<x-app-layout title="Campos adicionales" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
+<x-app-layout title="Campos adicionales" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard'],['title' => 'Tipos de Transacciones', 'url' => 'tipos_transacciones']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
 			{{ __('Tipos de Transacciones') }}
@@ -12,14 +12,58 @@
 	$permiso_editar_roles = tiene_permiso('edit_rol');
 	$permiso_eliminar_roles = tiene_permiso('del_rol');
 	@endphp
-	<?php #dd($tipos_campos); 
+	<?php 
+	#dd($valores); 
 	?>
 
 	<script type="text/javascript">
 		var table;
 		var save_method;
 
-		jQuery(document).ready(function($) {
+		jQuery(document).ready(function($) 
+		{
+
+			$("#form").submit(function(e) 
+			{
+				e.preventDefault();
+				var formData = new FormData(this);
+
+				//$('#guardar_campo').prop("disabled", true);
+
+				//show_loading();
+				$.ajax({
+					url: "{{ url('tipos_transacciones_campos_adicionales/ajax_guardar_columna') }}",
+					type: "POST",
+					data: formData,
+					method: 'POST',
+					cache: false,
+					contentType: false,
+					processData: false,
+					success: function(data) {
+						//hide_loading();
+						if (data == "true" || data == true) {
+							location.reload();
+						} else {
+							//$('#guardar_campo').prop("disabled", false);
+							//alert(data);
+							swal("Aviso", data, "warning");
+						}
+					},
+					error: function(jqXHR) {
+						hide_loading();
+						var mensaje = "Ocurrió un error al guardar la columna.";
+						if (jqXHR.responseText) {
+							mensaje = jqXHR.responseText;
+						}
+						if (mensaje != "") {
+							swal("Aviso", mensaje, "warning");
+						}
+					}
+				});
+			});
+
+			/*******************************************************************************************************************************
+			 *******************************************************************************************************************************/
 			table = $('#tipos_transacciones_table').DataTable({
 				"ajax": {
 					url: "{{ url('tipos_transacciones_campos_adicionales/ajax_listado') }}",
@@ -66,10 +110,14 @@
 			});
 		});
 
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
 		function reload_table() {
 			table.ajax.reload(null, false);
 		}
 
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
 		function add_campo_adicional() {
 			save_method = 'add';
 			$('#form')[0].reset();
@@ -83,15 +131,15 @@
 			$('#method').val('POST');
 		}
 
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
 		function edit_campos_adicionales(id) {
-
 			//console.log('edit_campos_adicionales '+id);
 			save_method = 'update';
 			$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#accion').val('edit');
-
 
 			$.ajax({
 				url: "{{ route('tipos_transacciones_campos_adicionales.ajax_edit', ':id') }}".replace(':id', id),
@@ -123,6 +171,8 @@
 			});
 		}
 
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
 		function delete_rol(id) {
 			if (confirm('¿Desea borrar el tipo de transacción?')) {
 
@@ -147,7 +197,8 @@
 			}
 		}
 
-
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
 		function guardar_datos() {
 			let form_data = $('#form').serializeArray();
 			let url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales') }}";
@@ -202,6 +253,30 @@
 				}
 			});
 		}
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function cambiar_tipo_campo(selector)
+		{
+			//alert(selector);
+	        var tipo_campo = $(selector).val();
+			switch(tipo_campo){
+				case '4':
+					$('#div_valores_selector').show();
+					break;
+				default:
+					$('#div_valores_selector').hide();
+					break;
+        	}
+    	}
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function agregar_valor_selector() 
+		{
+			var td = '<tr><td><input class="form-control" type="text" maxlength="255" minlength="1" required name="valores[]"/></td><td><a class="btn btn-danger" onclick="eliminar_valor(this)"><span class="glyphicon glyphicon-trash"></a></td></tr>';
+			$('#valores_selector tbody').append(td);
+		}
 	</script>
 	<!--LISTADO-->
 	<div class="container">
@@ -227,61 +302,22 @@
 						</button>
 					</div>
 
-					<table id="example" class="cell-border" style="width:100%">
-						<thead class="thead">
-							<tr>
-								<th>Nombre</th>
-								<th>Nombre a Mostrar</th>
-								<th>Es visible?</th>
-								<th>Orden</th>
-								<th>Es obligatorio?</th>
-								<th>Tipo</th>
-								<th>Default</th>
-								<th colspan="2" class="text-center">Acciones</th>
-							</tr>
+					<table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+						<thead>
+							<th>Nombre</th>
+							<th>Alias (Nombre de columna)</th>
+							<th>Posición</th>
+							<th>Requerido</th>
+							<th>Tipo de campo</th>
+							<th>Valores</th>
+							<th style="width:20%;" class="no-sort">Acción</th>
 						</thead>
 						<tbody>
-							<?php
-							#dd($campos_adicionales);
-							#dd($tipos_campos); 
-
-							?>
-							@foreach ($campos_adicionales as $campo_adicional)
-							<tr>
-								<td>{{ $campo_adicional->nombre_campo }}</td>
-								<td>{{ $campo_adicional->nombre_mostrar }}</td>
-								<td>{{ $campo_adicional->visible }}</td>
-								<td>{{ $campo_adicional->orden_listado }}</td>
-								<td>{{ $campo_adicional->requerido }}</td>
-								<td>{{ $campo_adicional->tipo_nombre }}</td>
-								<td>{{ $campo_adicional->valor_default }}</td>
-								<td>
-									<a class="btn btn-sm btn-outline-primary" title="Editar" href="{{ route('tipos_transacciones_campos_adicionales.edit', $campo_adicional->id) }}">
-										<i class="fas fa-pencil-alt"></i>
-									</a>
-
-									<form action="{{ route('tipos_transacciones_campos_adicionales.destroy', $campo_adicional->id) }}" method="POST" style="display:inline;">
-										@csrf
-										@method('DELETE')
-										<button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar este campo adicional?')">
-											<i class="fas fa-trash"></i>
-										</button>
-									</form>
-								</td>
-								</form>
-
-								</td>
-							</tr>
-							@endforeach
 						</tbody>
 					</table>
-
-
 				</div>
-
 			</div>
 		</div>
-
 	</div>
 
 	<?php
@@ -314,7 +350,7 @@
 
 						<div class="form-body">
 							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Nombre a Mostrar') }}</label>
+								<label class="col-form-label col-md-3">{{ __('Alias (Nombre de columna)') }}</label>
 								<div class="col-md-9">
 									<input name="nombre_mostrar" minlength="3" maxlength="255" placeholder="Nombre a Mostrar"
 										id="nombre_mostrar" class="form-control" type="text" required>
@@ -323,29 +359,12 @@
 							</div>
 						</div>
 
-						<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
-									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
-									 ya que el checkbox tiene prioridad sobre el hidden -->
-						<div class="form-body">
-							<div class="row mb-3">
-								<label class="col-md-3 col-form-label">{{ __('Visibilidad en Formulario?') }}</label>
-								<div class="col-md-9">
-									<div class="form-check form-switch">
-										<input type="hidden" name="visible" value="0">
-										<input class="form-check-input" name="visible" id="visible"
-											value="1" type="checkbox">
-										<label class="form-check-label" for="visible"></label>
-									</div>
-								</div>
-							</div>
-						</div>
-
 						<div class="form-body">
 							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Orden en el Formulario') }}</label>
+								<label class="col-form-label col-md-3">{{ __('Posición') }}</label>
 								<div class="col-md-9">
-									<input name="orden_abm" placeholder="1"
-										id="orden_abm" class="form-control" type="number" required>
+									<input name="posicion" placeholder="1"
+										id="posicion" class="form-control" type="number" required>
 									<span class="help-block"></span>
 								</div>
 							</div>
@@ -353,7 +372,7 @@
 
 						<div class="form-body">
 							<div class="row mb-3">
-								<label class="col-md-3 col-form-label">{{ __('Es Obligatorio?') }}</label>
+								<label class="col-md-3 col-form-label">{{ __('Requerido') }}</label>
 								<div class="col-md-9">
 									<div class="form-check form-switch">
 										<input type="hidden" name="requerido" value="0">
@@ -369,7 +388,7 @@
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Tipo de Campo') }}</label>
 								<div class="col-md-9">
-									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" required>
+									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" onchange="cambiar_tipo_campo(this)">
 										<option value="0">
 											{{ __('Elija un Tipo de Campo') }}
 										</option>
@@ -384,20 +403,24 @@
 							</div>
 						</div>
 
-						<div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Valor por Defecto') }}</label>
-								<div class="col-md-9">
-									<input name="valor_default" minlength="3" maxlength="255" placeholder="Valor por defecto"
-										id="valor_default" class="form-control" type="text" required>
-									<span class="help-block"></span>
-								</div>
-							</div>
-						</div>
+                        <div id="div_valores_selector" class="form-group" style="display:none">
+                            <hr>
+                            <a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
+                            <div class="table-responsive">
+                                <table class="table" id="valores_selector">
+                                    <thead>
+                                        <th>Valor</th>
+                                        <th>Acción</th>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
 					</div>
 					<div class="modal-footer">
-						<button type="submit" class="btn btn-primary">Guardar</button>
+						<button type="submit" class="btn btn-primary" id="guardar_campo">Guardar</button>
 						<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
 					</div>
 				</form>
@@ -413,8 +436,7 @@
 					<h5 class="modal-title">Formulario campos adicionales</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<!--form id="form_campos_adicionales" method="POST" enctype="multipart/form-data" class="form-horizontal" action="{{ route('tipos_transacciones_campos_adicionales.store') }}"-->
-				<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
+				<form id="form_campo_adicional" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
 					@csrf
 					<input name="_method" type="hidden" id="method">
 					<div class="modal-body form">
@@ -503,10 +525,9 @@
 								</div>
 							</div>
 						</div>
-
 						<div class="form-body">
 							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Valor por Defecto') }}</label>
+								<label class="col-form-label col-md-3">{{ __('Valores') }}</label>
 								<div class="col-md-9">
 									<input name="valor_default" minlength="3" maxlength="255" placeholder="Valor por defecto"
 										id="valor_default" class="form-control" type="text" required>
