@@ -30,11 +30,13 @@
 				"order": [[ 3, "desc" ]],
 				"ordering": true,
 				bAutoWidth: false, 
+				responsive: true, // Activa diseño responsive
+    			scrollX: true,
 				aoColumns : [
-					{ sWidth: '5%' },
+					{ sWidth: '10%' },
 					{ sWidth: '25%' },
 					{ sWidth: '20%' },
-					{ sWidth: '40%' },
+					{ sWidth: '35%' },
 					{ sWidth: '10%' }
 				],
 				language: traduccion_datatable,
@@ -62,8 +64,8 @@
 	</x-slot>
 
 	<div class="container-full-width">
-		<div class="row table-responsive">
-			<div class="col-md-12">
+		<div class="row">
+			<div class="col-md-12 table-responsive">
 				<h2>Log de accesos</h2>
 				<br>
 				<br>

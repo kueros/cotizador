@@ -37,7 +37,7 @@ class RolController extends Controller
 		$data = array();
         foreach($roles as $r) {
             $accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol('."'".$r->rol_id.
-				"'".')"><i class="bi bi-pencil"></i></a>';
+				"'".')"><i class="bi bi-pencil-fill"></i></a>';
 
             if($r->id != 1){
                 $accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_rol('."'".$r->rol_id.
@@ -72,8 +72,7 @@ class RolController extends Controller
 	public function ajax_delete($id, MyController $myController){
         $permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
 		if (!$permiso_eliminar_roles) {
-			abort(403, '.');
-			return false;
+			return response()->json(["error"=>"No tienes permiso para realizar esta acción, contáctese con un administrador."], "405");
 		}
 		$rol = Rol::find($id);
 		$nombre = $rol->nombre;
@@ -153,6 +152,9 @@ class RolController extends Controller
         return false;
     }
 
+	$request->merge([
+        'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
+    ]);
     // Validar los datos del usuario
 	$validatedData = $request->validate([
 		'nombre' => [
@@ -216,10 +218,17 @@ class RolController extends Controller
 			abort(403, '.');
 			return false;
 		}
+		$request->merge([
+			'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
+		]);
+		$messages = [
+			'nombre.unique' => 'Este nombre de rol ya está en uso.',
+			'nombre.required' => 'El nombre de rol es obligatorio.',
+		];
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
-			'nombre' => 'required|string|max:255|unique:roles,nombre',
-		]);
+			'nombre' => 'required|string|max:255|unique:roles,nombre,' . $rol->rol_id . ',rol_id'
+		], $messages);
 		#dd($validatedData);
 		$rol->update($validatedData);
 		$clientIP = \Request::ip();
@@ -228,7 +237,7 @@ class RolController extends Controller
 		$message = $username . " actualizó el rol " . $_POST['nombre'];
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 		return Redirect::route('roles.index')
-			->with('success', 'Rol updated successfully');
+			->with('success', 'Rol editado con éxito.');
 	}
 
 	/*******************************************************************************************************************************

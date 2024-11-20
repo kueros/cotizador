@@ -136,20 +136,18 @@
 			<div class="col-md-12">
 				<h2>Roles</h2>
 				@include('layouts.partials.message')
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-				
+				@if ($errors->any())
+					<div class="alert alert-danger">
+						@foreach ($errors->all() as $error)
+							{{ $error }}</br>
+						@endforeach
+					</div>
+				@endif
+				<br>
 				<div class="table-responsive">
 					<div class="float-right">
 						<button id="agregar" class="btn btn-success" onclick="add_rol()">
-							<i class="bi bi-plus"></i> {{ __('Nuevo Rol') }}
+							<i class="bi bi-plus"></i> {{ __('Agregar rol') }}
 						</button>
 					</div>
 					<br>

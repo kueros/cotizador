@@ -292,9 +292,6 @@ function show_ajax_error_message(jqXHR, textStatus = false, errorThrown = false,
                 break;
             case 500:
                 console.log(jqXHR)
-
-
-                
                 var mensaje = "Ocurrió un error interno, recargue la página y vuelva a intentar más tarde, si este error persiste contáctese con soporte@alephmanager.com";
                 break;
             default://Por defecto traigo el error del controller
@@ -308,7 +305,8 @@ function show_ajax_error_message(jqXHR, textStatus = false, errorThrown = false,
                                 location.replace(baseUrl);
                             });
                         }else{
-                            mensaje = jqXHR.responseText;
+                            let msj = JSON.parse(jqXHR.responseText);
+                            mensaje = msj.error;
                         }
                     }
                 }else{

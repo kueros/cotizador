@@ -49,7 +49,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		$data = array();
 		foreach ($campos_adicionales as $r) {
 			$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_campos_adicionales(' . "'" . $r->id .
-				"'" . ')"><i class="bi bi-pencil"></i></a>';
+				"'" . ')"><i class="bi bi-pencil-fill"></i></a>';
 
 			if ($r->id != 1) {
 				$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_campos_adicionales(' . "'" . $r->id .
