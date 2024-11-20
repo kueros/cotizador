@@ -1,4 +1,4 @@
-<x-app-layout title="Tipos de Transacciones" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
+<x-app-layout title="ABM Tipos de Transacciones" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
 			{{ __('Tipos de Transacciones') }}
@@ -149,7 +149,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-				<h2>Tipos de Transacciones</h2>
+				<h2>ABM Tipos de Transacciones</h2>
 				@include('layouts.partials.message')
 				@if ($errors->any())
 				<div class="alert alert-danger">
@@ -163,7 +163,7 @@
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
 						<button id="agregar" class="btn btn-success mr-2" onclick="add_tipo_transaccion()">
-							<i class="bi bi-plus"></i> {{ __('Nuevo Tipo de Transacción') }}
+							<i class="bi bi-plus"></i> {{ __('Agregar Tipo de Transacción') }}
 						</button>
 					</div>
 					<table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">

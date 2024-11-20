@@ -13,7 +13,7 @@
 	$permiso_eliminar_roles = tiene_permiso('del_rol');
 	@endphp
 	<?php
-	#dd($valores); 
+	#dd($id); 
 	?>
 
 	<script type="text/javascript">
@@ -21,7 +21,6 @@
 		var save_method;
 
 		jQuery(document).ready(function($) {
-
 			$("#form").submit(function(e) {
 				e.preventDefault();
 				var formData = new FormData(this);
@@ -62,10 +61,14 @@
 
 			/*******************************************************************************************************************************
 			 *******************************************************************************************************************************/
+			tipo_transaccion_id = <?php echo $id; ?>;
 			table = $('#tipos_transacciones_table').DataTable({
 				"ajax": {
 					url: "{{ url('tipos_transacciones_campos_adicionales/ajax_listado') }}",
-					type: 'GET'
+					type: 'GET',
+					data: function(d) { // Agrega parámetros adicionales a la solicitud
+						d.tipo_transaccion_id = tipo_transaccion_id;
+        			}
 				},
 				language: traduccion_datatable,
 				dom: 'Bfrtip',
@@ -270,7 +273,7 @@
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function agregar_valor_selector() {
-			var td = '<tr><td><input class="form-control" type="text" maxlength="255" minlength="1" required name="valores[]"/></td><td><a class="btn btn-danger" onclick="eliminar_valor(this)"><span class="glyphicon glyphicon-trash"></a></td></tr>';
+			var td = '<tr><td><input class="form-control" type="text" maxlength="255" minlength="1" required name="valores[]"/></td><td><a class="btn btn-danger" onclick="eliminar_valor(this)"><i class="bi bi-trash"></i></td></tr>';
 			$('#valores_selector tbody').append(td);
 		}
 	</script>
@@ -294,7 +297,7 @@
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
 						<button id="agregar" class="btn btn-success mr-2" onclick="add_campo_adicional()">
-							<i class="bi bi-plus"></i> {{ __('Nuevo Campo Adicional') }}
+							<i class="bi bi-plus"></i> {{ __('Agregar Campo Adicional') }}
 						</button>
 					</div>
 
@@ -317,6 +320,7 @@
 	</div>
 
 	<?php
+	#dd($id);
 	#dd($campos_adicionales);
 	#dd($tipos_campos);
 	?>
@@ -333,6 +337,7 @@
 					<div class="modal-body form">
 						<input type="hidden" value="" name="id" />
 						<input name="accion" id="accion" class="form-control" type="hidden">
+						<input name="tipo_transaccion_id" id="tipo_transaccion_id" class="form-control" type="hidden" value="<?php echo $id; ?>">
 						<div class="form-body">
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Nombre') }}</label>
