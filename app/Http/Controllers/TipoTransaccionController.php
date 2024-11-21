@@ -76,12 +76,13 @@ class TipoTransaccionController extends Controller
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
 	public function ajax_delete($id, MyController $myController){
-        $permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
+        #$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
 		/* 		if (!$permiso_eliminar_roles) {
 			abort(403, '.');
 			return false;
 		} */
 		$tipos_transacciones = TipoTransaccion::find($id);
+	print_r($tipos_transacciones);
 		$nombre = $tipos_transacciones->nombre;
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();

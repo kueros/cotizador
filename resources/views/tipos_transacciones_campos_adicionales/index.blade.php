@@ -175,17 +175,17 @@
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function delete_campos_adicionales(id) {
-			if (confirm('¿Desea borrar el tipo de transacción?')) {
+			if (confirm('¿Desea borrar el campo adicional de este tipo de transacción?')) {
 
 				$.ajax({
-					url: "{{ url('tipos_transacciones/ajax_delete') }}" + "/" + id,
+					url: "{{ route('tipos_transacciones_campos_adicionales.ajax_delete', ':id') }}".replace(':id', id),
 					type: "POST",
 					dataType: "JSON",
 					headers: {
 						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 					},
 					success: function(data) {
-						swal.fire("Aviso", "Tipo de transacción eliminado con éxito.", "success");
+						swal.fire("Aviso", "Campo adicional de este tipo de transacción eliminado con éxito.", "success");
 
 						$('#modal_form_campo_adicional').modal('hide');
 						reload_table();
@@ -282,7 +282,7 @@
 
 		<div class="row">
 			<div class="col-md-12">
-				<h2>Campos Adicionales</h2>
+				<h2>Campos Adicionales <?php echo $tipo_transaccion_nombre; ?></h2>
 				@include('layouts.partials.message')
 				@if ($errors->any())
 				<div class="alert alert-danger">

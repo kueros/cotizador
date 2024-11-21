@@ -12,6 +12,7 @@ use App\Http\Controllers\MyController;
 use App\Models\TipoTransaccionCampoAdicional;
 use App\Models\TipoCampo;
 use App\Models\Transaccion;
+use App\Models\TipoTransaccion;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
@@ -31,13 +32,12 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		}
  */
 
-#dd($id);
-
+		$tipo_transaccion_nombre = TipoTransaccion::where('id', $id)->first()['nombre'];
 		$tipos_campos = TipoCampo::all();
 		$campos_adicionales = TipoTransaccionCampoAdicional::leftJoin('tipos_campos', 'tipos_transacciones_campos_adicionales.tipo', '=', 'tipos_campos.id')
 			->select('tipos_campos.nombre as tipo_nombre', 'tipos_transacciones_campos_adicionales.*')
 			->paginate();
-		return view('tipos_transacciones_campos_adicionales.index', compact('campos_adicionales', 'tipos_campos', 'id'))
+		return view('tipos_transacciones_campos_adicionales.index', compact('campos_adicionales', 'tipos_campos', 'id', 'tipo_transaccion_nombre'))
 			->with('i', ($request->input('page', 1) - 1) * $campos_adicionales->perPage());
 	}
 
@@ -57,7 +57,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			$definirCamposUrl = route('tipos_transacciones_campos_adicionales.edit', $r->id);
 			$accion = '<a class="btn btn-sm btn-primary" href="' . $definirCamposUrl . '" title="Editar Campos"><i class="bi bi-pencil"></i></a>';
 
-			#$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_campos_adicionales(' . "'" . $r->id . "'" . ')"><i class="bi bi-trash"></i></a>';
+			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_campos_adicionales(' . "'" . $r->id . "'" . ')"><i class="bi bi-trash"></i></a>';
 			$data[] = array(
 				$r->nombre_campo,
 				$r->nombre_mostrar,
@@ -100,6 +100,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			abort(403, '.');
 			return false;
 		} */
+		#print_r($id);
 		$campos_adicionales = TipoTransaccionCampoAdicional::find($id);
 		$nombre = $campos_adicionales->nombre;
 		$clientIP = \Request::ip();
