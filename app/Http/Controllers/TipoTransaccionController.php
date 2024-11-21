@@ -82,7 +82,7 @@ class TipoTransaccionController extends Controller
 			return false;
 		} */
 		$tipos_transacciones = TipoTransaccion::find($id);
-	print_r($tipos_transacciones);
+		#print_r($tipos_transacciones);
 		$nombre = $tipos_transacciones->nombre;
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();

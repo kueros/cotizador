@@ -21,11 +21,12 @@
 		var save_method;
 
 		jQuery(document).ready(function($) {
+
+			/*******************************************************************************************************************************
+			*******************************************************************************************************************************/
 			$("#form").submit(function(e) {
 				e.preventDefault();
 				var formData = new FormData(this);
-
-				//$('#guardar_campo').prop("disabled", true);
 
 				//show_loading();
 				$.ajax({
@@ -38,14 +39,32 @@
 					processData: false,
 					success: function(data) {
 						//hide_loading();
-						if (data == "true" || data == true) {
-							location.reload();
+						console.log(data)
+						if(data.status == 0){
+						let errorMessage = data.message + "</br>";
+    					if (data.errors && Object.keys(data.errors).length > 0) {
+							// Recorre cada campo y sus mensajes de error
+							for (let field in data.errors) {
+								if (data.errors.hasOwnProperty(field)) {
+									errorMessage += `${field}: ${data.errors[field].join(", ")}</br>`;
+								}
+							}
 						} else {
-							//$('#guardar_campo').prop("disabled", false);
-							//alert(data);
-							swal("Aviso", data, "warning");
+							errorMessage += "No se encontraron errores específicos para los campos.";
 						}
-					},
+
+						swal.fire("Aviso", errorMessage, "warning");
+						return false;
+					}else{
+						swal.fire({
+							title: "Aviso",
+							text: data.message,
+							icon: "success"
+						}).then(() => {
+							// Recargar la tabla DataTables al cerrar el modal de éxito
+							location.reload();
+						});
+					}					},
 					error: function(jqXHR) {
 						hide_loading();
 						var mensaje = "Ocurrió un error al guardar la columna.";
@@ -74,7 +93,7 @@
 				dom: 'Bfrtip',
 				columnDefs: [{
 					"targets": 'no-sort',
-					"orderable": false
+					"orderable": true
 				}],
 				buttons: [{
 						"extend": 'pdf',
@@ -107,7 +126,8 @@
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
 					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
 					$('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
-				}
+				},
+				"order": [[2, 'asc']]
 			});
 		});
 
@@ -320,10 +340,13 @@
 	</div>
 
 	<?php
-	#dd($id);
-	#dd($campos_adicionales);
-	#dd($tipos_campos);
+		#dd($id);
+		#dd($campos_adicionales);
+		#dd($ultima_posicion);
 	?>
+	<?php
+	?>
+
 	<div class="modal fade" id="modal_form" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -364,8 +387,7 @@
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Posición') }}</label>
 								<div class="col-md-9">
-									<input name="posicion" placeholder="1"
-										id="posicion" class="form-control" type="number" required>
+									<input name="posicion" id="posicion" class="form-control" type="number" value="<?php echo $ultima_posicion; ?>" required>
 									<span class="help-block"></span>
 								</div>
 							</div>
@@ -375,21 +397,23 @@
 							<div class="row mb-3">
 								<label class="col-md-3 col-form-label">{{ __('Requerido') }}</label>
 								<div class="col-md-9">
-									<div class="form-check form-switch">
-										<input type="hidden" name="requerido" value="0">
-										<input class="form-check-input" name="requerido" id="requerido"
-											value="1" type="checkbox">
-										<label class="form-check-label" for="requerido"></label>
+									<!-- Radio buttons para "Requerido" en horizontal -->
+									<div class="form-check form-check-inline">
+										<input type="radio" class="form-check-input" name="requerido" id="requerido_si" value="1" {{ old('requerido') == '1' ? 'checked' : '' }}>
+										<label class="form-check-label" for="requerido_si">{{ __('Sí') }}</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<input type="radio" class="form-check-input" name="requerido" id="requerido_no" value="0" {{ old('requerido') == '0' ? 'checked' : '' }}>
+										<label class="form-check-label" for="requerido_no">{{ __('No') }}</label>
 									</div>
 								</div>
 							</div>
 						</div>
-
 						<div class="form-body">
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Tipo de Campo') }}</label>
 								<div class="col-md-9">
-									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" onchange="cambiar_tipo_campo(this)">
+									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" onchange="cambiar_tipo_campo(this)" required>
 										<option value="0">
 											{{ __('Elija un Tipo de Campo') }}
 										</option>

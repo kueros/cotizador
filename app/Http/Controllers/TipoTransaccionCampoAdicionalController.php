@@ -30,14 +30,17 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			abort(403, '.');
 			return false;
 		}
- */
-
+*/
+#dd($id);
+		$ultima_posicion = TipoTransaccionCampoAdicional::where('tipo_transaccion_id', $id)->max('orden_listado');
+		$ultima_posicion = $ultima_posicion ? $ultima_posicion + 1 : 1;
+		#dd($ultima_posicion);
 		$tipo_transaccion_nombre = TipoTransaccion::where('id', $id)->first()['nombre'];
 		$tipos_campos = TipoCampo::all();
 		$campos_adicionales = TipoTransaccionCampoAdicional::leftJoin('tipos_campos', 'tipos_transacciones_campos_adicionales.tipo', '=', 'tipos_campos.id')
 			->select('tipos_campos.nombre as tipo_nombre', 'tipos_transacciones_campos_adicionales.*')
 			->paginate();
-		return view('tipos_transacciones_campos_adicionales.index', compact('campos_adicionales', 'tipos_campos', 'id', 'tipo_transaccion_nombre'))
+		return view('tipos_transacciones_campos_adicionales.index', compact('campos_adicionales', 'tipos_campos', 'id', 'tipo_transaccion_nombre', 'ultima_posicion'))
 			->with('i', ($request->input('page', 1) - 1) * $campos_adicionales->perPage());
 	}
 
@@ -46,14 +49,17 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	public function ajax_listado(Request $request)
 	{
 		$tipo_transaccion_id = $request->input('tipo_transaccion_id');
-   
+
 		$campos_adicionales = TipoTransaccionCampoAdicional::leftJoin('tipos_campos', 'tipos_transacciones_campos_adicionales.tipo', '=', 'tipos_campos.id')
 			->select('tipos_campos.nombre as tipo_nombre', 'tipos_transacciones_campos_adicionales.*')
 			->where('tipo_transaccion_id', $tipo_transaccion_id)
+			->orderBy('orden_listado', 'asc')
 			->get();
+#dd($campos_adicionales);// ->toSql(), $campos_adicionales->getBindings());
+
 		$data = array();
 		foreach ($campos_adicionales as $r) {
-
+#print_r("kdk1 ".$r->orden_listado);
 			$definirCamposUrl = route('tipos_transacciones_campos_adicionales.edit', $r->id);
 			$accion = '<a class="btn btn-sm btn-primary" href="' . $definirCamposUrl . '" title="Editar Campos"><i class="bi bi-pencil"></i></a>';
 
@@ -96,7 +102,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	public function ajax_delete($id, MyController $myController)
 	{
 		/*$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
-         		if (!$permiso_eliminar_roles) {
+				if (!$permiso_eliminar_roles) {
 			abort(403, '.');
 			return false;
 		} */
@@ -113,15 +119,139 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		return response()->json(["status" => true]);
 	}
 
+
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
-	public function ajax_guardar_columna(MyController $myController)
+	public function ajax_guardar_columna(Request $request, MyController $myController)
 	{
-		$nombre_campo = str_replace(' ','_',strtolower($_POST['nombre_campo']));
-		$nombre_campo = substr($nombre_campo, 0, 60);
-		#$tipo_trasaccion_id = $_POST['tipo_trasaccion_id'];
+		#print_r($request->all());
+		// Validar los datos del usuario
+		$validatedData = Validator::make($request->all(), [
+			'nombre_campo' => [
+				'required',
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
+				Rule::unique('tipos_transacciones_campos_adicionales', 'nombre_campo'),
+			],
+			'nombre_mostrar' => 'required|string|max:255',
+			'tipo' => 'required|integer|exists:tipos_campos,id',
+			'posicion' => 'required|integer|min:0',
+			'tipo_transaccion_id' => 'integer',
+			'valores' => 'nullable|array', // Si tipo == 4, esto será validado manualmente
+		], [
+			'nombre_campo.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
+			'nombre_campo.unique' => 'Este nombre de campo adicional ya está en uso.',
+			'tipo.required' => 'Este campo no puede quedar vacío.',
+			'tipo.exists' => 'El tipo de campo seleccionado no es válido.',
+		]);
+		#print_r($validatedData);
+		// Verificar si la validación falla
+		if ($validatedData->fails()) {
+			$response = [
+				'status' => 0,
+				'message' => 'error en validacion',
+				'errors' => $validatedData->errors()
+			];
+			return response()->json($response);
+		}
+
+		$validated = $validatedData->validated(); // Obtiene los datos validados como array
+		$inserted_id = TipoTransaccionCampoAdicional::create($validated);
+		$orden_listado = $validated['posicion'];
+		$inserted_id->orden_listado = $orden_listado;
+		$inserted_id->save();
+		// Si el tipo es "selector" (id = 4), verificar valores
+		if ($validated['tipo'] == 4 ) {
+			if (empty($validated['tipo'])) {
+				return response()->json([
+					'errors' => ['valores' => 'Se deben agregar valores para el selector.']
+				], 400);
+			} else {
+				$valores = $validated['valores'];
+				$inserted_id->valores = json_encode($valores);
+				$inserted_id->save();
+			}
+		}
+	 	$nombre_campo = $validated['nombre_campo'];
+		$tipo = $validated['tipo'];
+
+		// Crear la columna en la tabla
+		$tabla = 'transacciones';
+		$tipoDB = TipoCampo::where('id', $tipo)->value('tipo');
+		if (!$tipoDB) {
+			return response()->json([
+				'status' => 0,
+				'message' => "El tipo $tipo no es válido para crear una columna en la tabla.",
+			], 400);
+		} else {
+			if (!Schema::hasColumn($tabla, $nombre_campo)) {
+				$tipoDB = TipoCampo::where('id', $tipo)->value('tipo');
+				Schema::table($tabla, function (Blueprint $table) use ($nombre_campo, $tipoDB) {
+					$table->{$tipoDB}($nombre_campo)->nullable()->after('nombre');
+				});
+			}
+		
+		}
+
+	
+		// Loguear la acción
+		$clientIP = $request->ip();
+		$userAgent = $request->userAgent();
+		$username = Auth::user()->username;
+		$message = "$username creó el campo adicional para tipo de transacción $nombre_campo";
+		$myController->loguear($clientIP, $userAgent, $username, $message);
+	
+			$response = [
+			'status' => 0,
+			'message' => $validatedData->errors()
+		];
+	// Respuesta exitosa
+		$response = [
+			'status' => 1,
+			'message' => 'Usuario creado correctamente.'
+		];
+		return response()->json($response);
+	}
+
+
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
+	public function ajax_guardar_columna1(Request $request, MyController $myController)
+	{
+
+
+#print_r($request);
+	// Validar los datos del usuario
+	$validatedData = Validator::make($request->all(), [
+		'nombre_campo' => [
+			'required',
+			'string',
+			'max:255',
+			'min:3',
+			'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+			Rule::unique('tipos_transacciones_campos_adicionales'),
+		],
+	], [
+		'nombre_campo.regex' => 'El nombre solo puede contener letras y espacios.',
+		'nombre_campo.unique' => 'Este nombre de campo adicional ya está en uso.',
+	]);
+
+	// Verificar si la validación falla
+	if ($validatedData->fails()) {
+		return redirect()->back()->withErrors(['nombre' => 'Este nombre de tipo de transacción ya está en uso.'])->withInput();
+		return response()->json([
+			'errors' => $validatedData->errors()
+		], 400);
+	}
+
+
+
+		#$nombre_campo = str_replace(' ','_',strtolower($_POST['nombre_campo']));
+		#$nombre_campo = substr($nombre_campo, 0, 60);
+		$nombre_campo = $_POST['nombre_campo'];
 		$existe = TipoTransaccionCampoAdicional::where('nombre_campo', $nombre_campo)->first();
-		#$existe = $this->generic->get_row_from_table("compliance_secciones_campos",array("norma_id" => $norma_id, "nombre_mostrar" => $_POST['nombre']));
 		if($existe){
 			echo "El campo ya existe";
 			return false;
@@ -153,7 +283,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 #print_r($data_campo);
 		$inserted_id = TipoTransaccionCampoAdicional::create($data_campo);
 
- 		if(!empty($_POST['valores']) && $_POST['tipo'] == 4){
+		if(!empty($_POST['valores']) && $_POST['tipo'] == 4){
 			#$valores = implode(',', $_POST['valores']);
 			$valores = json_encode($_POST['valores']);
 			$inserted_id->valores = $valores;
@@ -208,12 +338,12 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	{
 		#dd($request->valores);
 		/*     $permiso_agregar_roles = $myController->tiene_permiso('add_rol');
-    if (!$permiso_agregar_roles) {
-        abort(403, '.');
-        return false;
-    }
- */
-		dd($request->valores);
+	if (!$permiso_agregar_roles) {
+		abort(403, '.');
+		return false;
+	}
+*/
+		#dd($request->valores);
 
 		// Validar los datos del usuario
 		$validatedData = $request->validate([
@@ -247,10 +377,10 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		]);
 
 		/*         $tipoTransacciónExistente = CampoAdicionalTipoTransaccion::where('nombre', $request->input('nombre'))->first();
-        if ($tipoTransacciónExistente) {
-            return redirect()->back()->withErrors(['nombre' => 'Este nombre de tipo de transacción ya está en uso.'])->withInput();
-        }
-		 */
+		if ($tipoTransacciónExistente) {
+			return redirect()->back()->withErrors(['nombre' => 'Este nombre de tipo de transacción ya está en uso.'])->withInput();
+		}
+		*/
 		#dd($request->valores);
 		$campo = TipoTransaccionCampoAdicional::create($validatedData);
 		$valores = implode(',', $request->valores);
@@ -299,7 +429,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
 
-	 public function edit($id, MyController $myController): View
+	public function edit($id, MyController $myController): View
 	{
 		#dd($id);
 		/* 		$permiso_editar_roles = $myController->tiene_permiso('edit_rol');
@@ -307,11 +437,11 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			abort(403, '.');
 			return false;
 		}
- */
+*/
 /* 		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::find($id);
 		#dd($roles);
 		return view('tipos_transacciones_campos_adicionales.edit', compact('tipos_transacciones_campos_adicionales'));
- */
+*/
 		$tipos_campos = TipoCampo::all();
 		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::
 			where('tipos_transacciones_campos_adicionales.id', $id)
@@ -331,7 +461,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			abort(403, '.');
 			return false;
 		}
- */
+*/
 		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::find($id);
 		// Almacena el nombre de rol antes de eliminarlo
 		$nombre = $tipos_transacciones_campos_adicionales->nombre_campo;
