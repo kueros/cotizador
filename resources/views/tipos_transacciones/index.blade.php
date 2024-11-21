@@ -34,25 +34,25 @@
 						"text": 'Export',
 						"className": 'btn btn-danger',
 						"orientation": 'landscape',
-						title: 'Roles'
+						title: 'Tipos de Transacciones'
 					},
 					{
 						"extend": 'copy',
 						"text": 'Export',
 						"className": 'btn btn-primary',
-						title: 'Roles'
+						title: 'Tipos de Transacciones'
 					},
 					{
 						"extend": 'excel',
 						"text": 'Export',
 						"className": 'btn btn-success',
-						title: 'Roles'
+						title: 'Tipos de Transacciones'
 					},
 					{
 						"extend": 'print',
 						"text": 'Export',
 						"className": 'btn btn-secondary',
-						title: 'Roles'
+						title: 'Tipos de Transacciones'
 					}
 				],
 				initComplete: function() {
