@@ -70,7 +70,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 				$r->orden_listado,
 				$r->requerido == 1 ? 'Sí' : 'No', 
 				$r->tipo_nombre,
-				$r->valores,
+				$r->valores = json_decode($r->valores),
 				$accion
 			);
 		}
@@ -137,7 +137,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			],
 			'nombre_mostrar' => 'required|string|max:255',
 			'tipo' => 'required|integer|exists:tipos_campos,id',
-			'posicion' => 'required|integer|min:0',
+			'posicion' => 'required|integer|min:1|max:100',
 			'requerido' => 'required|integer',
 			'tipo_transaccion_id' => 'integer',
 			'valores' => 'nullable|array', // Si tipo == 4, esto será validado manualmente
@@ -212,111 +212,11 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	// Respuesta exitosa
 		$response = [
 			'status' => 1,
-			'message' => 'Usuario creado correctamente.'
+			'message' => 'Campo adicional creado correctamente.'
 		];
 		return response()->json($response);
 	}
 
-
-	/*******************************************************************************************************************************
-	 *******************************************************************************************************************************/
-	public function ajax_guardar_columna1(Request $request, MyController $myController)
-	{
-
-
-#print_r($request);
-	// Validar los datos del usuario
-	$validatedData = Validator::make($request->all(), [
-		'nombre_campo' => [
-			'required',
-			'string',
-			'max:255',
-			'min:3',
-			'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-			Rule::unique('tipos_transacciones_campos_adicionales'),
-		],
-	], [
-		'nombre_campo.regex' => 'El nombre solo puede contener letras y espacios.',
-		'nombre_campo.unique' => 'Este nombre de campo adicional ya está en uso.',
-	]);
-
-	// Verificar si la validación falla
-	if ($validatedData->fails()) {
-		return redirect()->back()->withErrors(['nombre' => 'Este nombre de tipo de transacción ya está en uso.'])->withInput();
-		return response()->json([
-			'errors' => $validatedData->errors()
-		], 400);
-	}
-
-
-
-		#$nombre_campo = str_replace(' ','_',strtolower($_POST['nombre_campo']));
-		#$nombre_campo = substr($nombre_campo, 0, 60);
-		$nombre_campo = $_POST['nombre_campo'];
-		$existe = TipoTransaccionCampoAdicional::where('nombre_campo', $nombre_campo)->first();
-		if($existe){
-			echo "El campo ya existe";
-			return false;
-		}
-#print_r ($_POST);
-		switch($_POST['tipo']){
-			case '4'://Verifico que tenga valores
-				if(!isset($_POST['valores']) || empty($_POST['valores'])){
-					echo "Se deben agregar valores para el selector";
-					return false;
-				}
-				break;
-			default:
-				break;
-		}
-		$requerido = $_POST['requerido'] ?? 0;
-		#$tipo = $_POST['tipo'];
-		$tipo = TipoCampo::where('id', $_POST['tipo'])->first()['tipo'];
-#print_r ($tipo);
-		//Creo el campo si no existe
-		$data_campo = array(
-			'nombre_campo' => $nombre_campo,
-			'nombre_mostrar' => $_POST['nombre_mostrar'],
-			'tipo' => $_POST['tipo'],
-			'requerido' => $requerido,
-			'orden_listado' => $_POST['posicion'],
-			'tipo_trasaccion_id' => $_POST['tipo_transaccion_id'],
-		);
-#print_r($data_campo);
-		$inserted_id = TipoTransaccionCampoAdicional::create($data_campo);
-
-		if(!empty($_POST['valores']) && $_POST['tipo'] == 4){
-			#$valores = implode(',', $_POST['valores']);
-			$valores = json_encode($_POST['valores']);
-			$inserted_id->valores = $valores;
-			$inserted_id->save();
-		}
-		$inserted_id->tipo_transaccion_id = $_POST['tipo_transaccion_id'];
-		$inserted_id->save();
-
-		$tabla = 'transacciones';
-		$columna = $nombre_campo;
-#print_r($tipo);
-
-		if($inserted_id){
-			if(!Schema::hasColumn($tabla, $columna)){
-				Schema::table($tabla, function(Blueprint $table) use ($columna, $tipo){
-					$table->{$tipo}($columna)->nullable()->after('nombre');
-				});
-			}
-			$clientIP = \Request::ip();
-			$userAgent = \Request::userAgent();
-			$username = Auth::user()->username;
-			$message = $username . " creó el campo adicional para tipo de transacción " . $nombre_campo;
-			$myController->loguear($clientIP, $userAgent, $username, $message);
-	
-			#echo "true";
-			return true;
-		}else{
-			return false;
-		}
-
-	}
 
 
 	/*******************************************************************************************************************************
