@@ -435,6 +435,9 @@ class UserController extends Controller
 		}
 	}
 
+	/**************************************************************************
+	*
+	**************************************************************************/
 	public function ajax_edit($id, MyController $myController){
 		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
 		if (!$permiso_editar_usuario) {
@@ -450,6 +453,9 @@ class UserController extends Controller
 		return response()->json($data);
     }
 
+	/**************************************************************************
+	*
+	**************************************************************************/
 	public function ajax_delete($id, MyController $myController){
         $permiso_borrar_usuario = $myController->tiene_permiso('del_usr');
 		if (!$permiso_borrar_usuario) {

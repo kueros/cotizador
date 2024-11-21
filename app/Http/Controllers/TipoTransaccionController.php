@@ -38,28 +38,20 @@ class TipoTransaccionController extends Controller
 		#dd($tipos_transacciones);
 		$data = array();
         foreach($tipos_transacciones as $r) {
+			#$definirCamposUrl = route('tipos_transacciones_campos_adicionales');
+			$definirCamposUrl = route('tipos_transacciones_campos_adicionales', ['id' => $r->id]); 
+			$accion = '<a class="btn btn-sm btn-info" href="' . $definirCamposUrl . '" title="Definir Campos">Definir Campos</a>';
 
+#			$accion = '<a class="btn btn-sm btn-info" href="javascript:void(0)" title="Definir Campos" onclick="{{ route(\"tipos_transacciones_campos_adicionales\") }}"><i class="bi bi-pencil"></i></a>';
 
+			$accion .= '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_tipos_transacciones(' . "'" . $r->id .
+			"'" . ')"><i class="bi bi-pencil"></i></a>';
 
-			$accion = "<a class=\"btn btn-sm btn-outline-primary\" title=\"Editar\" href=\"{{ route(\"tipos_transacciones_campos_adicionales.edit\", \" . $r->id . \") }}\">
-						<i class=\"fas fa-pencil-alt\"></i>
-						</a>";
-
-
-
-						#$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol(' . "'" . $r->rol_id .
-			#	"'" . ')"><i class="bi bi-pencil"></i></a>';
-
-
-
-            if($r->id != 1){
-                $accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_rol('."'".$r->rol_id.
-					"'".')"><i class="bi bi-trash"></i></a>';
-            }
+			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_tipos_transacciones(' . "'" . $r->id .
+				"'" . ')"><i class="bi bi-trash"></i></a>';
 
             $data[] = array(
 				$r->nombre,
-				$r->descripcion,
                 $accion
             );
         }
@@ -84,12 +76,13 @@ class TipoTransaccionController extends Controller
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
 	public function ajax_delete($id, MyController $myController){
-        $permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
+        #$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
 		/* 		if (!$permiso_eliminar_roles) {
 			abort(403, '.');
 			return false;
 		} */
 		$tipos_transacciones = TipoTransaccion::find($id);
+	print_r($tipos_transacciones);
 		$nombre = $tipos_transacciones->nombre;
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
@@ -188,7 +181,6 @@ class TipoTransaccionController extends Controller
 		// Validar los datos
 		$validatedData = $request->validate([
 			'nombre' => 'required|string|max:255',
-			'descripcion' => 'required|string|max:255',
 		]);
 
 		// Obtener el modelo
