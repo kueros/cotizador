@@ -138,7 +138,9 @@ class TipoTransaccionCampoAdicionalController extends Controller
 				break;
 		}
 		$requerido = $_POST['requerido'] ?? 0;
-
+		#$tipo = $_POST['tipo'];
+		$tipo = TipoCampo::where('id', $_POST['tipo'])->first()['tipo'];
+#print_r ($tipo);
 		//Creo el campo si no existe
 		$data_campo = array(
 			'nombre_campo' => $nombre_campo,
@@ -159,23 +161,23 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		}
 		$inserted_id->tipo_transaccion_id = $_POST['tipo_transaccion_id'];
 		$inserted_id->save();
-		$clientIP = \Request::ip();
-		$userAgent = \Request::userAgent();
-		$username = Auth::user()->username;
-		$message = $username . " creó el campo adicional para tipo de transacción " . $nombre_campo;
-		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$tabla = 'transacciones';
 		$columna = $nombre_campo;
+#print_r($tipo);
 
 		if($inserted_id){
-
 			if(!Schema::hasColumn($tabla, $columna)){
-				Schema::table($tabla, function(Blueprint $table) use ($columna){
-					$table->string($columna)->nullable()->after('nombre');
+				Schema::table($tabla, function(Blueprint $table) use ($columna, $tipo){
+					$table->{$tipo}($columna)->nullable()->after('nombre');
 				});
 			}
-
+			$clientIP = \Request::ip();
+			$userAgent = \Request::userAgent();
+			$username = Auth::user()->username;
+			$message = $username . " creó el campo adicional para tipo de transacción " . $nombre_campo;
+			$myController->loguear($clientIP, $userAgent, $username, $message);
+	
 			#echo "true";
 			return true;
 		}else{

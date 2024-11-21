@@ -1,4 +1,4 @@
-<x-app-layout title="Campos adicionales" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard'],['title' => 'Tipos de Transacciones', 'url' => 'tipos_transacciones']]">
+<x-app-layout title="Campos adicionales" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard'],['title' => 'Tipos de Transacciones', 'url' => '/tipos_transacciones']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
 			{{ __('Tipos de Transacciones') }}
