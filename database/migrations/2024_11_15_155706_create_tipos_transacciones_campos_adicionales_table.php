@@ -17,11 +17,11 @@ return new class extends Migration
             $table->string('nombre_mostrar')->default('nombre_mostrar');
             $table->string('campo_base')->nullable();
             $table->tinyInteger('visible')->default(1);
-            $table->tinyInteger('orden_abm')->default(0);
+            $table->tinyInteger('posicion')->default(0);
             $table->tinyInteger('orden_listado')->default(0);
             $table->tinyInteger('requerido')->default(1);
             $table->string('tipo')->default('texto');
-            $table->string('valor_default')->default('valor_default');
+            $table->string('valores')->nullable();
             $table->tinyInteger('es_default')->default(1);
             $table->tinyInteger('mostrar_formulario')->default(1);
             $table->tinyInteger('tipo_transaccion_id')->default(1);
