@@ -1,4 +1,4 @@
-<x-app-layout title="Campos adicionales" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard'],['title' => 'Tipos de Transacciones', 'url' => '/tipos_transacciones']]">
+<x-app-layout title="Campos adicionales" :breadcrumbs="[['title' => 'Inicio', 'url' => '/dashboard'],['title' => 'ABM Tipos de Transacciones', 'url' => '/tipos_transacciones']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
 			{{ __('Tipos de Transacciones') }}
@@ -100,25 +100,25 @@
 						"text": 'Export',
 						"className": 'btn btn-danger',
 						"orientation": 'landscape',
-						title: 'Roles'
+						title: 'Campos Adicionales <?php echo $tipo_transaccion_nombre; ?>'
 					},
 					{
 						"extend": 'copy',
 						"text": 'Export',
 						"className": 'btn btn-primary',
-						title: 'Roles'
+						title: 'Campos Adicionales <?php echo $tipo_transaccion_nombre; ?>'
 					},
 					{
 						"extend": 'excel',
 						"text": 'Export',
 						"className": 'btn btn-success',
-						title: 'Roles'
+						title: 'Campos Adicionales <?php echo $tipo_transaccion_nombre; ?>'
 					},
 					{
 						"extend": 'print',
 						"text": 'Export',
 						"className": 'btn btn-secondary',
-						title: 'Roles'
+						title: 'Campos Adicionales <?php echo $tipo_transaccion_nombre; ?>'
 					}
 				],
 				initComplete: function() {
@@ -295,6 +295,14 @@
 		function agregar_valor_selector() {
 			var td = '<tr><td><input class="form-control" type="text" maxlength="255" minlength="1" required name="valores[]"/></td><td><a class="btn btn-danger" onclick="eliminar_valor(this)"><i class="bi bi-trash"></i></td></tr>';
 			$('#valores_selector tbody').append(td);
+		}
+
+		function eliminar_valor(button) {
+			// Obtener la fila <tr> que contiene el botón de eliminar
+			var row = button.closest('tr');
+			
+			// Eliminar la fila
+			row.remove();
 		}
 	</script>
 	<!--LISTADO-->

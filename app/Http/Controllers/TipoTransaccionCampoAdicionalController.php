@@ -68,7 +68,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 				$r->nombre_campo,
 				$r->nombre_mostrar,
 				$r->orden_listado,
-				$r->requerido,
+				$r->requerido == 1 ? 'Sí' : 'No', 
 				$r->tipo_nombre,
 				$r->valores,
 				$accion
@@ -138,6 +138,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			'nombre_mostrar' => 'required|string|max:255',
 			'tipo' => 'required|integer|exists:tipos_campos,id',
 			'posicion' => 'required|integer|min:0',
+			'requerido' => 'required|integer',
 			'tipo_transaccion_id' => 'integer',
 			'valores' => 'nullable|array', // Si tipo == 4, esto será validado manualmente
 		], [
@@ -145,6 +146,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			'nombre_campo.unique' => 'Este nombre de campo adicional ya está en uso.',
 			'tipo.required' => 'Este campo no puede quedar vacío.',
 			'tipo.exists' => 'El tipo de campo seleccionado no es válido.',
+			'requerido.required' => 'Este campo no puede quedar vacío.',
 		]);
 		#print_r($validatedData);
 		// Verificar si la validación falla
