@@ -8,7 +8,7 @@
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 
 	<title>{{ config('app.name', 'YAFO') }}</title>
-	<link rel="shortcut icon" type="image/png" href="{{ asset('aleph_theme/img/favicon.png') }}"/>
+	<link rel="shortcut icon" type="image/png" href="{{ asset('build/aleph_theme/img/favicon.png') }}"/>
 
 	<!--SECCION CSS-->
 	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/bootstrap/dist/css/bootstrap.min.css') }}">

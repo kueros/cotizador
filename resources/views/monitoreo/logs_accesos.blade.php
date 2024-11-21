@@ -27,7 +27,7 @@
 					url : "{{ url('monitoreo/ajax_log_acceso') }}",
 					type : 'GET'
 				},
-				"order": [[ 3, "desc" ]],
+				"order": [[ 0, "desc" ]],
 				"ordering": true,
 				bAutoWidth: false, 
 				responsive: true, // Activa diseño responsive
@@ -42,6 +42,9 @@
 				language: traduccion_datatable,
 				"pageLength": 100,
 				dom: 'Bfrtip',
+				columnDefs: [
+					{ targets: '_all', className: 'text-start' },
+				],
 				buttons: [
 					{"extend": 'copy', "text":'Portapapeles',"className": 'btn btn-primary', title: 'Log de acciones'},
 					{"extend": 'pdf', "text":'PDF',"className": 'btn btn-danger', title: 'Log de acciones'},
