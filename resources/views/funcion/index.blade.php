@@ -365,7 +365,7 @@
 						<div class="form-body">
 							<div class="row align-items-center">
 								<div class="col-md-3 d-flex align-items-center">
-									<input name="segundo_nombre" maxlength="255" placeholder="Nombre de la función" class="form-control" type="text" readonly="readonly" />
+									<input name="segundo_nombre" maxlength="255" class="form-control" type="text" readonly="readonly" />
 									<button class="btn btn-info btn-sm ms-2" type="button" id="equalMenuButton" disabled>
 										<i class="fas fa-equals"></i>
 									</button>
