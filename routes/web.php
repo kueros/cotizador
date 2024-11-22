@@ -11,6 +11,7 @@ use App\Http\Controllers\MyController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\TipoTransaccionController;
 use App\Http\Controllers\TipoTransaccionCampoAdicionalController;
+use App\Http\Controllers\FuncionController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -194,6 +195,22 @@ Route::middleware('auth')->group(
 		Route::post('/tipos_transacciones_campos_adicionales/ajax_guardar_columna/', [TipoTransaccionCampoAdicionalController::class, 'ajax_guardar_columna'])->name('tipos_transacciones_campos_adicionales.ajax_guardar_columna');
 	}
 );
+
+Route::middleware('auth')->group(function () {
+	Route::get('/funciones', [FuncionController::class, 'index'])->name('funciones.index');
+#	Route::get('/show/{id}', [FuncionController::class, 'show'])->name('roles.show');
+	#Route::get('/funciones/create', [FuncionController::class, 'create'])->name('funciones.create');
+	Route::post('/funciones', [FuncionController::class, 'store'])->name('funciones.store');
+#	Route::get('/funciones/{rol}/edit', [FuncionController::class, 'edit'])->name('funciones.edit');
+	Route::put('/funciones/{id}', [FuncionController::class, 'update'])->name('funciones.update');
+#	Route::delete('/funciones/{rol}', [FuncionController::class, 'destroy'])->name('funciones.destroy');
+#	Route::post('/funciones/options', [FuncionController::class, 'options'])->name('funciones.options');
+#	Route::get('/funciones/fields', [FuncionController::class, 'fields'])->name('funciones.fields');
+	Route::get('/funciones/ajax_listado', [FuncionController::class, 'ajax_listado'])->name('funciones.ajax_listado');
+	Route::get('/funciones/ajax_edit/{id}', [FuncionController::class, 'ajax_edit'])->name('funciones.ajax_edit');
+	Route::post('/funciones/ajax_delete/{id}', [FuncionController::class, 'ajax_delete'])->name('funciones.ajax_delete');
+});
+
 
 require __DIR__ . '/auth.php';
 
