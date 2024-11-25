@@ -64,7 +64,7 @@
 				$('.form-group').removeClass('has-error');
 				$('.help-block').empty();
 				$('#modal_form_add').modal('show');
-				$('.modal-title').text('Agregar funciones');
+				$('.modal-title').text('Agregar función');
 				$('#accion').val('add');
 				$('#form_add').attr('action', "{{ url('funciones') }}");
 				$('#method').val('POST');
@@ -95,7 +95,7 @@
 						//}?>
 
 						$('#modal_form_edit').modal('show');
-						$('.modal-title').text('Editar funcion');
+						$('.modal-title').text('Editar función');
 						$('#form_edit').attr('action', "{{ url('funciones') }}" + "/" + id);
 						$('#method').val('PUT');
 					},
@@ -148,33 +148,55 @@
 
 			/*******************************************************************************************************************************
 			 *******************************************************************************************************************************/
-			// Array para almacenar la fórmula
-			let formulaElements = [];
-			document.addEventListener('DOMContentLoaded', function () {
-				// Array para almacenar la fórmula
-				//let formulaElements = [];
-				document.getElementById('form_add').addEventListener('submit', function (event) {
-					// Evita el envío automático para procesar los datos
-					event.preventDefault();
+document.addEventListener('DOMContentLoaded', function () {
+    // Array para almacenar la fórmula
+    let formulaElements = [];
 
-					// Recopilar todos los inputs del contenedor
-					const inputs = document.querySelectorAll('#input-container input');
-					let formulaString = '';
+    const formAdd = document.getElementById('form_add');
+    const modalAdd = document.getElementById('modalAdd');
+    const inputContainer = document.getElementById('input-container');
+    const formulaField = document.getElementById('formula');
 
-					// Concatenar los valores de cada input al string
-					inputs.forEach(input => {
-						if (input.value.trim() !== '') {
-							formulaString += input.value.trim();
-						}
-					});
+    if (!formAdd || !modalAdd || !inputContainer || !formulaField) {
+        console.error("Revisa los IDs de los elementos. Alguno no existe.");
+        return;
+    }
 
-					// Asignar el string concatenado al campo oculto
-					document.getElementById('formula').value = formulaString;
+    // Evento para procesar el formulario antes de enviarlo
+    formAdd.addEventListener('submit', function (event) {
+        event.preventDefault(); // Evita el envío automático
 
-					// Enviar el formulario
-					this.submit();
-				});
-			});
+        // Recopilar todos los inputs del contenedor
+        const inputs = inputContainer.querySelectorAll('input');
+        let formulaString = '';
+
+        inputs.forEach(input => {
+            if (input.value.trim() !== '') {
+                formulaString += input.value.trim();
+            }
+        });
+
+        // Asignar el string concatenado al campo oculto
+        formulaField.value = formulaString;
+
+        // Enviar el formulario
+        this.submit();
+    });
+
+    // Evento para limpiar cuando se cierra la modal
+    modalAdd.addEventListener('hidden.bs.modal', function () {
+        formulaElements = []; // Vaciar el array
+        console.log('formulaElements ha sido limpiado:', formulaElements);
+
+        // Limpiar los elementos del contenedor de inputs
+        while (inputContainer.firstChild) {
+            inputContainer.removeChild(inputContainer.firstChild);
+        }
+
+        // Limpiar el campo oculto
+        formulaField.value = '';
+    });
+});
 
 			// Función para agregar elementos a la fórmula
 			function addOption(optionText) {
@@ -335,10 +357,19 @@
 					</div>
 					
 				</div>
+			<style>
+				#input-container {
+					display: flex;
+					flex-wrap: wrap;
+				}
+				#input-container .d-flex {
+					margin-bottom: 10px;
+				}
+			</style>
 			</div>
 
 		</div>
-		<div class="modal fade modal-lg" id="modal_form_add" role="dialog">
+		<div class="modal fade modal-xl" id="modal_form_add" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
