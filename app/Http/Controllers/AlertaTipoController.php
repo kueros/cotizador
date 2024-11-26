@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Funcion;
+use App\Models\Alerta;
+use App\Models\TipoAlerta;
+use App\Models\AlertaDetalle;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -13,7 +15,7 @@ use App\Http\Controllers\MyController;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
-class FuncionController extends Controller
+class AlertaTipoController extends Controller
 {
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
@@ -24,34 +26,35 @@ class FuncionController extends Controller
 			abort(403, '.');
 			return false;
 		}
-*/
-		$funciones = Funcion::paginate();
-		return view('funcion.index', compact('funciones'))
-			->with('i', ($request->input('page', 1) - 1) * $funciones->perPage());
+ */		
+        $tipos_alertas = TipoAlerta::paginate();
+
+        return view('alertas_tipos.index', compact('tipos_alertas'))
+			->with('i', ($request->input('page', 1) - 1) * $tipos_alertas->perPage());
 	}
 
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
 	public function ajax_listado(Request $request)
 	{
-		$funciones = Funcion::all();
+        $tipos_alertas = TipoAlerta::all();
 		$data = array();
-        foreach($funciones as $r) {
-            $accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_funcion('."'".$r->id.
+        foreach($tipos_alertas as $r) {
+#dd($r);
+			$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_alertas_tipos('."'".$r->id.
 					"'".')"><i class="bi bi-pencil-fill"></i></a>';
 
-			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_funcion('."'".$r->id.
+			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_alertas_tipos('."'".$r->id.
 					"'".')"><i class="bi bi-trash"></i></a>';
 
             $data[] = array(
                 $r->nombre,
-                $r->formula,
                 $accion
             );
         }
         $output = array(
-            "recordsTotal" => $funciones->count(),
-            "recordsFiltered" => $funciones->count(),
+            "recordsTotal" => $tipos_alertas->count(),
+            "recordsFiltered" => $tipos_alertas->count(),
             "data" => $data
         );
  
@@ -59,49 +62,66 @@ class FuncionController extends Controller
     }
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
-	public function store(Request $request, MyController $myController): RedirectResponse
-    {
-	#dd($request->input('nombre'));
-/*     $permiso_agregar_funciones = $myController->tiene_permiso('add_funcion');
-    if (!$permiso_agregar_funciones) {
-        abort(403, '.');
-        return false;
-    }
- */
-    // Validar los datos del usuario
-    $validatedData = $request->validate([
-        'nombre' => 'required|string|max:255',
-        'formula' => 'required', 
-	], [
-		'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-		'nombre.unique' => 'Este nombre de funcion ya está en uso.',
-	]);
+	 *******************************************************************************************************************************/
+	public function ajax_guardar_columna(Request $request, MyController $myController)
+	{
+		#dd($request->all());
+		// Validar los datos del usuario
+		$validatedData = Validator::make($request->all(), [
+			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
+				Rule::unique('alertas_tipos', 'nombre'),
+			], [
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
+			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
+		]);
+		#dd($validatedData);
+		// Verificar si la validación falla
+		if ($validatedData->fails()) {
+			$response = [
+				'status' => 0,
+				'message' => 'error en validacion',
+				'errors' => $validatedData->errors()
+			];
+			return response()->json($response);
+		}
 
-    $campo = funcion::create($validatedData);
-	$campo->formula = $validatedData['formula'];
-	$campo->save();
+		$validated = $validatedData->validated(); // Obtiene los datos validados como array
+		#$inserted_id = Alerta::create($validated);
 
-    $clientIP = \Request::ip();
-    $userAgent = \Request::userAgent();
-    $username = Auth::user()->username;
-    $message = $username . " creó la funcion " . $request->input('nombre');
-    $myController->loguear($clientIP, $userAgent, $username, $message);
+		$alerta = TipoAlerta::create([
+			'nombre' => $validated['nombre'],
+		]);
+		// Loguear la acción
+		$clientIP = $request->ip();
+		$userAgent = $request->userAgent();
+		$username = Auth::user()->username;
+		$message = "$username creó un nuevo tipo de alerta: $validated[nombre]";
+		$myController->loguear($clientIP, $userAgent, $username, $message);
+	
+			$response = [
+			'status' => 0,
+			'message' => $validatedData->errors()
+		];
+	// Respuesta exitosa
+		$response = [
+			'status' => 1,
+			'message' => 'Tipo de Alerta creado correctamente.'
+		];
+		return response()->json($response);
+	}
 
-    return Redirect::route('funciones.index')->with('success', 'funcion creada exitosamente.');
-}
 
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
 	public function ajax_edit($id){
 
-        $data = Funcion::find($id);
+        $data = TipoAlerta::find($id);
 		return response()->json($data);
     }
 
     /*******************************************************************************************************************************
 	*******************************************************************************************************************************/
-	public function update(Request $request, Funcion $funcion, MyController $myController): RedirectResponse
+	public function update(Request $request, TipoAlerta $alertas_tipos, MyController $myController): RedirectResponse
 	{
 		#dd($request->id);
 /* 		$permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
@@ -111,25 +131,25 @@ class FuncionController extends Controller
 		}
 */
 		// Validar los datos
+
+
 		$validatedData = $request->validate([
 			'nombre' => 'required|string|max:255',
 		]);
 
 		// Obtener el modelo
-		$funcion = Funcion::findOrFail($request->id);
+		$alertas_tipos = TipoAlerta::findOrFail($request->id);
 
 		// Actualizar el modelo con los datos validados
-		$funcion->update($validatedData);
+		$alertas_tipos->update($validatedData);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " actualizó la función " . $request->nombre;
+		$message = $username . " actualizó el tipo de alerta " . $request->nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
-		return redirect()->route('funciones.index')->with('success', 'Función actualizado correctamente.');
+		return redirect()->route('alertas_tipos')->with('success', 'Tipo de Alerta actualizado correctamente.');
 
-		#return Redirect::route('funciones.index')
-		#	->with('success', 'Función editada con éxito.');
 	}
 
 	/*******************************************************************************************************************************
@@ -140,18 +160,15 @@ class FuncionController extends Controller
 			return response()->json(["error"=>"No tienes permiso para realizar esta acción, contáctese con un administrador."], "405");
 		}
 */
-		$funcion = Funcion::find($id);
-		$nombre = $funcion->nombre;
+		$alerta_tipo = TipoAlerta::find($id);
+		$nombre = $alerta_tipo->nombre;
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " borró la función " . $nombre;
+		$message = $username . " borró el tipo de alerta " . $nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
-		$funcion->delete();
+		$alerta_tipo->delete();
 		return response()->json(["status"=>true]);
     }
-
-
-
 }
