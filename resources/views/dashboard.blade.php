@@ -6,8 +6,9 @@
 	</x-slot>
 
 <?php 
-$copa_background_home_custom = session('copa_background_home_custom');
-$background_home_custom_path = session('background_home_custom_path');
+
+// $copa_background_home_custom = \Variable::where('nombre', 'copa_background_home_custom')->first()['valor'];
+//$background_home_custom_path = \Variable::where('nombre', 'background_home_custom_path')->first()['valor'];
 ?>
     <style>
 
@@ -18,7 +19,7 @@ $background_home_custom_path = session('background_home_custom_path');
 			body, html {
 			height: 100%;
 			background-repeat: no-repeat;
-			background: url('<?= $background_home_custom_path ?>') center top no-repeat;
+			background: url('{{ asset($background_home_custom_path) }}')  center top no-repeat;
 			background-repeat: no-repeat;
 			background-size: cover;
 			}

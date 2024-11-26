@@ -116,9 +116,17 @@ class ConfiguracionController extends Controller
 		// Obtener el archivo de la solicitud
 		$file = $request->file('copa_path');
 		$filename = 'background_home.jpg';// . '.' . $file->getClientOriginalExtension();
-		$path = $file->storeAs('uploads/imagenes', $filename, 'public');
+		//$path = $file->storeAs('uploads/imagenes', $filename, 'public');
+		$path = $file->move(public_path('images'), $filename);
+		//$variable = $this->get_variable('background_home_custom_path');
+		$variable = Variable::where('nombre', '=', 'background_home_custom_path')->first();
+		if( is_null($variable) ) {
+			return redirect()->back()->with('error', 'La variable no existe.');
+		}
+		$variable->valor = 'images/'.$filename;
+		$variable->save();
 
-		return redirect()->back()->with('success', 'Imagen guardada exitosamente en: ' . $path);
+		return redirect()->back()->with('success', 'Imagen guardada correctamente.');
     }
 
 	/*****************************************************************************************************************
@@ -133,9 +141,17 @@ class ConfiguracionController extends Controller
 		// Obtener el archivo de la solicitud
 		$file = $request->file('copa_path');
 		$filename = 'background_login.jpg';// . '.' . $file->getClientOriginalExtension();
-		$path = $file->storeAs('uploads/imagenes', $filename, 'public');
+		$path = $file->move(public_path('images'), $filename);
+		//$path = $file->storeAs('uploads/imagenes', $filename, 'public');
+		$variable = Variable::where('nombre', '=', 'background_login_custom_path')->first();
+		//$variable = $this->get_variable('background_login_custom_path');
+		if( is_null($variable) ) {
+			return redirect()->back()->with('error', 'La variable no existe.');
+		}
+		$variable->valor = 'images/'.$filename;
+		$variable->save();
 
-        return redirect()->back()->with('success', 'Imagen guardada exitosamente en: ' . $path);
+        return redirect()->back()->with('success', 'Imagen guardada correctamente.');
     }
 
 	/*****************************************************************************************************************

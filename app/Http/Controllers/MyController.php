@@ -702,12 +702,11 @@ public function loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado)
 		}
 	}
 
-	public static function get_variable($nombre)
+	public function get_variable($nombre)
 	{
-		$myController = new MyController();
-		$variable = $myController->get_variable($nombre);
+		$variable = Variable::where('nombre', '=', $nombre)->first();
 
-		if ($variable) {
+		if( is_null($variable) ) {
 			return $variable->valor;
 		} else {
 			return false;
