@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use App\Models\Variable;
 
 
 Route::get('/', function () {
@@ -37,7 +38,13 @@ Route::get('/dashboard/{imagenHome}', function () {
 */
 
 Route::get('/dashboard', function () {
-	return view('dashboard');
+	$copa_background_home_custom = Variable::where('nombre', '=', 'copa_background_home_custom')->first();
+	$background_home_custom_path = Variable::where('nombre', '=', 'background_home_custom_path')->first();
+	if( !is_null($copa_background_home_custom) ){
+		$copa_background_home_custom = $copa_background_home_custom->valor;
+		$background_home_custom_path = is_null($background_home_custom_path) ? "" : $background_home_custom_path->valor;
+	}
+	return view('dashboard', compact('copa_background_home_custom', 'background_home_custom_path'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
