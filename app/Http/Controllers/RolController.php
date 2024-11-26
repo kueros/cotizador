@@ -101,48 +101,6 @@ class RolController extends Controller
 
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
-/* 	public function store(Request $request, MyController $myController): RedirectResponse
-	{
-		#dd($request);
-		$permiso_agregar_roles = $myController->tiene_permiso('add_rol');
-		if (!$permiso_agregar_roles) {
-			abort(403, '.');
-			return false;
-		}
-		$formData = [];
-		foreach ($request->input('form_data') as $input) {
-			$formData[$input['name']] = $input['value'];
-		}
-		// Validar los datos del usuario
-		$validatedData = Validator::make($formData, [
-			'nombre' => [
-				'required',
-				'string',
-				'max:255',
-				'min:3',
-				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-				Rule::unique('roles'),
-			],
-		], [
-			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-		]);
-		// Verifica si la validación falla
-		if ($validatedData->fails()) {
-			$response["message"] = 'Error en la validación de los datos.';
-			$response["errors"] = $validatedData->errors();
-			return response()->json($response);
-		}
-		$validatedData = $validatedData->validated();
-		Rol::create($validatedData);
-		$clientIP = \Request::ip();
-		$userAgent = \Request::userAgent();
-		$username = Auth::user()->username;
-		$message = $username . " creó el rol " . $_POST['nombre'];
-		$myController->loguear($clientIP, $userAgent, $username, $message);
-		return Redirect::route('roles.index')
-			->with('success', 'Rol creado exitosamente.');
-	} */
-
 	public function store(Request $request, MyController $myController): RedirectResponse
 {
 	#dd($request->input('nombre'));

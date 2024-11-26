@@ -79,6 +79,16 @@ $permiso_configuraciones_software = tiene_permiso('setup_soft');
 			<ul class="nav navbar-nav me-auto nav-bar-1">
 				<li><a class="nav-link main-item" id="boton-inicio" href="{{ url('dashboard') }}">Inicio</a></li>
 				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">Configuración
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('tipos_transacciones') }}">ABM Tipos de transacciones</a></li>
+						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('funciones') }}">ABM de Funciones</a></li>
+						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('conf_alertas') }}">ABM de Alertas</a></li>
+					</ul>
+				</li>
+				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">Administración
 						<span class="caret"></span>
 					</a>
@@ -88,16 +98,6 @@ $permiso_configuraciones_software = tiene_permiso('setup_soft');
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('monitoreo') }}">Monitoreo</a></li>
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('roles') }}">Roles</a></li>
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('users') }}">Usuarios</a></li>
-					</ul>
-				</li>
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">Configuración
-						<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('tipos_transacciones') }}">ABM Tipos de transacciones</a></li>
-						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('conf_funciones') }}">ABM de Funciones</a></li>
-						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('conf_alertas') }}">ABM de Alertas</a></li>
 					</ul>
 				</li>
 			</ul>
