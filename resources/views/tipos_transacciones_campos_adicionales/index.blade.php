@@ -24,7 +24,7 @@
 
 			/*******************************************************************************************************************************
 			*******************************************************************************************************************************/
-			$("#form").submit(function(e) {
+			/*$("#form").submit(function(e) {
 				e.preventDefault();
 				var formData = new FormData(this);
 
@@ -76,7 +76,7 @@
 						}
 					}
 				});
-			});
+			});*/
 
 			/*******************************************************************************************************************************
 			 *******************************************************************************************************************************/
@@ -141,14 +141,14 @@
 		 *******************************************************************************************************************************/
 		function add_campo_adicional() {
 			save_method = 'add';
-			$('#form')[0].reset();
+			$('#form_campo_adicional')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			//$('#modal_form_campo_adicional').modal('show');
-			$('#modal_form').modal('show');
+			$('#modal_form_campo_adicional').modal('show');
 			$('.modal-title').text('Agregar campos adicionales');
 			$('#accion').val('add');
-			$('#form').attr('action', "{{ url('tipos_transacciones_campos_adicionales') }}");
+			$('#form_campo_adicional').attr('action', "{{ url('tipos_transacciones_campos_adicionales') }}");
 			$('#method').val('POST');
 		}
 
@@ -157,7 +157,7 @@
 		function edit_campos_adicionales(id) {
 			//console.log('edit_campos_adicionales '+id);
 			save_method = 'update';
-			$('#form')[0].reset();
+			$('#form_campo_adicional')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#accion').val('edit');
@@ -174,7 +174,11 @@
 					$('[name="orden_listado"]').val(data.orden_listado);
 					$('[name="requerido"]').val(data.requerido);
 					$('[name="tipo"]').val(data.tipo);
+					$('[name="posicion"]').val(data.orden_listado);
 					$('[name="valor_default"]').val(data.valor_default);
+
+					$('[name="visible"]').prop('checked', data.visible == 1);
+					$('[name="requerido"]').prop('checked', data.requerido == 1);
 
 
 					$('#modal_form_campo_adicional').modal('show');
@@ -218,12 +222,38 @@
 			}
 		}
 
+		function validar_campos_requeridos(form_id){
+			var form_status = true;
+
+			$($('#'+form_id).find(':input')).each(function(){
+				if($(this).prop("required") && !$(this).prop("disabled")){
+					if($(this).val()){
+						if(!$(this)[0].checkValidity()){
+							$(this).addClass('field-required');
+							form_status = false;
+						}else{
+							$(this).removeClass('field-required');
+						}
+					}else{
+						$(this).addClass('field-required');
+						form_status = false;
+					}
+				}
+			});
+
+			return form_status;
+		}
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function guardar_datos() {
-			let form_data = $('#form').serializeArray();
-			let url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales') }}";
+			let form_data = $('#form_campo_adicional').serializeArray();
+			let url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales/ajax_guardar_columna') }}";
 			let type_guarda_datos = "POST";
+
+			if(!validar_campos_requeridos('form_campo_adicional')){
+				$('#form_campo_adicional')[0].reportValidity();
+				return false;
+			}
 
 			if ($('#accion').val() != "add") {
 				url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales') }}" + "/" + $('[name="id"]').val();
@@ -355,112 +385,6 @@
 	<?php
 	?>
 
-	<div class="modal fade" id="modal_form" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Formulario tipos de transacciones</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
-					@csrf
-					<input name="_method" type="hidden" id="method">
-					<div class="modal-body form">
-						<input type="hidden" value="" name="id" />
-						<input name="accion" id="accion" class="form-control" type="hidden">
-						<input name="tipo_transaccion_id" id="tipo_transaccion_id" class="form-control" type="hidden" value="<?php echo $id; ?>">
-						<div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Nombre') }}</label>
-								<div class="col-md-9">
-									<input name="nombre_campo" minlength="3" maxlength="255" placeholder="Nombre del tipo de transacción"
-										id="nombre_campo" class="form-control" type="text" required>
-									<span class="help-block"></span>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Alias (Nombre de columna)') }}</label>
-								<div class="col-md-9">
-									<input name="nombre_mostrar" minlength="3" maxlength="255" placeholder="Nombre a Mostrar"
-										id="nombre_mostrar" class="form-control" type="text" required>
-									<span class="help-block"></span>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Posición') }}</label>
-								<div class="col-md-9">
-									<input name="posicion" id="posicion" class="form-control" type="number" value="<?php echo $ultima_posicion; ?>" required>
-									<span class="help-block"></span>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-body">
-							<div class="row mb-3">
-								<label class="col-md-3 col-form-label">{{ __('Requerido') }}</label>
-								<div class="col-md-9">
-									<!-- Radio buttons para "Requerido" en horizontal -->
-									<div class="form-check form-check-inline">
-										<input type="radio" class="form-check-input" name="requerido" id="requerido_si" value="1" {{ old('requerido') == '1' ? 'checked' : '' }}>
-										<label class="form-check-label" for="requerido_si">{{ __('Sí') }}</label>
-									</div>
-									<div class="form-check form-check-inline">
-										<input type="radio" class="form-check-input" name="requerido" id="requerido_no" value="0" {{ old('requerido') == '0' ? 'checked' : '' }}>
-										<label class="form-check-label" for="requerido_no">{{ __('No') }}</label>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Tipo de Campo') }}</label>
-								<div class="col-md-9">
-									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" onchange="cambiar_tipo_campo(this)" required>
-										<option value="0">
-											{{ __('Elija un Tipo de Campo') }}
-										</option>
-										@foreach($tipos_campos as $tipo_campo)
-										<option value="{{ $tipo_campo->id }}">
-											{{ $tipo_campo->nombre }}
-										</option>
-										@endforeach
-									</select>
-									<span class="help-block"></span>
-								</div>
-							</div>
-						</div>
-
-						<div id="div_valores_selector" class="form-group" style="display:none">
-							<hr>
-							<a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
-							<div class="table-responsive">
-								<table class="table" id="valores_selector">
-									<thead>
-										<th>Valor</th>
-										<th>Acción</th>
-									</thead>
-									<tbody>
-									</tbody>
-								</table>
-							</div>
-						</div>
-
-					</div>
-					<div class="modal-footer">
-						<button type="submit" class="btn btn-primary" id="guardar_campo">Guardar</button>
-						<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-
 
 	<div class="modal fade" id="modal_form_campo_adicional" role="dialog">
 		<div class="modal-dialog">
@@ -473,6 +397,7 @@
 					@csrf
 					<input name="_method" type="hidden" id="method">
 					<div class="modal-body form">
+					<input name="tipo_transaccion_id" id="tipo_transaccion_id" class="form-control" type="hidden" value="<?php echo $id; ?>">
 						<input type="hidden" value="" name="accion" id="accion" />
 						<input type="hidden" value="" name="id" />
 						<div class="form-body">
@@ -497,20 +422,15 @@
 							</div>
 						</div>
 
-
-						<!-- en los siguientes controles checkbox, agrego un hidden con el mismo nombre para enviar 
-									 valor "0" para que se envíe al server, cuando se setea el checkbox, se manda el valor de este
-									 ya que el checkbox tiene prioridad sobre el hidden -->
 						<div class="form-body">
 							<div class="row mb-3">
 								<label class="col-md-3 col-form-label">{{ __('Visibilidad en Formulario?') }}</label>
 								<div class="col-md-9">
-									<div class="form-check form-switch">
-										<input type="hidden" name="visible" value="0">
-										<input class="form-check-input" name="visible" id="visible"
-											value="1" type="checkbox">
-										<label class="form-check-label" for="visible"></label>
-									</div>
+									<select name="visible" class="form-control" required>
+										<option value="">Seleccionar</option>
+										<option value="1">Sí</option>
+										<option value="0">No</option>
+									</select>
 								</div>
 							</div>
 						</div>
@@ -519,8 +439,8 @@
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Orden en el Formulario') }}</label>
 								<div class="col-md-9">
-									<input name="orden_abm" placeholder="1"
-										id="orden_abm" class="form-control" type="number" required>
+									<input name="posicion" placeholder="1"
+										id="posicion" class="form-control" type="number" required>
 									<span class="help-block"></span>
 								</div>
 							</div>
@@ -530,12 +450,11 @@
 							<div class="row mb-3">
 								<label class="col-md-3 col-form-label">{{ __('Es Obligatorio?') }}</label>
 								<div class="col-md-9">
-									<div class="form-check form-switch">
-										<input type="hidden" name="requerido" value="0">
-										<input class="form-check-input" name="requerido" id="requerido"
-											value="1" type="checkbox">
-										<label class="form-check-label" for="requerido"></label>
-									</div>
+									<select name="requerido" class="form-control" required>
+										<option value="">Seleccionar</option>
+										<option value="1">Sí</option>
+										<option value="0">No</option>
+									</select>
 								</div>
 							</div>
 						</div>
@@ -545,7 +464,7 @@
 								<label class="col-form-label col-md-3">{{ __('Tipo de Campo') }}</label>
 								<div class="col-md-9">
 									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" required>
-										<option value="0">
+										<option value="">
 											{{ __('Elija un Tipo de Campo') }}
 										</option>
 										@foreach($tipos_campos as $tipo_campo)
@@ -563,12 +482,11 @@
 								<label class="col-form-label col-md-3">{{ __('Valores') }}</label>
 								<div class="col-md-9">
 									<input name="valor_default" minlength="3" maxlength="255" placeholder="Valor por defecto"
-										id="valor_default" class="form-control" type="text" required>
+										id="valor_default" class="form-control" type="text">
 									<span class="help-block"></span>
 								</div>
 							</div>
 						</div>
-
 
 					</div>
 					<div class="modal-footer">
@@ -580,4 +498,5 @@
 			</div>
 		</div>
 	</div>
+
 </x-app-layout>

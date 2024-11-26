@@ -59,9 +59,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 
 		$data = array();
 		foreach ($campos_adicionales as $r) {
-#print_r("kdk1 ".$r->orden_listado);
-			$definirCamposUrl = route('tipos_transacciones_campos_adicionales.edit', $r->id);
-			$accion = '<a class="btn btn-sm btn-primary" href="' . $definirCamposUrl . '" title="Editar Campos"><i class="bi bi-pencil"></i></a>';
+			$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_campos_adicionales(' . "'" . $r->id . "'" . ')"><i class="bi bi-pencil"></i></a>';
 
 			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_campos_adicionales(' . "'" . $r->id . "'" . ')"><i class="bi bi-trash"></i></a>';
 			$data[] = array(
@@ -126,7 +124,11 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	{
 		#print_r($request->all());
 		// Validar los datos del usuario
-		$validatedData = Validator::make($request->all(), [
+		$formData = [];
+		foreach ($request->input('form_data') as $input) {
+			$formData[$input['name']] = $input['value'];
+		}
+		$validatedData = Validator::make($formData, [
 			'nombre_campo' => [
 				'required',
 				'string',
@@ -138,8 +140,9 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			'nombre_mostrar' => 'required|string|max:255',
 			'tipo' => 'required|integer|exists:tipos_campos,id',
 			'posicion' => 'required|integer|min:1|max:100',
-			'requerido' => 'required|integer',
 			'tipo_transaccion_id' => 'integer',
+			'visible' => 'required|integer',
+			'requerido' => 'required|integer',
 			'valores' => 'nullable|array', // Si tipo == 4, esto será validado manualmente
 		], [
 			'nombre_campo.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
@@ -205,10 +208,10 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		$message = "$username creó el campo adicional para tipo de transacción $nombre_campo";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 	
-			$response = [
+			/*$response = [
 			'status' => 0,
 			'message' => $validatedData->errors()
-		];
+		];*/
 	// Respuesta exitosa
 		$response = [
 			'status' => 1,
@@ -236,19 +239,17 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	 * 
 	 ********************************************************************************************************************************/
 
-	public function store(Request $request, MyController $myController): RedirectResponse
+	public function store(Request $request, MyController $myController)
 	{
 		#dd($request->valores);
-		/*     $permiso_agregar_roles = $myController->tiene_permiso('add_rol');
-	if (!$permiso_agregar_roles) {
-		abort(403, '.');
-		return false;
-	}
-*/
-		#dd($request->valores);
 
+		#dd($request->valores);
+		$formData = [];
+		foreach ($request->input('form_data') as $input) {
+			$formData[$input['name']] = $input['value'];
+		}
 		// Validar los datos del usuario
-		$validatedData = $request->validate([
+		$validatedData = Validator::make($formData, [
 			'nombre_campo' => [
 				'required',
 				'string',
@@ -278,12 +279,21 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			]
 		]);
 
+		if ($validatedData->fails()) {
+			$response = [
+				'status' => 0,
+				'message' => 'Error en validacion',
+				'errors' => $validatedData->errors()
+			];
+			return response()->json($response);
+		}
+
 		/*         $tipoTransacciónExistente = CampoAdicionalTipoTransaccion::where('nombre', $request->input('nombre'))->first();
 		if ($tipoTransacciónExistente) {
 			return redirect()->back()->withErrors(['nombre' => 'Este nombre de tipo de transacción ya está en uso.'])->withInput();
 		}
 		*/
-		#dd($request->valores);
+		//$validatedData = $validatedData->validated();
 		$campo = TipoTransaccionCampoAdicional::create($validatedData);
 		$valores = implode(',', $request->valores);
 		$campo->valores = $valores;
@@ -294,7 +304,11 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		$message = $username . " creó el campo adicional para tipo de transacción " . $request->input('nombre');
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
-		return Redirect::route('tipos_transacciones_campos_adicionales')->with('success', 'Campo adicional para tipo de transacción creado exitosamente.');
+		$response = [
+			'status' => 1,
+			'message' => 'Campo adicional para tipo de transacción creado exitosamente.'
+		];
+		return response()->json($response);
 	}
 
 	/*******************************************************************************************************************************
@@ -304,28 +318,49 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	{
 		#dd($request);
 		// Validar los datos
-		$request->merge([
-			'visible' => $request->has('visible') ? 1 : 0,
-			'requerido' => $request->has('requerido') ? 1 : 0,
-		]);
-		$validatedData = $request->validate([
+		
+		$formData = [];
+		foreach ($request->input('form_data') as $input) {
+			if( $input['name'] == "posicion" ){
+				$formData['orden_listado'] = $input['value'];
+			} else {
+				$formData[$input['name']] = $input['value'];
+			}
+		}
+		
+		$validatedData = Validator::make($formData, [
 			'nombre_campo' => 'required|string|max:255',
 			'nombre_mostrar' => 'required|string|max:255',
 			'tipo' => 'required|integer',
+			'visible' => 'required|integer',
 			'requerido' => 'required|integer',
-			'orden_listado' => 'required|integer',
-		]);		// Obtener el modelo
+			'orden_listado' => 'required|integer'
+		]);
+
+		if ($validatedData->fails()) {
+			$response = [
+				'status' => 0,
+				'message' => 'Error en validacion',
+				'errors' => $validatedData->errors()
+			];
+			return response()->json($response);
+		}
+		$validated = $validatedData->validated(); // Obtiene los datos validados como array
+
 		#dd($validatedData);
-		$tipoTransaccionId = $request->tipo_transaccion_id;
+		$tipoTransaccionId = $formData['tipo_transaccion_id'];
 		#dd($tipoTransaccionId);
-		$tipo_transaccion_campo_adicional = TipoTransaccionCampoAdicional::findOrFail($request->id);
+		$tipo_transaccion_campo_adicional = TipoTransaccionCampoAdicional::findOrFail($formData['id']);
 		// Actualizar el modelo con los datos validados
-		$tipo_transaccion_campo_adicional->update($validatedData);
+		$tipo_transaccion_campo_adicional->update($validated);
 
 		#return redirect()->route('tipos_transacciones_campos_adicionales')->with('success', 'Campo adicional de tipo de transacción actualizado correctamente.');
 
-		return redirect()->route('tipos_transacciones_campos_adicionales', ['id' => $tipoTransaccionId])
-		->with('success', 'Campo adicional de tipo de transacción actualizado correctamente.');
+		$response = [
+			'status' => 1,
+			'message' => 'Campo adicional de tipo de transacción actualizado correctamente.'
+		];
+		return response()->json($response);
 	}
 
 	/*******************************************************************************************************************************

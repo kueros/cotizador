@@ -9,6 +9,13 @@
     src: url('../fonts/corbel/Corbel Bold.ttf') format('truetype');
 }
 
+body{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+}
+
 h2{
     font-family: Corbel-bold;
     color: #014B7D;
@@ -28,6 +35,25 @@ textarea{
     min-width: 30%;
     min-height: 50px;
     max-height: 400px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9 !important; /* Cambia el color de las filas impares */
+}
+  
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #ffffff; /* Cambia el color de las filas pares (opcional) */
+}
+
+.accordion-header .accordion-button:not(.collapsed) {
+    background-color: #e2e9ff; /* Cambia el color del fondo */
+    color: #337ab7;
+}
+
+.accordion-header .accordion-button {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 900;
+    font-size: 14px !important;
 }
 
 /**********************HEADER**********************/
@@ -1258,5 +1284,9 @@ table{
     /*.dropdown.open .dropdown-menu .hover-aleph-buttons{*/
     /*color: white!important;*/
     /*}*/
+}
+
+.accordion-button{
+    font-size: large !important;
 }
 /******************************************* FIN ESTILOS MOBILE ***********************************/

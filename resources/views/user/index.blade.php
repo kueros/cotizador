@@ -27,6 +27,16 @@
 					"orderable": false
 				}
 			],
+			aoColumns : [
+				{ sWidth: '13%' },
+				{ sWidth: '13%' },
+				{ sWidth: '13%' },
+				{ sWidth: '13%' },
+				{ sWidth: '13%' },
+				{ sWidth: '10%' },
+				{ sWidth: '10%' },
+				{ sWidth: '15%' }
+			],
             buttons: [
                 {"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Usuarios'},
                 {"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Usuarios'},
