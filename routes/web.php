@@ -226,7 +226,7 @@ Route::middleware('auth')->group(
 		Route::post('/alertas/ajax_delete/{id}', [AlertaController::class, 'ajax_delete'])->name('alertas.ajax_delete');
 	#	Route::get('/show/{id}', [AlertaController::class, 'show'])->name('alertas.show');
 		#Route::get('/alertas/create', [AlertaController::class, 'create'])->name('alertas.create');
-		Route::post('/alertas', [AlertaController::class, 'store'])->name('alertas.store');
+		Route::post('/alertas/store', [AlertaController::class, 'store'])->name('alertas.store');
 	#	Route::get('/alertas/{rol}/edit', [AlertaController::class, 'edit'])->name('alertas.edit');
 	#	Route::delete('/alertas/{rol}', [AlertaController::class, 'destroy'])->name('alertas.destroy');
 	#	Route::post('/alertas/options', [AlertaController::class, 'options'])->name('alertas.options');

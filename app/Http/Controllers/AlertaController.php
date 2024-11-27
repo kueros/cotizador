@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Alerta;
 use App\Models\TipoAlerta;
 use App\Models\AlertaDetalle;
+use App\Models\Funcion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class AlertaController extends Controller
 {
@@ -27,6 +29,7 @@ class AlertaController extends Controller
 			return false;
 		}
  */		
+		$funciones = Funcion::all();
         $tipos_alertas = TipoAlerta::all();
         $alertas = 
             Alerta::
@@ -35,7 +38,7 @@ class AlertaController extends Controller
                 #where('tipo_transaccion_id', $tipo_transaccion_id)->
                 #orderBy('nombre', 'asc')->
                 paginate();
-        return view('alertas.index', compact('alertas', 'tipos_alertas'))
+        return view('alertas.index', compact('alertas', 'tipos_alertas', 'funciones'))
 			->with('i', ($request->input('page', 1) - 1) * $alertas->perPage());
 	}
 
@@ -49,6 +52,7 @@ class AlertaController extends Controller
         ->orderBy('nombre', 'asc')
         ->get();
 		$data = array();
+		#dd($alertas);
         foreach($alertas as $r) {
  			$detalleAlerta = route('alertas_detalles', ['id' => $r->id]); 
 			$accion = '<a class="btn btn-sm btn-info" href="' . $detalleAlerta . '" title="Detalle Alerta">Detalle Alerta</a>';
@@ -66,6 +70,7 @@ class AlertaController extends Controller
                 $accion
             );
         }
+		#dd($data);
         $output = array(
             "recordsTotal" => $alertas->count(),
             "recordsFiltered" => $alertas->count(),
@@ -79,15 +84,17 @@ class AlertaController extends Controller
 	 *******************************************************************************************************************************/
 	public function ajax_guardar_columna(Request $request, MyController $myController)
 	{
-		#dd($request->all());
+		dd($request->all());
 		// Validar los datos del usuario
 		$validatedData = Validator::make($request->all(), [
 			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
 				Rule::unique('alertas', 'nombre'),
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
-			'valores' => 'required|array', // El campo de tipo array para la segunda tabla
-			'valores.*' => 'string', // Cada elemento del array debe ser un string
+			'funciones_id' => 'required|exists:funciones,id',
+			#'valores' => 'array', // El campo de tipo array para la segunda tabla
+			#'valores.*' => 'string', // Cada elemento del array debe ser un string
+
 			], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
 			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
@@ -113,17 +120,13 @@ class AlertaController extends Controller
 			'descripcion' => $validated['descripcion'],
 			'tipos_alertas_id' => $validated['tipos_alertas_id'],
 		]);
-	#dd($alerta->id);
-		foreach ($validated['valores'] as $valor) {
-			#dd($alerta->id);
-			AlertaDetalle::create([
-				'alertas_id' => $alerta->id, // Usar el ID de la alerta creada como clave foránea
-				'funciones_id' => $valor,
-				'fecha_desde' => '2021-01-01',
-				'fecha_hasta' => '2021-12-31',
-			]);
-		}
-
+#	dd($validated['funciones_id']);
+		AlertaDetalle::create([
+			'alertas_id' => $alerta->id,
+			'funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
+			'fecha_desde' => $request['fecha_desde'][0] ?? null, // Usar el primer valor del arreglo, o null si no existe
+			'fecha_hasta' => $request['fecha_hasta'][0] ?? null, // Usar el primer valor del arreglo, o null si no existe
+		]);
 
 		// Loguear la acción
 		$clientIP = $request->ip();
@@ -141,23 +144,30 @@ class AlertaController extends Controller
 			'status' => 1,
 			'message' => 'Alerta creada correctamente.'
 		];
+		#dd($response);
 		return response()->json($response);
 	}
-
 
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
 	public function ajax_edit($id){
 
-        $data = Alerta::find($id);
-		return response()->json($data);
-    }
+        $alerta = Alerta::where('id', $id)->first();
+		$alertasDetalles = AlertaDetalle::where('alertas_id', $id)->get();
+		$response = response()->json([
+			'alertas' => $alerta,
+			'alertas_detalles' => $alertasDetalles,
+			'funciones' => Funcion::all(), // Todas las funciones disponibles
+		]);
+		#dd($alertasDetalles,$id);
+		return $response;
+	}
 
     /*******************************************************************************************************************************
 	*******************************************************************************************************************************/
 	public function update(Request $request, Alerta $alerta, MyController $myController): RedirectResponse
 	{
-		#dd($request->id);
+		dd($request->id);
 /* 		$permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
 		if (!$permiso_editar_funciones) {
 			abort(403, '.');

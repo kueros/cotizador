@@ -158,7 +158,7 @@
 			if ($('#accion').val() != "add") {
 				url_guarda_datos = "{{ url('alertas_detalles') }}" + "/" + $('[name="id"]').val();
 				type_guarda_datos = "PUT";
-				console.log('asdf '+$('name="id"').val());
+				console.log('asdf ' + $('[name="id"]').val());
 			}
 
 			show_loading();

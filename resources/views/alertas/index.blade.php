@@ -14,6 +14,7 @@
 	@endphp
 	<?php
 	#dd($tipos_alertas); 
+	#dd($response);
 	?>
 
 	<script type="text/javascript">
@@ -30,7 +31,7 @@
 
 				//show_loading();
 				$.ajax({
-					url: "{{ url('alertas/ajax_guardar_columna') }}",
+					url: "{{ url('alertas/ajax_guardar_columna2') }}",
 					type: "POST",
 					data: formData,
 					method: 'POST',
@@ -154,50 +155,18 @@
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		function edit_alertas(id) {
-			save_method = 'update';
-			$('#form')[0].reset();
-			$('.form-group').removeClass('has-error');
-			$('.help-block').empty();
-			$('#accion').val('edit');
-			$.ajax({
-				url: "{{ route('alertas.ajax_edit', ':id') }}".replace(':id', id),
-				type: "GET",
-				dataType: "JSON",
-				success: function(data) {
-					$('[name="id"]').val(data.id);
-					$('[name="nombre"]').val(data.nombre);
-					$('[name="descripcion"]').val(data.descripcion);
-					$('[name="tipos_alertas_id"]').val(data.tipos_alertas_id);
-					$('#modal_form_alertas').modal('show');
-					$('.modal-title').text('Editar Alerta');
-					$('#form').attr('action', "{{ url('alertas') }}" + "/" + id);
-					$('#method').val('PUT');
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					if (jqXHR.status === 404) {
-						alert("El registro no fue encontrado.");
-					} else {
-						show_ajax_error_message(jqXHR, textStatus, errorThrown);
-					}
-				}
-			});
-		}
-
-		/*******************************************************************************************************************************
-		 *******************************************************************************************************************************/
-		function delete_campos_adicionales(id) {
-			if (confirm('¿Desea borrar el campo adicional de este tipo de transacción?')) {
+		function delete_alerta(id) {
+			if (confirm('¿Desea borrar esta alerta?')) {
 
 				$.ajax({
-					url: "{{ route('tipos_transacciones_campos_adicionales.ajax_delete', ':id') }}".replace(':id', id),
+					url: "{{ route('alertas.ajax_delete', ':id') }}".replace(':id', id),
 					type: "POST",
 					dataType: "JSON",
 					headers: {
 						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 					},
 					success: function(data) {
-						swal.fire("Aviso", "Campo adicional de este tipo de transacción eliminado con éxito.", "success");
+						swal.fire("Aviso", "Alerta eliminada con éxito.", "success");
 
 						$('#modal_form_alertas').modal('hide');
 						reload_table();
@@ -266,14 +235,53 @@
 				}
 			});
 		}
-
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function agregar_valor_selector() {
-			var td = '<tr><td><input class="form-control" type="text" maxlength="255" minlength="1" required name="valores[]"/></td><td><a class="btn btn-danger" onclick="eliminar_valor(this)"><i class="bi bi-trash"></i></td></tr>';
-			$('#valores_selector tbody').append(td);
+/* 			var td = '<tr><td><input class="form-control" type="text" maxlength="255" minlength="1" required name="valores[]"/></td><td><a class="btn btn-danger" onclick="eliminar_valor(this)"><i class="bi bi-trash"></i></td></tr>';
+			$('#detalles_alertas tbody').append(td);
+ */			const tableBody = document.querySelector("#detalles_alertas tbody");
+
+			// Crear una nueva fila con los campos necesarios
+			const newRow = document.createElement("tr");
+
+			newRow.innerHTML = `
+				<td>
+					<select class="form-control" name="funciones_id[]" required>
+						<option value="0">Elija una Función</option>
+						@foreach($funciones as $funcion)
+						<option value="{{ $funcion->id }}">{{ $funcion->nombre }}</option>
+						@endforeach
+					</select>
+				</td>
+				<td>
+					<input type="date" name="fecha_desde[]" class="form-control" required>
+				</td>
+				<td>
+					<input type="date" name="fecha_hasta[]" class="form-control" required>
+				</td>
+				<td>
+					<button type="button" class="btn btn-danger btn-sm" onclick="remove_row(this)">
+						<i class="fa fa-trash"></i> Eliminar
+					</button>
+				</td>
+			`;
+
+			// Agregar la fila a la tabla
+			tableBody.appendChild(newRow);
 		}
 
+		// Función para eliminar una fila
+		function remove_row(button) {
+			const row = button.closest("tr");
+			row.remove();
+		}
+
+
+
+
+
+		
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function eliminar_valor(button) {
@@ -301,7 +309,7 @@
 				</div>
 				@endif
 <?php
-#dd($alertas);
+#dd($funciones);
 ?>
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
@@ -326,53 +334,29 @@
 		</div>
 	</div>
 
-	<?php
-		#dd($id);
-		#dd($campos_adicionales);
-		#dd($ultima_posicion);
-	?>
-	<?php
-	?>
 
-	<div class="modal fade" id="modal_form_alertas" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Formulario alertas</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
-					@csrf
-					<input name="_method" type="hidden" id="method">
-					<div class="modal-body form">
-						<input type="hidden" value="" name="id" />
-						<input name="accion" id="accion" class="form-control" type="hidden">
-						<div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Nombre') }}</label>
-								<div class="col-md-9">
-									<input name="nombre" minlength="3" maxlength="255" placeholder="Nombre de la alerta"
-										id="nombre" class="form-control" type="text" required>
-									<span class="help-block"></span>
-								</div>
-							</div>
-						</div>
+<?php #dd($alertas); ?>
 
-						<div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Descripcion') }}</label>
-								<div class="col-md-9">
-									<input name="descripcion" minlength="3" maxlength="255" placeholder="Descripción"
-										id="descripcion" class="form-control" type="text" required>
-									<span class="help-block"></span>
-								</div>
-							</div>
-						</div>
-<?php 
-#dd($tipos_alertas);
-dd($alertas);
-?>
-						<div class="form-body">
+<div class="modal fade modal-lg" id="modal_form_alertas" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Editar alertas</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
+				@csrf
+                <div class="modal-body">
+                    <!-- Campos principales -->
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" class="form-control" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <textarea class="form-control" name="descripcion" required></textarea>
+                    </div>
+					<div class="form-body">
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Tipo de Alerta') }}</label>
 								<div class="col-md-9">
@@ -391,29 +375,122 @@ dd($alertas);
 							</div>
 						</div>
 
-						<div id="div_valores_selector" class="form-group" style="display:block">
-							<hr>
-							<a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
-							<div class="table-responsive">
-								<table class="table" id="valores_selector">
-									<thead>
-										<th>Valor</th>
-										<th>Acción</th>
-									</thead>
-									<tbody>
-									</tbody>
-								</table>
-							</div>
-						</div>
+                    <!-- Detalles de Alerta -->
+                    <h5>Detalles de la Alerta</h5>
+					<a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
 
-					</div>
-					<div class="modal-footer">
+                    <table class="table table-bordered" id="detalles_alertas">
+                        <thead>
+                            <tr>
+                                <th>Función ID</th>
+                                <th>Fecha Desde</th>
+                                <th>Fecha Hasta</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filas dinámicas se añadirán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+				<div class="modal-footer">
 						<button type="submit" class="btn btn-primary" id="guardar_campo">Guardar</button>
 						<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
 					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function edit_alertas(id) {
+			save_method = 'update';
+			$('#form')[0].reset(); // Resetea el formulario principal
+			$('.form-group').removeClass('has-error');
+			$('.help-block').empty();
+			$('#accion').val('edit');
+			let url_guarda_datos = "{{ route('alertas.ajax_edit', ':id') }}".replace(':id', id);
+			//console.log('id alerta ' + id);
+			//console.log('url_guarda_datos ' + url_guarda_datos);
+
+			$.ajax({
+				url: url_guarda_datos,
+				type: "GET",
+				dataType: "JSON",
+				success: function(response) {
+
+					//console.log('Respuesta del servidor:', response.original.alertas.tipos_alertas_id); 
+					//console.log('Respuesta del servidor:', response.alertas); 
+					console.log('Respuesta del servidor:', response.alertas_detalles); 
+					//console.log('Respuesta del servidor:', response.funciones); 
+
+					// Asignar datos de la alerta principal al formulario
+					//$('#form [name="id"]').val(response.alerta.id);
+					$('#form [name="nombre"]').val(response.alertas.nombre);
+					$('#form [name="descripcion"]').val(response.alertas.descripcion);
+					$('#form [name="tipos_alertas_id"]').val(response.alertas.tipos_alertas_id);
+
+					// Mostrar la modal
+					$('#modal_form_alertas').modal('show');
+					$('.modal-title').text('Editar Alerta');
+					$('#form').attr('action', "{{ url('alertas.update') }}" + "/" + id);
+					$('#method').val('PUT');
+
+					// Limpiar la tabla de detalles antes de llenarla
+					$('#detalles_alertas tbody').empty();
+					//console.log('funciones ' + response.funciones.length);
+
+					// Asignar los datos de detalles_alertas
+					if (response.alertas_detalles.length > 0) {
+						response.alertas_detalles.forEach(function(detalle) {
+							let opcionesFunciones = '';
+							response.funciones.forEach(function(funcion) {
+								const selected = funcion.id == detalle.funciones_id ? 'selected' : '';
+								opcionesFunciones += `<option value="${funcion.id}" ${selected}>${funcion.nombre}</option>`;
+								//console.log('funcion.id '+`<option value="${funcion.id}" ${funcion.id == detalle.funciones_id ? "selected" : ""}>${funcion.nombre}</option>`);
+							});
+							//console.log('selected '+opcionesFunciones);
+							const row = `
+								<tr>
+										<input type="hidden" name="detalles_id[]" value="${detalle.id}">
+										<input type="hidden" name="alertas_id[]" value="${detalle.alertas_id}">
+									<td>
+										<select class="form-control" name="funciones_id[]" required>
+											${opcionesFunciones}
+										</select>
+									</td>
+									<td>
+										<input type="date" class="form-control" name="fecha_desde[]" value="${detalle.fecha_desde}">
+									</td>
+									<td>
+										<input type="date" class="form-control" name="fecha_hasta[]" value="${detalle.fecha_hasta}">
+									</td>
+									<td>
+										<button type="button" class="btn btn-danger btn-sm" onclick="remove_row(this)">
+											<i class="fa fa-trash"></i>
+										</button>
+									</td>
+								</tr>`;
+							$('#detalles_alertas tbody').append(row);
+						});
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					if (jqXHR.status === 404) {
+						alert("El registro no fue encontrado.");
+					} else {
+						show_ajax_error_message(jqXHR, textStatus, errorThrown);
+					}
+				}
+			});
+		}
+
+		// Función para eliminar una fila de detalles
+		function remove_row(button) {
+			$(button).closest('tr').remove();
+		}
+	</script>
 
 </x-app-layout>

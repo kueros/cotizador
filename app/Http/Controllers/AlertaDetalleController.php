@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AlertaDetalle;
 use App\Models\Funcion;
+use App\Models\Alerta;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class AlertaDetalleController extends Controller
 {
@@ -119,7 +121,6 @@ class AlertaDetalleController extends Controller
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
 	public function ajax_edit($id){
-
 		$data = AlertaDetalle::find($id);
 		return response()->json($data);
 	}
@@ -128,29 +129,32 @@ class AlertaDetalleController extends Controller
 	*******************************************************************************************************************************/
 	public function update(Request $request, AlertaDetalle $alerta_detalle, MyController $myController): RedirectResponse
 	{
-		dd($request->input('alertas_id'));
-/* 		$permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
-		if (!$permiso_editar_funciones) {
-			abort(403, '.');
-			return false;
-		}
-*/
+		/* 		$permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
+				if (!$permiso_editar_funciones) {
+					abort(403, '.');
+					return false;
+				}
+		*/
 
-		// Obtener el modelo
-		$alerta_detalle = AlertaDetalle::findOrFail($request->id);
+		$form_data = $request->input('form_data');
+		$form_data_array = collect($form_data)->pluck('value', 'name')->toArray();
+		$alertas_id = $form_data_array['alertas_id'] ?? null;
+		$alerta_detalle = DB::table('detalles_alertas')
+              ->where('id', $form_data_array['id'])
+              ->update(['alertas_id' => $form_data_array['alertas_id'],
+			  			'funciones_id' => $form_data_array['funciones_id'],
+						'fecha_desde' => $form_data_array['fecha_desde'],
+						'fecha_hasta' => $form_data_array['fecha_hasta']
+					]);
 
-		$alertas_id = $request->input('alertas_id');
-		#dd($alerta_detalle_id);
-		// Actualizar el modelo con los datos validados
-		$alerta_detalle->update($request->all());
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " actualizó el detalel de alerta " . $request->nombre;
+		$message = $username . " actualizó el detalle de alerta ";// . $alerta_nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		return redirect()->route('alertas_detalles', ['id' => $alertas_id])
-		->with('success', 'Campo adicional de tipo de transacción actualizado correctamente.');
+		->with('success', 'Detalle de alerta actualizado correctamente.');
 
 	}
 
