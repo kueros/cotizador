@@ -21,7 +21,7 @@ class AlertaController extends Controller
 {
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
-	public function index(Request $request, MyController $myController): View
+	public function alertasIndex(Request $request, MyController $myController): View
 	{
 /* 		$permiso_listar_funciones = $myController->tiene_permiso('list_funciones');
 		if (!$permiso_listar_funciones) {
@@ -84,7 +84,7 @@ class AlertaController extends Controller
 	 *******************************************************************************************************************************/
 	public function ajax_guardar_columna(Request $request, MyController $myController)
 	{
-		dd($request->all());
+		#dd($request->all());
 		// Validar los datos del usuario
 		$validatedData = Validator::make($request->all(), [
 			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
@@ -92,9 +92,6 @@ class AlertaController extends Controller
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
 			'funciones_id' => 'required|exists:funciones,id',
-			#'valores' => 'array', // El campo de tipo array para la segunda tabla
-			#'valores.*' => 'string', // Cada elemento del array debe ser un string
-
 			], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
 			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
@@ -102,7 +99,6 @@ class AlertaController extends Controller
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
 		]);
 		#dd($validatedData);
-		// Verificar si la validación falla
 		if ($validatedData->fails()) {
 			$response = [
 				'status' => 0,
@@ -120,7 +116,7 @@ class AlertaController extends Controller
 			'descripcion' => $validated['descripcion'],
 			'tipos_alertas_id' => $validated['tipos_alertas_id'],
 		]);
-#	dd($validated['funciones_id']);
+	#dd($alerta->id);
 		AlertaDetalle::create([
 			'alertas_id' => $alerta->id,
 			'funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
@@ -163,37 +159,102 @@ class AlertaController extends Controller
 		return $response;
 	}
 
+
     /*******************************************************************************************************************************
 	*******************************************************************************************************************************/
-	public function update(Request $request, Alerta $alerta, MyController $myController): RedirectResponse
+	public function alertasUpdate(Request $request, Alerta $alerta, MyController $myController)
 	{
-		dd($request->id);
-/* 		$permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
+		#dd(request()->all());
+		/* $permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
 		if (!$permiso_editar_funciones) {
 			abort(403, '.');
 			return false;
+		} */
+	
+	
+		// Validación de los datos
+		#$validatedData = $request->validate([
+		$validatedData = Validator::make($request->all(), [
+			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
+			Rule::unique('alertas', 'nombre'),
+			'descripcion' => 'required|string|max:255',
+			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
+			'funciones_id' => 'required|exists:funciones,id',
+			], [
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
+			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
+			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
+			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
+		]);	
+		if ($validatedData->fails()) {
+			$response = [
+				'status' => 0,
+				'message' => 'error en validacion',
+				'errors' => $validatedData->errors()
+			];
+			return response()->json($response);
 		}
-*/
-		// Validar los datos
-		$validatedData = $request->validate([
-			'nombre' => 'required|string|max:255',
+
+		$validated = $validatedData->validated(); // Obtiene los datos validados como array
+		#dd($request->alertas_id);
+		// Obtener el modelo
+		$alerta_id = Alerta::where('id',$request->alertas_id)->first()['id'];
+		$updated_id = DB::table('alertas')
+		->where('id', $alerta_id)
+		->update
+		([
+			'nombre' => $validated['nombre'],
+			'descripcion' => $validated['descripcion'],
+			'tipos_alertas_id' => $validated['tipos_alertas_id'],
 		]);
 
-		// Obtener el modelo
-		$alerta = Alerta::findOrFail($request->id);
+/* 		$alerta = Alerta::update([
+			'nombre' => $validatedData['nombre'],
+			'descripcion' => $validatedData['descripcion'],
+			'tipos_alertas_id' => $validatedData['tipos_alertas_id'],
+		]);
+ */#	dd($validated['funciones_id']);
+		#dd($request->alertas_id[0]);
 
-		// Actualizar el modelo con los datos validados
-		$alerta->update($validatedData);
+		DB::table('detalles_alertas')
+		->updateOrInsert(
+			['alertas_id' => $request->alertas_id],
+			['funciones_id' => implode(',', $validated['funciones_id']),
+			'fecha_desde' => $request['fecha_desde'][0] ?? null,
+			'fecha_hasta' => $request['fecha_hasta'][0] ?? null
+		]);
+
+/* 		$alerta_detalle_id = AlertaDetalle::where('alertas_id',$request->alertas_id)->first()['id'];
+		$alertas_id = AlertaDetalle::where('alertas_id',$request->alertas_id)->first()['alertas_id'];
+		#dd($alertas_id);
+		$updated_id = DB::table('detalles_alertas')
+		->where('id', $alerta_detalle_id)
+		->update
+		([
+			'alertas_id' => $alertas_id,
+			'funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
+			'fecha_desde' => $request['fecha_desde'][0] ?? null, // Usar el primer valor del arreglo, o null si no existe
+			'fecha_hasta' => $request['fecha_hasta'][0] ?? null, // Usar el primer valor del arreglo, o null si no existe
+		]);
+ */
+
+
+
+
+		// Loguear la acción
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
 		$message = $username . " actualizó el alerta " . $request->nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
+	
+		#return redirect()->route('alertasIndex')->with('success', 'alerta actualizada correctamente.');
+		$response = [
+			'status' => 1,
+			'message' => 'Alerta actualizada correctamente.'
+		];
+		return response()->json($response);
 
-		return redirect()->route('alertas.index')->with('success', 'alerta actualizada correctamente.');
-
-		#return Redirect::route('funciones.index')
-		#	->with('success', 'Función editada con éxito.');
 	}
 
 	/*******************************************************************************************************************************

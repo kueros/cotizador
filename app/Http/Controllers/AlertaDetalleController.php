@@ -51,17 +51,18 @@ class AlertaDetalleController extends Controller
 		#dd($detalles_alertas);
 		$data = array();
 		foreach($detalles_alertas as $r) {
-			$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_alertas_detalles('."'".$r->id.
-					"'".')"><i class="bi bi-pencil-fill"></i></a>';
+			$accion = "";
+			#$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_alertas_detalles('."'".$r->id.
+			#		"'".')"><i class="bi bi-pencil-fill"></i></a>';
 
-			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_alertas_detalles('."'".$r->id.
-					"'".')"><i class="bi bi-trash"></i></a>';
+			#$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_alertas_detalles('."'".$r->id.
+			#		"'".')"><i class="bi bi-trash"></i></a>';
 
 			$data[] = array(
 				$r->nombre_funcion,
 				$r->fecha_desde,
-				$r->fecha_hasta,
-				$accion
+				$r->fecha_hasta#,
+				#$accion
 			);
 		}
 		$output = array(

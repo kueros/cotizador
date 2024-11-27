@@ -1,4 +1,4 @@
-<x-app-layout title="Detalles de Alertas" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard'],['title' => 'Alertas', 'url' => '/alertas']]">
+<x-app-layout title="Detalles de Alertas" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard'],['title' => 'Alertas', 'url' => '/alertasIndex']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
 			{{ __('Detalle del Alerta') }}
@@ -230,7 +230,7 @@
 							<th>Función</th>
 							<th>Fecha Desde</th>
 							<th>Fecha Hasta</th>
-							<th style="width:20%;" class="no-sort">Acción</th>
+							<!--th style="width:20%;" class="no-sort">Acción</th-->
 						</thead>
 						<tbody>
 						</tbody>

@@ -23,61 +23,6 @@
 
 		jQuery(document).ready(function($) {
 
-			/*******************************************************************************************************************************
-			*******************************************************************************************************************************/
-			$("#form").submit(function(e) {
-				e.preventDefault();
-				var formData = new FormData(this);
-
-				//show_loading();
-				$.ajax({
-					url: "{{ url('alertas/ajax_guardar_columna2') }}",
-					type: "POST",
-					data: formData,
-					method: 'POST',
-					cache: false,
-					contentType: false,
-					processData: false,
-					success: function(data) {
-						//hide_loading();
-						console.log(data)
-						if(data.status == 0){
-						let errorMessage = data.message + "</br>";
-    					if (data.errors && Object.keys(data.errors).length > 0) {
-							// Recorre cada campo y sus mensajes de error
-							for (let field in data.errors) {
-								if (data.errors.hasOwnProperty(field)) {
-									errorMessage += `${field}: ${data.errors[field].join(", ")}</br>`;
-								}
-							}
-						} else {
-							errorMessage += "No se encontraron errores específicos para los campos.";
-						}
-
-						swal.fire("Aviso", errorMessage, "warning");
-						return false;
-					}else{
-						swal.fire({
-							title: "Aviso",
-							text: data.message,
-							icon: "success"
-						}).then(() => {
-							// Recargar la tabla DataTables al cerrar el modal de éxito
-							location.reload();
-						});
-					}					},
-					error: function(jqXHR) {
-						hide_loading();
-						var mensaje = "Ocurrió un error al guardar la columna.";
-						if (jqXHR.responseText) {
-							mensaje = jqXHR.responseText;
-						}
-						if (mensaje != "") {
-							swal("Aviso", mensaje, "warning");
-						}
-					}
-				});
-			});
 
 			/*******************************************************************************************************************************
 			 *******************************************************************************************************************************/
@@ -151,6 +96,7 @@
 			$('#accion').val('add');
 			$('#form').attr('action', "{{ url('alertas') }}");
 			$('#method').val('POST');
+			console.log('accion1: ', $('#accion').val());
 		}
 
 		/*******************************************************************************************************************************
@@ -181,23 +127,30 @@
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		function guardar_datos() {
+		 function guardar_datos() {
+
 			let form_data = $('#form').serializeArray();
-			let url_guarda_datos = "{{ url('alertas') }}";
+			//console.log('Contenido de form_data (JSON):', JSON.stringify(form_data, null, 2));
+			console.log('accion: ', $('#accion').val());
+			let url_guarda_datos = "{{ url('alertas/ajax_guardar_columna') }}";
+			//let url_guarda_datos = "{{ url('alertasIndex') }}";
 			let type_guarda_datos = "POST";
 
 			if ($('#accion').val() != "add") {
-				url_guarda_datos = "{{ url('alertas') }}" + "/" + $('[name="id"]').val();
+				console.log('form_data: ', form_data);
+				let alertasIdValue = form_data.find(item => item.name == 'alertas_id')?.value;
+				console.log('alertasIdValue: ', alertasIdValue);
+				url_guarda_datos = "{{ url('alertasUpdate') }}" + "/" + alertasIdValue;
 				type_guarda_datos = "PUT";
+				form_data.push({ name: '_method', value: 'PUT' });
+				console.log('url_guarda_datos: ', url_guarda_datos);
 			}
 
 			show_loading();
 			$.ajax({
 				url: url_guarda_datos,
 				type: type_guarda_datos,
-				data: {
-					form_data: form_data
-				},
+				data: $.param(form_data), 
 				dataType: "JSON",
 				headers: {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -206,6 +159,7 @@
 					hide_loading();
 					if (data.status == 0) {
 						let errorMessage = data.message + "</br>";
+						mostrarErroresPorFila(data.errors);
 						if (data.errors && Object.keys(data.errors).length > 0) {
 							// Recorre cada campo y sus mensajes de error
 							for (let field in data.errors) {
@@ -235,12 +189,90 @@
 				}
 			});
 		}
+
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function validarFormulario() 
+		{
+			let errores = [];
+			let nombre = document.querySelector('input[name="nombre"]').value.trim();
+			let descripcion = document.querySelector('input[name="descripcion"]').value.trim();
+			let tiposAlertasId = document.querySelector('select[name="tipos_alertas_id"]').value;
+			let funcionesId = document.querySelectorAll('select[name="funciones_id[]"]');
+			let fechasDesde = document.querySelectorAll('input[name="fecha_desde[]"]');
+			let fechasHasta = document.querySelectorAll('input[name="fecha_hasta[]"]');
+
+			if (!nombre) errores.push("El campo 'Nombre' es obligatorio.");
+			if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
+			if (!tiposAlertasId || tiposAlertasId === "0") errores.push("Seleccione un 'Tipo de Alerta'.");
+
+			funcionesId.forEach((funcion, index) => {
+				if (!funcion.value || funcion.value === "0") {
+					errores.push(`La fila ${index + 1} necesita un valor válido en 'Función ID'.`);
+				}
+			});
+
+			fechasDesde.forEach((fecha, index) => {
+				if (!fecha.value) errores.push(`La fila ${index + 1} necesita una 'Fecha Desde'.`);
+			});
+
+			fechasHasta.forEach((fecha, index) => {
+				if (!fecha.value) errores.push(`La fila ${index + 1} necesita una 'Fecha Hasta'.`);
+				else if (new Date(fechasDesde[index].value) > new Date(fecha.value)) {
+					errores.push(`En la fila ${index + 1}, 'Fecha Hasta' debe ser mayor o igual a 'Fecha Desde'.`);
+				}
+			});
+
+			if (errores.length > 0) {
+				swal.fire("Aviso", "Errores:\n" + errores.join("\n"), "warning");
+				
+				//alert("Errores:\n" + errores.join("\n"));
+				return false;
+			}
+			return true;
+		}
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function mostrarErroresPorFila(errores) {
+			// Iterar sobre las filas que tienen errores
+			for (let filaIndex in errores) {
+				let erroresFila = errores[filaIndex];
+
+				// Seleccionar la fila correspondiente en la tabla
+				let fila = document.querySelector(`#detalles_alertas tbody tr:nth-child(${parseInt(filaIndex) + 1})`);
+
+				if (fila) {
+					// Iterar sobre los campos con errores en esa fila
+					for (let campo in erroresFila) {
+						let mensajes = erroresFila[campo];
+
+						// Buscar el input o select correspondiente dentro de la fila
+						let input = fila.querySelector(`[name="${campo}[]"]`);
+						if (input) {
+							// Mostrar el error como un tooltip o al lado del campo
+							input.classList.add('is-invalid');
+
+							// Crear un span para mostrar el mensaje de error (si no existe)
+							let errorSpan = input.parentNode.querySelector('.invalid-feedback');
+							if (!errorSpan) {
+								errorSpan = document.createElement('span');
+								errorSpan.classList.add('invalid-feedback');
+								errorSpan.style.display = 'block'; // Asegurar que sea visible
+								input.parentNode.appendChild(errorSpan);
+							}
+							errorSpan.innerHTML = mensajes.join(', ');
+						}
+					}
+				}
+			}
+		}
+
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function agregar_valor_selector() {
-/* 			var td = '<tr><td><input class="form-control" type="text" maxlength="255" minlength="1" required name="valores[]"/></td><td><a class="btn btn-danger" onclick="eliminar_valor(this)"><i class="bi bi-trash"></i></td></tr>';
-			$('#detalles_alertas tbody').append(td);
- */			const tableBody = document.querySelector("#detalles_alertas tbody");
+			const tableBody = document.querySelector("#detalles_alertas tbody");
 
 			// Crear una nueva fila con los campos necesarios
 			const newRow = document.createElement("tr");
@@ -335,7 +367,7 @@
 	</div>
 
 
-<?php #dd($alertas); ?>
+<?php #dd($alertas->first()['id']); ?>
 
 <div class="modal fade modal-lg" id="modal_form_alertas" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -346,6 +378,10 @@
 			</div>
 			<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
 				@csrf
+				<input name="_method" type="hidden" id="method">
+				<input name="alertas_id" id="alertas_id" class="form-control" type="hidden" value="<?php echo $alertas->first()['id'] ?? ""; ?>">
+				<input type="hidden" value="" name="accion" id="accion" />
+				<input type="hidden" value="" name="id" />
                 <div class="modal-body">
                     <!-- Campos principales -->
                     <div class="form-group">
@@ -354,7 +390,7 @@
                     </div>
                     <div class="form-group">
                         <label for="descripcion">Descripción</label>
-                        <textarea class="form-control" name="descripcion" required></textarea>
+                        <input type="text" class="form-control" name="descripcion" required>
                     </div>
 					<div class="form-body">
 							<div class="mb-3 row">
@@ -394,9 +430,9 @@
                     </table>
                 </div>
 				<div class="modal-footer">
-						<button type="submit" class="btn btn-primary" id="guardar_campo">Guardar</button>
-						<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-					</div>
+					<a onclick="if (validarFormulario()) guardar_datos();" class="btn btn-primary">Guardar</a>
+					<a class="btn btn-danger" data-bs-dismiss="modal">Cancelar</a>
+				</div>
             </form>
         </div>
     </div>
@@ -412,7 +448,7 @@
 			$('.help-block').empty();
 			$('#accion').val('edit');
 			let url_guarda_datos = "{{ route('alertas.ajax_edit', ':id') }}".replace(':id', id);
-			//console.log('id alerta ' + id);
+			console.log('id alerta ' + id);
 			//console.log('url_guarda_datos ' + url_guarda_datos);
 
 			$.ajax({
@@ -420,13 +456,6 @@
 				type: "GET",
 				dataType: "JSON",
 				success: function(response) {
-
-					//console.log('Respuesta del servidor:', response.original.alertas.tipos_alertas_id); 
-					//console.log('Respuesta del servidor:', response.alertas); 
-					console.log('Respuesta del servidor:', response.alertas_detalles); 
-					//console.log('Respuesta del servidor:', response.funciones); 
-
-					// Asignar datos de la alerta principal al formulario
 					//$('#form [name="id"]').val(response.alerta.id);
 					$('#form [name="nombre"]').val(response.alertas.nombre);
 					$('#form [name="descripcion"]').val(response.alertas.descripcion);
@@ -435,8 +464,8 @@
 					// Mostrar la modal
 					$('#modal_form_alertas').modal('show');
 					$('.modal-title').text('Editar Alerta');
-					$('#form').attr('action', "{{ url('alertas.update') }}" + "/" + id);
-					$('#method').val('PUT');
+					//$('#form').attr('action', "{{ url('alertas') }}" + "/" + id);
+					//$('#method').val('PUT');
 
 					// Limpiar la tabla de detalles antes de llenarla
 					$('#detalles_alertas tbody').empty();

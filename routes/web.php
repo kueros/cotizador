@@ -43,11 +43,13 @@ Route::get('/dashboard', function () {
 	return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+
 Route::middleware('auth')->group(function () {
 	Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 	Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 	Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 //->middleware('custom.csrf')
 Route::middleware('auth')->group(function () {
 	Route::get('/users', 								[UserController::class, 'index'])->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
@@ -218,19 +220,13 @@ Route::middleware('auth')->group(
 
 Route::middleware('auth')->group(
 	function () {
-		Route::put('/alertas/{id}', [AlertaController::class, 'update'])->name('alertas.update');
-		Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
-		Route::post('/alertas/ajax_guardar_columna/', [AlertaController::class, 'ajax_guardar_columna'])->name('alertas.ajax_guardar_columna');
-		Route::get('/alertas/ajax_listado', [AlertaController::class, 'ajax_listado'])->name('alertas.ajax_listado');
-		Route::get('/alertas/ajax_edit/{id}', [AlertaController::class, 'ajax_edit'])->name('alertas.ajax_edit');
-		Route::post('/alertas/ajax_delete/{id}', [AlertaController::class, 'ajax_delete'])->name('alertas.ajax_delete');
-	#	Route::get('/show/{id}', [AlertaController::class, 'show'])->name('alertas.show');
-		#Route::get('/alertas/create', [AlertaController::class, 'create'])->name('alertas.create');
-		Route::post('/alertas/store', [AlertaController::class, 'store'])->name('alertas.store');
-	#	Route::get('/alertas/{rol}/edit', [AlertaController::class, 'edit'])->name('alertas.edit');
-	#	Route::delete('/alertas/{rol}', [AlertaController::class, 'destroy'])->name('alertas.destroy');
-	#	Route::post('/alertas/options', [AlertaController::class, 'options'])->name('alertas.options');
-	#	Route::get('/alertas/fields', [AlertaController::class, 'fields'])->name('alertas.fields');
+		Route::get('/alertasIndex', 					[AlertaController::class, 'alertasIndex'])->name('alertasIndex');
+		Route::put('/alertasUpdate/{id}', 				[AlertaController::class, 'alertasUpdate'])->name('alertasUpdate');
+		Route::post('/alertas/ajax_guardar_columna/', 	[AlertaController::class, 'ajax_guardar_columna'])->name('alertas.ajax_guardar_columna');
+		Route::get('/alertas/ajax_listado', 			[AlertaController::class, 'ajax_listado'])->name('alertas.ajax_listado');
+		Route::get('/alertas/ajax_edit/{id}', 			[AlertaController::class, 'ajax_edit'])->name('alertas.ajax_edit');
+		Route::post('/alertas/ajax_delete/{id}', 		[AlertaController::class, 'ajax_delete'])->name('alertas.ajax_delete');
+		Route::post('/alertas/store', 					[AlertaController::class, 'store'])->name('alertas.store');
 	}
 );
 
@@ -241,13 +237,7 @@ Route::middleware('auth')->group(
 		Route::get('/alertas_detalles/{id}', [AlertaDetalleController::class, 'index'])->name('alertas_detalles');
 		Route::get('/alertas_detalles/ajax_edit/{id}', [AlertaDetalleController::class, 'ajax_edit'])->name('alertas_detalles.ajax_edit');
 		Route::post('/alertas_detalles/ajax_delete/{id}', [AlertaDetalleController::class, 'ajax_delete'])->name('alertas_detalles.ajax_delete');
-	#	Route::get('/show/{id}', [AlertaDetalleController::class, 'show'])->name('alertas_detalles.show');
-		#Route::get('/alertas_detalles/create', [AlertaDetalleController::class, 'create'])->name('alertas_detalles.create');
 		Route::post('/alertas_detalles', [AlertaDetalleController::class, 'store'])->name('alertas_detalles.store');
-	#	Route::get('/alertas_detalles/{rol}/edit', [AlertaDetalleController::class, 'edit'])->name('alertas_detalles.edit');
-	#	Route::delete('/alertas_detalles/{rol}', [AlertaDetalleController::class, 'destroy'])->name('alertas_detalles.destroy');
-	#	Route::post('/alertas_detalles/options', [AlertaDetalleController::class, 'options'])->name('alertas_detalles.options');
-	#	Route::get('/alertas_detalles/fields', [AlertaDetalleController::class, 'fields'])->name('alertas_detalles.fields');
 	}
 );
 
@@ -258,14 +248,8 @@ Route::middleware('auth')->group(
 		Route::post('/alertas_tipos/ajax_guardar_columna/', [AlertaTipoController::class, 'ajax_guardar_columna'])->name('alertas_tipos.ajax_guardar_columna');
 		Route::get('/alertas_tipos/ajax_edit/{id}', [AlertaTipoController::class, 'ajax_edit'])->name('alertas_tipos.ajax_edit');
 		Route::post('/alertas_tipos/ajax_delete/{id}', [AlertaTipoController::class, 'ajax_delete'])->name('alertas_tipos.ajax_delete');
-	#	Route::get('/show/{id}', [AlertaTipoController::class, 'show'])->name('alertas_tipos.show');
-		#Route::get('/alertas_tipos/create', [AlertaTipoController::class, 'create'])->name('alertas_tipos.create');
 		Route::post('/alertas_tipos', [AlertaTipoController::class, 'store'])->name('alertas_tipos.store');
-	#	Route::get('/alertas_tipos/{rol}/edit', [AlertaTipoController::class, 'edit'])->name('alertas_tipos.edit');
 		Route::put('/alertas_tipos/{id}', [AlertaTipoController::class, 'update'])->name('alertas_tipos.update');
-	#	Route::delete('/alertas_tipos/{rol}', [AlertaTipoController::class, 'destroy'])->name('alertas_tipos.destroy');
-	#	Route::post('/alertas_tipos/options', [AlertaTipoController::class, 'options'])->name('alertas_tipos.options');
-	#	Route::get('/alertas_tipos/fields', [AlertaTipoController::class, 'fields'])->name('alertas_tipos.fields');
 	}
 );
 
