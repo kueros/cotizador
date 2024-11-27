@@ -407,8 +407,20 @@
 								<div id="div_copa_background_home_custom" style="display: {{ $variables->where('nombre', 'copa_background_home_custom')->first()['valor'] == 1 ? 'none' : 'block' }}">
 									<form action="{{ route('configuracion.guardar_imagen_home') }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 										@csrf
-										<div class="form-group row">
-											<label class="control-label col-md-4">Subir imagen</label>
+										<div class="row mb-3">
+											<label class="col-md-4 col-form-label">Imagen actual home</label>
+											<div class="col-md-8">
+												@if( !is_null($variables->where('nombre', 'background_home_custom_path')->first()) )
+													<a href="{{ asset($variables->where('nombre', 'background_home_custom_path')->first()['valor']) }}" target="_blank">
+														<img id="imagen-actual" src="{{ asset($variables->where('nombre', 'background_home_custom_path')->first()['valor']) }}" alt="Imagen actual" class="img-thumbnail mb-3" style="max-width: 300px;">
+													</a>
+												@else
+													<p class="text-muted">No hay imagen cargada actualmente.</p>
+												@endif
+											</div>
+										</div>
+										<div class="row mb-3">
+											<label class="col-md-4 col-form-label">Subir imagen</label>
 											<div class="col-md-8">
 												<input type="file" class="form-control" name="copa_path" accept="image/png, .jpeg, .jpg, .webp, image/gif" required>
 												<button type="submit" class="btn btn-primary mt-2">Guardar</button>
@@ -432,8 +444,20 @@
 								<div id="copa_background_login_custom" style="display: {{ $variables->where('nombre', 'copa_background_login_custom')->first()['valor'] == 1 ? 'none' : 'block' }}">
 									<form action="{{ route('configuracion.guardar_imagen_login') }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 										@csrf
-										<div class="form-group row">
-											<label class="control-label col-md-4">Subir imagen</label>
+										<div class="row mb-3">
+											<label class="col-md-4 col-form-label">Imagen actual login</label>
+											<div class="col-md-8">
+												@if( !is_null($variables->where('nombre', 'background_login_custom_path')->first()) )
+													<a href="{{ asset($variables->where('nombre', 'background_login_custom_path')->first()['valor']) }}" target="_blank">
+														<img id="imagen-actual" src="{{ asset($variables->where('nombre', 'background_login_custom_path')->first()['valor']) }}" alt="Imagen actual" class="img-thumbnail mb-3" style="max-width: 300px;">
+													</a>
+												@else
+													<p class="text-muted">No hay imagen cargada actualmente.</p>
+												@endif
+											</div>
+										</div>
+										<div class="row mb-3">
+											<label class="col-md-4 col-form-label">Subir imagen</label>
 											<div class="col-md-8">
 												<input type="file" class="form-control" name="copa_path" accept="image/png, .jpeg, .jpg, .webp, image/gif" required>
 												<button type="submit" class="btn btn-primary mt-2">Guardar</button>

@@ -109,24 +109,37 @@ class ConfiguracionController extends Controller
 
     public function guardarImagenHome(Request $request)
     {
-        // Validar que el archivo es una imagen
-        $request->validate([
-            'copa_path' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096', 
-        ]);
-		// Obtener el archivo de la solicitud
-		$file = $request->file('copa_path');
-		$filename = 'background_home.jpg';// . '.' . $file->getClientOriginalExtension();
-		//$path = $file->storeAs('uploads/imagenes', $filename, 'public');
-		$path = $file->move(public_path('images'), $filename);
-		//$variable = $this->get_variable('background_home_custom_path');
-		$variable = Variable::where('nombre', '=', 'background_home_custom_path')->first();
-		if( is_null($variable) ) {
-			return redirect()->back()->with('error', 'La variable no existe.');
-		}
-		$variable->valor = 'images/'.$filename;
-		$variable->save();
+		try{
+			// Validar que el archivo es una imagen
+			$request->validate([
+				'copa_path' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', 
+			], [
+				'copa_path.required' => 'Debes seleccionar una imagen.',
+				'copa_path.mimes' => 'La imagen debe ser de tipo: jpeg, jpg, png, gif o webp.',
+				'copa_path.max' => 'El archivo no debe superar los 5 MB.',
+			]);
 
-		return redirect()->back()->with('success', 'Imagen guardada correctamente.');
+			$file = $request->file('copa_path');
+			$time = date('Ymd_His');
+			$filename = "background_home_".$time.".jpg";
+			$path_filename = 'images/'.$filename;
+			$variable = Variable::where('nombre', '=', 'background_home_custom_path')->first();
+			if( is_null($variable) ) {
+				return redirect()->back()->with('error', 'La variable no existe.');
+			}
+			$path_oldfilename = public_path($variable->valor);
+			if (file_exists($path_oldfilename)) {
+				unlink($path_oldfilename);
+			}
+			
+			$path = $file->move(public_path('images'), $filename);
+			$variable->valor = $path_filename;
+			$variable->save();
+
+			return redirect()->back()->with('success', 'Imagen guardada correctamente.');
+		}catch(\Exception $ex){
+			return redirect()->back()->with('error', 'La imagen no se pudo cargar.');
+		}
     }
 
 	/*****************************************************************************************************************
@@ -134,24 +147,37 @@ class ConfiguracionController extends Controller
 
     public function guardarImagenLogin(Request $request)
     {
-        // Validar que el archivo es una imagen
-        $request->validate([
-            'copa_path' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096', 
-        ]);
-		// Obtener el archivo de la solicitud
-		$file = $request->file('copa_path');
-		$filename = 'background_login.jpg';// . '.' . $file->getClientOriginalExtension();
-		$path = $file->move(public_path('images'), $filename);
-		//$path = $file->storeAs('uploads/imagenes', $filename, 'public');
-		$variable = Variable::where('nombre', '=', 'background_login_custom_path')->first();
-		//$variable = $this->get_variable('background_login_custom_path');
-		if( is_null($variable) ) {
-			return redirect()->back()->with('error', 'La variable no existe.');
-		}
-		$variable->valor = 'images/'.$filename;
-		$variable->save();
+		try{
+			// Validar que el archivo es una imagen
+			$request->validate([
+				'copa_path' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', 
+			], [
+				'copa_path.required' => 'Debes seleccionar una imagen.',
+				'copa_path.mimes' => 'La imagen debe ser de tipo: jpeg, jpg, png, gif o webp.',
+				'copa_path.max' => 'El archivo no debe superar los 5 MB.',
+			]);
+			// Obtener el archivo de la solicitud
+			$file = $request->file('copa_path');
+			$time = date('Ymd_His');
+			$filename = "background_login_".$time.".jpg";
+			$path_filename = 'images/'.$filename;
+			$variable = Variable::where('nombre', '=', 'background_login_custom_path')->first();
+			if( is_null($variable) ) {
+				return redirect()->back()->with('error', 'La variable no existe.');
+			}
+			$path_oldfilename = public_path($variable->valor);
+			if (file_exists($path_oldfilename)) {
+				unlink($path_oldfilename);
+			}
 
-        return redirect()->back()->with('success', 'Imagen guardada correctamente.');
+			$path = $file->move(public_path('images'), $filename);
+			$variable->valor = $path_filename;
+			$variable->save();
+
+			return redirect()->back()->with('success', 'Imagen guardada correctamente.');
+		}catch(\Exception $ex){
+			return redirect()->back()->with('error', 'La imagen no se pudo cargar.');
+		}
     }
 
 	/*****************************************************************************************************************
