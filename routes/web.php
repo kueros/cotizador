@@ -12,6 +12,9 @@ use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\TipoTransaccionController;
 use App\Http\Controllers\TipoTransaccionCampoAdicionalController;
 use App\Http\Controllers\FuncionController;
+use App\Http\Controllers\AlertaController;
+use App\Http\Controllers\AlertaDetalleController;
+use App\Http\Controllers\AlertaTipoController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -47,11 +50,13 @@ Route::get('/dashboard', function () {
 	return view('dashboard', compact('copa_background_home_custom', 'background_home_custom_path'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+
 Route::middleware('auth')->group(function () {
 	Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 	Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 	Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 //->middleware('custom.csrf')
 Route::middleware('auth')->group(function () {
 	Route::get('/users', 								[UserController::class, 'index'])->name('users.index'); #agregar estado y mensaje para mostrar modalcita con resultado de la acción realizada.
@@ -203,20 +208,57 @@ Route::middleware('auth')->group(
 	}
 );
 
-Route::middleware('auth')->group(function () {
-	Route::get('/funciones', [FuncionController::class, 'index'])->name('funciones.index');
-#	Route::get('/show/{id}', [FuncionController::class, 'show'])->name('roles.show');
-	#Route::get('/funciones/create', [FuncionController::class, 'create'])->name('funciones.create');
-	Route::post('/funciones', [FuncionController::class, 'store'])->name('funciones.store');
-#	Route::get('/funciones/{rol}/edit', [FuncionController::class, 'edit'])->name('funciones.edit');
-	Route::put('/funciones/{id}', [FuncionController::class, 'update'])->name('funciones.update');
-#	Route::delete('/funciones/{rol}', [FuncionController::class, 'destroy'])->name('funciones.destroy');
-#	Route::post('/funciones/options', [FuncionController::class, 'options'])->name('funciones.options');
-#	Route::get('/funciones/fields', [FuncionController::class, 'fields'])->name('funciones.fields');
-	Route::get('/funciones/ajax_listado', [FuncionController::class, 'ajax_listado'])->name('funciones.ajax_listado');
-	Route::get('/funciones/ajax_edit/{id}', [FuncionController::class, 'ajax_edit'])->name('funciones.ajax_edit');
-	Route::post('/funciones/ajax_delete/{id}', [FuncionController::class, 'ajax_delete'])->name('funciones.ajax_delete');
-});
+Route::middleware('auth')->group(
+	function () {
+		Route::get('/funciones', [FuncionController::class, 'index'])->name('funciones.index');
+	#	Route::get('/show/{id}', [FuncionController::class, 'show'])->name('roles.show');
+		#Route::get('/funciones/create', [FuncionController::class, 'create'])->name('funciones.create');
+		Route::post('/funciones', [FuncionController::class, 'store'])->name('funciones.store');
+	#	Route::get('/funciones/{rol}/edit', [FuncionController::class, 'edit'])->name('funciones.edit');
+		Route::put('/funciones/{id}', [FuncionController::class, 'update'])->name('funciones.update');
+	#	Route::delete('/funciones/{rol}', [FuncionController::class, 'destroy'])->name('funciones.destroy');
+	#	Route::post('/funciones/options', [FuncionController::class, 'options'])->name('funciones.options');
+	#	Route::get('/funciones/fields', [FuncionController::class, 'fields'])->name('funciones.fields');
+		Route::get('/funciones/ajax_listado', [FuncionController::class, 'ajax_listado'])->name('funciones.ajax_listado');
+		Route::get('/funciones/ajax_edit/{id}', [FuncionController::class, 'ajax_edit'])->name('funciones.ajax_edit');
+		Route::post('/funciones/ajax_delete/{id}', [FuncionController::class, 'ajax_delete'])->name('funciones.ajax_delete');
+	}
+);
+
+Route::middleware('auth')->group(
+	function () {
+		Route::get('/alertasIndex', 					[AlertaController::class, 'alertasIndex'])->name('alertasIndex');
+		Route::put('/alertasUpdate/{id}', 				[AlertaController::class, 'alertasUpdate'])->name('alertasUpdate');
+		Route::post('/alertas/ajax_guardar_columna/', 	[AlertaController::class, 'ajax_guardar_columna'])->name('alertas.ajax_guardar_columna');
+		Route::get('/alertas/ajax_listado', 			[AlertaController::class, 'ajax_listado'])->name('alertas.ajax_listado');
+		Route::get('/alertas/ajax_edit/{id}', 			[AlertaController::class, 'ajax_edit'])->name('alertas.ajax_edit');
+		Route::post('/alertas/ajax_delete/{id}', 		[AlertaController::class, 'ajax_delete'])->name('alertas.ajax_delete');
+		Route::post('/alertas/store', 					[AlertaController::class, 'store'])->name('alertas.store');
+	}
+);
+
+Route::middleware('auth')->group(
+	function () {
+		Route::put('/alertas_detalles/{id}', [AlertaDetalleController::class, 'update'])->name('alertas_detalles.update');
+		Route::get('/alertas_detalles/ajax_listado', [AlertaDetalleController::class, 'ajax_listado'])->name('alertas_detalles.ajax_listado');
+		Route::get('/alertas_detalles/{id}', [AlertaDetalleController::class, 'index'])->name('alertas_detalles');
+		Route::get('/alertas_detalles/ajax_edit/{id}', [AlertaDetalleController::class, 'ajax_edit'])->name('alertas_detalles.ajax_edit');
+		Route::post('/alertas_detalles/ajax_delete/{id}', [AlertaDetalleController::class, 'ajax_delete'])->name('alertas_detalles.ajax_delete');
+		Route::post('/alertas_detalles', [AlertaDetalleController::class, 'store'])->name('alertas_detalles.store');
+	}
+);
+
+Route::middleware('auth')->group(
+	function () {
+		Route::get('/alertas_tipos/ajax_listado', [AlertaTipoController::class, 'ajax_listado'])->name('alertas_tipos.ajax_listado');
+		Route::get('/alertas_tipos', [AlertaTipoController::class, 'index'])->name('alertas_tipos');
+		Route::post('/alertas_tipos/ajax_guardar_columna/', [AlertaTipoController::class, 'ajax_guardar_columna'])->name('alertas_tipos.ajax_guardar_columna');
+		Route::get('/alertas_tipos/ajax_edit/{id}', [AlertaTipoController::class, 'ajax_edit'])->name('alertas_tipos.ajax_edit');
+		Route::post('/alertas_tipos/ajax_delete/{id}', [AlertaTipoController::class, 'ajax_delete'])->name('alertas_tipos.ajax_delete');
+		Route::post('/alertas_tipos', [AlertaTipoController::class, 'store'])->name('alertas_tipos.store');
+		Route::put('/alertas_tipos/{id}', [AlertaTipoController::class, 'update'])->name('alertas_tipos.update');
+	}
+);
 
 
 require __DIR__ . '/auth.php';
