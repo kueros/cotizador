@@ -5,15 +5,9 @@
 		</h2>
 	</x-slot>
 
-<?php 
-
-// $copa_background_home_custom = \Variable::where('nombre', 'copa_background_home_custom')->first()['valor'];
-//$background_home_custom_path = \Variable::where('nombre', 'background_home_custom_path')->first()['valor'];
-?>
     <style>
 
 		<?php 
-		#$copa_background_login_custom = 1;
 		if($copa_background_home_custom == '0'){
 		?>
 			body, html {

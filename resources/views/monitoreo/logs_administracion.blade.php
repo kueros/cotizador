@@ -33,7 +33,7 @@
 					url : "{{ url('monitoreo/ajax_log_administracion') }}",
 					type : 'GET'
 				},
-				"order": [[ 3, "desc" ]],
+				"order": [[ 0, "desc" ]],
 				"ordering": true,
 				bAutoWidth: false, 
 				aoColumns : [
@@ -45,12 +45,24 @@
 				],
 				language: traduccion_datatable,
 				"pageLength": 100,
-				dom: 'Bfrtip',
-				buttons: [
-					{"extend": 'copy', "text":'Portapapeles',"className": 'btn btn-primary', title: 'Log de acciones'},
-					{"extend": 'pdf', "text":'PDF',"className": 'btn btn-danger', title: 'Log de acciones'},
-					{"extend": 'excel', "text":'Excel',"className": 'btn btn-success', title: 'Log de acciones'},
-					{"extend": 'print', "text":'Imprimir',"className": 'btn btn-secondary', title: 'Log de acciones'}
+				//dom: 'Bfrtip',
+				layout: {
+					topStart: {
+						buttons: [
+							{"extend": 'copy', "text":'Portapapeles',"className": 'btn btn-primary', title: 'Log de acciones'},
+							{"extend": 'pdf', "text":'PDF',"className": 'btn btn-danger', title: 'Log de acciones'},
+							{"extend": 'excel', "text":'Excel',"className": 'btn btn-success', title: 'Log de acciones'},
+							{"extend": 'print', "text":'Imprimir',"className": 'btn btn-secondary', title: 'Log de acciones'}
+						],
+					},
+					bottomEnd: {
+						paging: {
+							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
+						}
+					}
+				},
+				columnDefs: [
+					{ targets: '_all', className: 'text-start' },
 				],
 				initComplete: function () {
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');

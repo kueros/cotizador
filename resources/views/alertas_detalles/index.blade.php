@@ -31,37 +31,46 @@
         			}
 				},
 				language: traduccion_datatable,
-				dom: 'Bfrtip',
+				//dom: 'Bfrtip',
 				columnDefs: [{
 					"targets": 'no-sort',
 					"orderable": false
 				}],
-				buttons: [{
-						"extend": 'pdf',
-						"text": 'Export',
-						"className": 'btn btn-danger',
-						"orientation": 'landscape',
-						title: 'Detalles Alertas'
+				layout: {
+					topStart: {
+						buttons: [{
+								"extend": 'pdf',
+								"text": 'Export',
+								"className": 'btn btn-danger',
+								"orientation": 'landscape',
+								title: 'Detalles Alertas'
+							},
+							{
+								"extend": 'copy',
+								"text": 'Export',
+								"className": 'btn btn-primary',
+								title: 'Detalles Alertas'
+							},
+							{
+								"extend": 'excel',
+								"text": 'Export',
+								"className": 'btn btn-success',
+								title: 'Detalles Alertas'
+							},
+							{
+								"extend": 'print',
+								"text": 'Export',
+								"className": 'btn btn-secondary',
+								title: 'Detalles Alertas'
+							}
+						]
 					},
-					{
-						"extend": 'copy',
-						"text": 'Export',
-						"className": 'btn btn-primary',
-						title: 'Detalles Alertas'
-					},
-					{
-						"extend": 'excel',
-						"text": 'Export',
-						"className": 'btn btn-success',
-						title: 'Detalles Alertas'
-					},
-					{
-						"extend": 'print',
-						"text": 'Export',
-						"className": 'btn btn-secondary',
-						title: 'Detalles Alertas'
+					bottomEnd: {
+						paging: {
+							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
+						}
 					}
-				],
+				},
 				initComplete: function() {
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');

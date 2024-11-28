@@ -24,37 +24,46 @@
 					type: 'GET'
 				},
 				language: traduccion_datatable,
-				dom: 'Bfrtip',
+				//dom: 'Bfrtip',
 				columnDefs: [{
 					"targets": 'no-sort',
 					"orderable": false
 				}],
-				buttons: [{
-						"extend": 'pdf',
-						"text": 'Export',
-						"className": 'btn btn-danger',
-						"orientation": 'landscape',
-						title: 'Tipos de Transacciones'
+				layout: {
+					topStart: {
+						buttons: [{
+								"extend": 'pdf',
+								"text": 'Export',
+								"className": 'btn btn-danger',
+								"orientation": 'landscape',
+								title: 'Tipos de Transacciones'
+							},
+							{
+								"extend": 'copy',
+								"text": 'Export',
+								"className": 'btn btn-primary',
+								title: 'Tipos de Transacciones'
+							},
+							{
+								"extend": 'excel',
+								"text": 'Export',
+								"className": 'btn btn-success',
+								title: 'Tipos de Transacciones'
+							},
+							{
+								"extend": 'print',
+								"text": 'Export',
+								"className": 'btn btn-secondary',
+								title: 'Tipos de Transacciones'
+							}
+						]
 					},
-					{
-						"extend": 'copy',
-						"text": 'Export',
-						"className": 'btn btn-primary',
-						title: 'Tipos de Transacciones'
-					},
-					{
-						"extend": 'excel',
-						"text": 'Export',
-						"className": 'btn btn-success',
-						title: 'Tipos de Transacciones'
-					},
-					{
-						"extend": 'print',
-						"text": 'Export',
-						"className": 'btn btn-secondary',
-						title: 'Tipos de Transacciones'
+					bottomEnd: {
+						paging: {
+							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
+						}
 					}
-				],
+				},
 				initComplete: function() {
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
@@ -163,7 +172,9 @@
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
 						<button id="agregar" class="btn btn-success mr-2" onclick="add_tipo_transaccion()">
-							<i class="bi bi-plus"></i> {{ __('Agregar Tipo de Transacción') }}
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+								<path d="M8 4v8m4-4H4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg> {{ __('Agregar Tipo de Transacción') }}
 						</button>
 					</div>
 					<table id="tipos_transacciones_table" class="table table-striped table-bordered" cellspacing="0" width="100%">

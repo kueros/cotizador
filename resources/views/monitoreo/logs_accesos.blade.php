@@ -41,15 +41,24 @@
 				],
 				language: traduccion_datatable,
 				"pageLength": 100,
-				dom: 'Bfrtip',
+				//dom: 'Bfrtip',
+				layout: {
+					topStart: {
+						buttons: [
+							{"extend": 'copy', "text":'Portapapeles',"className": 'btn btn-primary', title: 'Log de acciones'},
+							{"extend": 'pdf', "text":'PDF',"className": 'btn btn-danger', title: 'Log de acciones'},
+							{"extend": 'excel', "text":'Excel',"className": 'btn btn-success', title: 'Log de acciones'},
+							{"extend": 'print', "text":'Imprimir',"className": 'btn btn-secondary', title: 'Log de acciones'}
+						],
+					},
+					bottomEnd: {
+						paging: {
+							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
+						}
+					}
+				},
 				columnDefs: [
 					{ targets: '_all', className: 'text-start' },
-				],
-				buttons: [
-					{"extend": 'copy', "text":'Portapapeles',"className": 'btn btn-primary', title: 'Log de acciones'},
-					{"extend": 'pdf', "text":'PDF',"className": 'btn btn-danger', title: 'Log de acciones'},
-					{"extend": 'excel', "text":'Excel',"className": 'btn btn-success', title: 'Log de acciones'},
-					{"extend": 'print', "text":'Imprimir',"className": 'btn btn-secondary', title: 'Log de acciones'}
 				],
 				initComplete: function () {
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');

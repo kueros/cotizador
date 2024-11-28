@@ -20,13 +20,28 @@
 		jQuery(document).ready(function($){
 			table = $('#usuarios-table').DataTable({
 			language: traduccion_datatable,
-            dom: 'Bfrtip',
+            //dom: 'Bfrtip',
 			columnDefs: [
 				{
 					"targets": 'no-sort',
 					"orderable": false
 				}
 			],
+			layout: {
+				topStart: {
+					buttons: [
+						{"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Usuarios'},
+						{"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Usuarios'},
+						{"extend": 'excel', "text":'Export',"className": 'btn btn-success', title: 'Usuarios'},
+						{"extend": 'print', "text":'Export',"className": 'btn btn-secondary', title: 'Usuarios'}
+					],
+				},
+				bottomEnd: {
+					paging: {
+						firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
+					}
+				}
+			},
 			aoColumns : [
 				{ sWidth: '13%' },
 				{ sWidth: '13%' },
@@ -37,17 +52,11 @@
 				{ sWidth: '10%' },
 				{ sWidth: '15%' }
 			],
-            buttons: [
-                {"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Usuarios'},
-                {"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Usuarios'},
-                {"extend": 'excel', "text":'Export',"className": 'btn btn-success', title: 'Usuarios'},
-                {"extend": 'print', "text":'Export',"className": 'btn btn-secondary', title: 'Usuarios'}
-            ],
             initComplete: function () {
                 $('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
                 $('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
                 $('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
-                $('.buttons-print').html('<span class="glyphicon glyphicon-print" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
+                $('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
             }
 			});
 		});
@@ -405,7 +414,9 @@
 					<div class="float-left">
 						@if ($permiso_agregar_usuario)
 						<button id="agregar" class="btn btn-success float-right" onclick="add_usuario()">
-							<i class="bi bi-plus"></i> {{ __('Agregar Usuario') }}
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+								<path d="M8 4v8m4-4H4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg> {{ __('Agregar Usuario') }}
 						</button>
 						@endif
 						@if ($permiso_agregar_usuario)

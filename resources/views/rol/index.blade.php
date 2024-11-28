@@ -27,19 +27,30 @@
 					type : 'GET'
 				},
 				language: traduccion_datatable,
-				dom: 'Bfrtip',
+				//dom: 'Bfrtip',
+				layout: {
+					topStart: {
+						buttons: [
+							{"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Roles'},
+							{"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Roles'},
+							{"extend": 'excel', "text":'Export',"className": 'btn btn-success', title: 'Roles'},
+							{"extend": 'print', "text":'Export',"className": 'btn btn-secondary', title: 'Roles'}
+						]
+					},
+					bottomEnd: {
+						paging: {
+							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
+						}
+					}
+				},
 				columnDefs: [
 					{
 						"targets": 'no-sort',
 						"orderable": false
 					}
 				],
-				buttons: [
-					{"extend": 'pdf', "text":'Export',"className": 'btn btn-danger', "orientation": 'landscape', title: 'Roles'},
-					{"extend": 'copy', "text":'Export',"className": 'btn btn-primary', title: 'Roles'},
-					{"extend": 'excel', "text":'Export',"className": 'btn btn-success', title: 'Roles'},
-					{"extend": 'print', "text":'Export',"className": 'btn btn-secondary', title: 'Roles'}
-				],
+				
+				//pagingType: 'simple_numbers',
 				initComplete: function () {
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
@@ -158,7 +169,9 @@
 				<div class="table-responsive">
 					<div class="float-right">
 						<button id="agregar" class="btn btn-success" onclick="add_rol()">
-							<i class="bi bi-plus"></i> {{ __('Agregar rol') }}
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+								<path d="M8 4v8m4-4H4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg> {{ __('Agregar rol') }}
 						</button>
 					</div>
 					<br>

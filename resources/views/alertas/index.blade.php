@@ -36,37 +36,46 @@
         			}
  */				},
 				language: traduccion_datatable,
-				dom: 'Bfrtip',
+				//dom: 'Bfrtip',
 				columnDefs: [{
 					"targets": 'no-sort',
 					"orderable": true
 				}],
-				buttons: [{
-						"extend": 'pdf',
-						"text": 'Export',
-						"className": 'btn btn-danger',
-						"orientation": 'landscape',
-						title: 'Alertas'
+				layout: {
+					topStart: {
+						buttons: [{
+								"extend": 'pdf',
+								"text": 'Export',
+								"className": 'btn btn-danger',
+								"orientation": 'landscape',
+								title: 'Alertas'
+							},
+							{
+								"extend": 'copy',
+								"text": 'Export',
+								"className": 'btn btn-primary',
+								title: 'Alertas'
+							},
+							{
+								"extend": 'excel',
+								"text": 'Export',
+								"className": 'btn btn-success',
+								title: 'Alertas'
+							},
+							{
+								"extend": 'print',
+								"text": 'Export',
+								"className": 'btn btn-secondary',
+								title: 'Alertas'
+							}
+						]
 					},
-					{
-						"extend": 'copy',
-						"text": 'Export',
-						"className": 'btn btn-primary',
-						title: 'Alertas'
-					},
-					{
-						"extend": 'excel',
-						"text": 'Export',
-						"className": 'btn btn-success',
-						title: 'Alertas'
-					},
-					{
-						"extend": 'print',
-						"text": 'Export',
-						"className": 'btn btn-secondary',
-						title: 'Alertas'
+					bottomEnd: {
+						paging: {
+							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
+						}
 					}
-				],
+				},
 				initComplete: function() {
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
@@ -346,7 +355,9 @@
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
 						<button id="agregar" class="btn btn-success mr-2" onclick="add_alerta()">
-							<i class="bi bi-plus"></i> {{ __('Agregar Alerta') }}
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+								<path d="M8 4v8m4-4H4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg> {{ __('Agregar Alerta') }}
 						</button>
 						<a class="btn btn-primary" href="{{ route('alertas_tipos') }}" title="Detalle Alerta">{{ __('Administrar Tipos de Alertas') }}</a>
 					</div>
