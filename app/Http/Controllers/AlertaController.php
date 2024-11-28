@@ -82,7 +82,7 @@ class AlertaController extends Controller
 
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
-	public function ajax_guardar_columna(Request $request, MyController $myController)
+	public function ajax_store(Request $request, MyController $myController)
 	{
 		#dd($request->all());
 		// Validar los datos del usuario
@@ -120,8 +120,8 @@ class AlertaController extends Controller
 		AlertaDetalle::create([
 			'alertas_id' => $alerta->id,
 			'funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
-			'fecha_desde' => $request['fecha_desde'][0] ?? null, // Usar el primer valor del arreglo, o null si no existe
-			'fecha_hasta' => $request['fecha_hasta'][0] ?? null, // Usar el primer valor del arreglo, o null si no existe
+			'fecha_desde' => implode(',', $request['fecha_desde']),
+			'fecha_hasta' => implode(',', $request['fecha_hasta']),
 		]);
 
 		// Loguear la acción

@@ -30,7 +30,7 @@
 
 				//show_loading();
 				$.ajax({
-					url: "{{ url('alertas_tipos/ajax_guardar_columna') }}",
+					url: "{{ url('alertas_tipos/ajax_store') }}",
 					type: "POST",
 					data: formData,
 					method: 'POST',

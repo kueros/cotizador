@@ -30,6 +30,7 @@ class AlertaDetalleController extends Controller
 								where('alertas_id', $id)->
 								orderBy('nombre', 'asc')->
 								paginate();
+		#dd($detalles_alertas);
 		return view('alertas_detalles.index', compact('detalles_alertas', 'id', 'funciones'))
 			->with('i', ($request->input('page', 1) - 1) * $detalles_alertas->perPage());
 	}
@@ -39,8 +40,8 @@ class AlertaDetalleController extends Controller
 	*******************************************************************************************************************************/
 	public function ajax_listado(Request $request)
 	{
+		#dd($request);
 		$alertas_id = $request->input('alertas_id');
-
 		$detalles_alertas = 
 							AlertaDetalle::
 								leftJoin('funciones', 'detalles_alertas.funciones_id', '=', 'funciones.id')->
@@ -48,27 +49,69 @@ class AlertaDetalleController extends Controller
 								where('alertas_id', $alertas_id)->
 								orderBy('nombre', 'asc')->
 								get();
+		#dd($detalles_alertas['nombre_funcion']);
 		#dd($detalles_alertas);
+
+
+		$datos = $detalles_alertas->map(function ($detalle) {
+			return [
+  				'funciones_id' => explode(',', $detalle->funciones_id),
+				'fecha_desde' => explode(',', $detalle->fecha_desde),
+				'fecha_hasta' => explode(',', $detalle->fecha_hasta),
+			];
+		})->toArray();
+		
+		
+		
+		$detalles = $detalles_alertas->map(function ($detalle) {
+			// Separar los valores de los campos con comas
+			$funciones = explode(',', $detalle->funciones_id);
+			$fechasDesde = explode(',', $detalle->fecha_desde);
+			$fechasHasta = explode(',', $detalle->fecha_hasta);
+		
+			// Construir filas para cada elemento
+			$rows = [];
+			for ($i = 0; $i < count($funciones); $i++) {
+				$rows[] = [
+					$detalle->nombre_funcion, // Nombre de la función
+					$fechasDesde[$i] ?? null, // Fecha desde
+					$fechasHasta[$i] ?? null, // Fecha hasta
+				];
+			}
+			return $rows;
+		})->flatten(1)->toArray();
+		
+/* 		// Resultado final
+		return view('tu.vista', compact('detalles'));		
+ */		
+		
+		
+		#dd($detalles);
+
+/* 
 		$data = array();
-		foreach($detalles_alertas as $r) {
+		for ($i = 0; $i < count($funciones); $i++) {
 			$accion = "";
 			#$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_alertas_detalles('."'".$r->id.
 			#		"'".')"><i class="bi bi-pencil-fill"></i></a>';
 
 			#$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_alertas_detalles('."'".$r->id.
 			#		"'".')"><i class="bi bi-trash"></i></a>';
-
-			$data[] = array(
-				$r->nombre_funcion,
-				$r->fecha_desde,
-				$r->fecha_hasta#,
-				#$accion
-			);
+			$data[] = [
+				'funcion_id' => $funciones[$i],
+				'fecha_desde' => $fechasDesde[$i],
+				'fecha_hasta' => $fechasHasta[$i],
+			];
 		}
+ */
+
+
+
+
 		$output = array(
 			"recordsTotal" => $detalles_alertas->count(),
 			"recordsFiltered" => $detalles_alertas->count(),
-			"data" => $data
+			"data" => $detalles
 		);
 
 		return response()->json($output);

@@ -30,7 +30,7 @@
 
 				//show_loading();
 				$.ajax({
-					url: "{{ url('tipos_transacciones_campos_adicionales/ajax_guardar_columna') }}",
+					url: "{{ url('tipos_transacciones_campos_adicionales/ajax_store') }}",
 					type: "POST",
 					data: formData,
 					method: 'POST',

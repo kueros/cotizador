@@ -197,7 +197,7 @@ Route::middleware('auth')->group(
 		Route::delete('/tipos_transacciones_campos_adicionales/{id}', 				[TipoTransaccionCampoAdicionalController::class, 'destroy'])->name('tipos_transacciones_campos_adicionales.destroy');
 		Route::get('/tipos_transacciones_campos_adicionales/ajax_edit/{id}', 		[TipoTransaccionCampoAdicionalController::class, 'ajax_edit'])->name('tipos_transacciones_campos_adicionales.ajax_edit');		
 		Route::post('/tipos_transacciones_campos_adicionales/ajax_delete/{id}', 	[TipoTransaccionCampoAdicionalController::class, 'ajax_delete'])->name('tipos_transacciones_campos_adicionales.ajax_delete');
-		Route::post('/tipos_transacciones_campos_adicionales/ajax_guardar_columna/',[TipoTransaccionCampoAdicionalController::class, 'ajax_guardar_columna'])->name('tipos_transacciones_campos_adicionales.ajax_guardar_columna');
+		Route::post('/tipos_transacciones_campos_adicionales/ajax_store/',[TipoTransaccionCampoAdicionalController::class, 'ajax_store'])->name('tipos_transacciones_campos_adicionales.ajax_store');
 	}
 );
 
@@ -216,7 +216,7 @@ Route::middleware('auth')->group(
 	function () {
 		Route::get('/alertasIndex', 							[AlertaController::class, 'alertasIndex'])->name('alertasIndex');
 		Route::put('/alertasUpdate/{id}', 						[AlertaController::class, 'alertasUpdate'])->name('alertasUpdate');
-		Route::post('/alertas/ajax_guardar_columna/', 			[AlertaController::class, 'ajax_guardar_columna'])->name('alertas.ajax_guardar_columna');
+		Route::post('/alertas/ajax_store/', 			[AlertaController::class, 'ajax_store'])->name('alertas.ajax_store');
 		Route::get('/alertas/ajax_listado', 					[AlertaController::class, 'ajax_listado'])->name('alertas.ajax_listado');
 		Route::get('/alertas/ajax_edit/{id}', 					[AlertaController::class, 'ajax_edit'])->name('alertas.ajax_edit');
 		Route::post('/alertas/ajax_delete/{id}', 				[AlertaController::class, 'ajax_delete'])->name('alertas.ajax_delete');
@@ -239,7 +239,7 @@ Route::middleware('auth')->group(
 	function () {
 		Route::get('/alertas_tipos/ajax_listado', 				[AlertaTipoController::class, 'ajax_listado'])->name('alertas_tipos.ajax_listado');
 		Route::get('/alertas_tipos', 							[AlertaTipoController::class, 'index'])->name('alertas_tipos');
-		Route::post('/alertas_tipos/ajax_guardar_columna/', 	[AlertaTipoController::class, 'ajax_guardar_columna'])->name('alertas_tipos.ajax_guardar_columna');
+		Route::post('/alertas_tipos/ajax_store/', 	[AlertaTipoController::class, 'ajax_store'])->name('alertas_tipos.ajax_store');
 		Route::get('/alertas_tipos/ajax_edit/{id}', 			[AlertaTipoController::class, 'ajax_edit'])->name('alertas_tipos.ajax_edit');
 		Route::post('/alertas_tipos/ajax_delete/{id}', 			[AlertaTipoController::class, 'ajax_delete'])->name('alertas_tipos.ajax_delete');
 		Route::post('/alertas_tipos', 							[AlertaTipoController::class, 'store'])->name('alertas_tipos.store');

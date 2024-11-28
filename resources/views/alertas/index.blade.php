@@ -137,7 +137,7 @@
 			let form_data = $('#form').serializeArray();
 			//console.log('Contenido de form_data (JSON):', JSON.stringify(form_data, null, 2));
 			console.log('accion: ', $('#accion').val());
-			let url_guarda_datos = "{{ url('alertas/ajax_guardar_columna') }}";
+			let url_guarda_datos = "{{ url('alertas/ajax_store') }}";
 			//let url_guarda_datos = "{{ url('alertasIndex') }}";
 			let type_guarda_datos = "POST";
 
