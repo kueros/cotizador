@@ -189,7 +189,8 @@
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		function validarFormulario() {
+		function validarFormulario() 
+		{
 			let errores = [];
 			let nombre = document.querySelector('input[name="nombre"]').value.trim();
 			let descripcion = document.querySelector('input[name="descripcion"]').value.trim();
@@ -197,12 +198,6 @@
 			let funcionesId = document.querySelectorAll('select[name="funciones_id[]"]');
 			let fechasDesde = document.querySelectorAll('input[name="fecha_desde[]"]');
 			let fechasHasta = document.querySelectorAll('input[name="fecha_hasta[]"]');
-
-			// Verificar si el tbody de la tabla tiene al menos un hijo
-			let tbody = document.querySelector('#detalles_alertas tbody');
-			if (!tbody || tbody.children.length === 0) {
-				errores.push("La tabla 'detalles_alertas' debe tener al menos una fila.");
-			}
 
 			if (!nombre) errores.push("El campo 'Nombre' es obligatorio.");
 			if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
@@ -227,9 +222,10 @@
 
 			if (errores.length > 0) {
 				swal.fire("Aviso", "Errores:\n" + errores.join("\n"), "warning");
+				
+				//alert("Errores:\n" + errores.join("\n"));
 				return false;
 			}
-
 			return true;
 		}
 
@@ -373,7 +369,6 @@
 			</div>
 		</div>
 	</div>
-
 	<div class="modal fade modal-lg" id="modal_form_alertas" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
@@ -389,11 +384,11 @@
 					<input type="hidden" value="" name="id" />
 					<div class="modal-body">
 						<!-- Campos principales -->
-						<div class="form-group" style="margin-top:15px; margin-bottom:15px;">
+						<div class="form-group">
 							<label for="nombre">Nombre</label>
 							<input type="text" class="form-control" name="nombre" required>
 						</div>
-						<div class="form-group" style="margin-top:15px; margin-bottom:15px;">
+						<div class="form-group">
 							<label for="descripcion">Descripción</label>
 							<input type="text" class="form-control" name="descripcion" required>
 						</div>
@@ -417,11 +412,9 @@
 							</div>
 
 						<!-- Detalles de Alerta -->
-						 <div  style="margin-top:15px; margin-bottom:15px;">
-							<h5>Detalles de la Alerta</h5>
-						</div>
+						<h5>Detalles de la Alerta</h5>
 						<a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
-						<table class="table table-bordered" id="detalles_alertas" style="margin-top:15px; margin-bottom:15px;">
+						<table class="table table-bordered" id="detalles_alertas">
 							<thead>
 								<tr>
 									<th>Función ID</th>
@@ -534,17 +527,28 @@
 		 *******************************************************************************************************************************/
 		function eliminarValores() 
 		{
+			console.log("Función eliminar_valores");
+
 			// Selecciona el botón de eliminar
 			const botonEliminar = document.querySelector("#eliminar_filas");
+			console.log('botonEliminar: ', botonEliminar);
+
 			if (botonEliminar) {
+				console.log('dentro del if: ', botonEliminar);
+
 				botonEliminar.addEventListener("click", function () {
+					console.log("Botón eliminar clickeado");
+
 					// Selecciona el tbody dentro de la tabla
 					const tablaBody = document.querySelector("#detalles_alertas tbody");
+					console.log('tablaBody: ', tablaBody);
+
 					if (tablaBody) {
 						// Elimina todas las filas dinámicas del tbody
 						while (tablaBody.firstChild) {
 							tablaBody.removeChild(tablaBody.firstChild);
 						}
+						console.log("Todas las filas en el tbody fueron eliminadas.");
 					} else {
 						console.error("No se encontró un <tbody> en la tabla.");
 					}
@@ -553,7 +557,10 @@
 				console.error("El botón con ID #eliminar_filas no existe en el DOM.");
 			}
 		}
+
 		// Llamar a la función eliminarValores
 		document.addEventListener("DOMContentLoaded", eliminarValores);
+
 	</script>
+
 </x-app-layout>
