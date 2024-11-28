@@ -63,7 +63,7 @@ class AlertaTipoController extends Controller
 
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
-	public function ajax_guardar_columna(Request $request, MyController $myController)
+	public function ajax_store(Request $request, MyController $myController)
 	{
 		#dd($request->all());
 		// Validar los datos del usuario

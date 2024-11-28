@@ -14,7 +14,7 @@
 @endphp
 -->	
 <?php
-#dd($id);
+#dd($detalles_alertas);
 ?>
 	<script type="text/javascript">
 		alertas_id = <?php echo $id; ?>;
