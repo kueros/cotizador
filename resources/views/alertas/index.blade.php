@@ -16,14 +16,10 @@
 	#dd($tipos_alertas); 
 	#dd($response);
 	?>
-
 	<script type="text/javascript">
 		var table;
 		var save_method;
-
 		jQuery(document).ready(function($) {
-
-
 			/*******************************************************************************************************************************
 			 *******************************************************************************************************************************/
 			//tipo_transaccion_id = <?php #echo $id; ?>;
@@ -308,14 +304,24 @@
 			const row = button.closest("tr");
 			row.remove();
 		}
-
-
-
-
+/* 		// Función para eliminar los valores dinámicos
+		function eliminarValores() {
+			const tablaDinamica = document.getElementById("detalles_alertas");
+			
+			// Elimina todas las filas dinámicas
+			while (tablaDinamica.firstChild) {
+				tablaDinamica.removeChild(tablaDinamica.firstChild);
+			}
+		}
+ */
+		// Evento para asociar el botón "Cancelar" a la función "eliminarValores".
+		document.getElementById("btn-cancelar").addEventListener("click", function() {
+			eliminarValores(); // Llama a la función para limpiar la tabla
+		});
 
 		
-		/*******************************************************************************************************************************
-		 *******************************************************************************************************************************/
+/* 		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************
 		function eliminar_valor(button) {
 			// Obtener la fila <tr> que contiene el botón de eliminar
 			var row = button.closest('tr');
@@ -323,7 +329,8 @@
 			// Eliminar la fila
 			row.remove();
 		}
-	</script>
+ */	
+ </script>
 	<!--LISTADO-->
 	<div class="container">
 
@@ -340,9 +347,6 @@
 					</ul>
 				</div>
 				@endif
-<?php
-#dd($funciones);
-?>
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
 						<button id="agregar" class="btn btn-success mr-2" onclick="add_alerta()">
@@ -365,79 +369,74 @@
 			</div>
 		</div>
 	</div>
-
-
-<?php #dd($alertas->first()['id']); ?>
-
-<div class="modal fade modal-lg" id="modal_form_alertas" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Editar alertas</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
-				@csrf
-				<input name="_method" type="hidden" id="method">
-				<input name="alertas_id" id="alertas_id" class="form-control" type="hidden" value="<?php echo $alertas->first()['id'] ?? ""; ?>">
-				<input type="hidden" value="" name="accion" id="accion" />
-				<input type="hidden" value="" name="id" />
-                <div class="modal-body">
-                    <!-- Campos principales -->
-                    <div class="form-group">
-                        <label for="nombre">Nombre</label>
-                        <input type="text" class="form-control" name="nombre" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="descripcion">Descripción</label>
-                        <input type="text" class="form-control" name="descripcion" required>
-                    </div>
-					<div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Tipo de Alerta') }}</label>
-								<div class="col-md-9">
-									<select id="tipos_alertas_id" name="tipos_alertas_id" class="mt-1 block w-full form-control" required>
-										<option value="0">
-											{{ __('Elija un Tipo de Alerta') }}
-										</option>
-										@foreach($tipos_alertas as $tipo_alerta)
-										<option value="{{ $tipo_alerta->id }}">
-											{{ $tipo_alerta->nombre }}
-										</option>
-										@endforeach
-									</select>
-									<span class="help-block"></span>
+	<div class="modal fade modal-lg" id="modal_form_alertas" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Editar alertas</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
+					@csrf
+					<input name="_method" type="hidden" id="method">
+					<input name="alertas_id" id="alertas_id" class="form-control" type="hidden" value="<?php echo $alertas->first()['id'] ?? ""; ?>">
+					<input type="hidden" value="" name="accion" id="accion" />
+					<input type="hidden" value="" name="id" />
+					<div class="modal-body">
+						<!-- Campos principales -->
+						<div class="form-group">
+							<label for="nombre">Nombre</label>
+							<input type="text" class="form-control" name="nombre" required>
+						</div>
+						<div class="form-group">
+							<label for="descripcion">Descripción</label>
+							<input type="text" class="form-control" name="descripcion" required>
+						</div>
+						<div class="form-body">
+								<div class="mb-3 row">
+									<label class="col-form-label col-md-3">{{ __('Tipo de Alerta') }}</label>
+									<div class="col-md-9">
+										<select id="tipos_alertas_id" name="tipos_alertas_id" class="mt-1 block w-full form-control" required>
+											<option value="0">
+												{{ __('Elija un Tipo de Alerta') }}
+											</option>
+											@foreach($tipos_alertas as $tipo_alerta)
+											<option value="{{ $tipo_alerta->id }}">
+												{{ $tipo_alerta->nombre }}
+											</option>
+											@endforeach
+										</select>
+										<span class="help-block"></span>
+									</div>
 								</div>
 							</div>
-						</div>
 
-                    <!-- Detalles de Alerta -->
-                    <h5>Detalles de la Alerta</h5>
-					<a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
-
-                    <table class="table table-bordered" id="detalles_alertas">
-                        <thead>
-                            <tr>
-                                <th>Función ID</th>
-                                <th>Fecha Desde</th>
-                                <th>Fecha Hasta</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Filas dinámicas se añadirán aquí -->
-                        </tbody>
-                    </table>
-                </div>
-				<div class="modal-footer">
-					<a onclick="if (validarFormulario()) guardar_datos();" class="btn btn-primary">Guardar</a>
-					<a class="btn btn-danger" data-bs-dismiss="modal">Cancelar</a>
-				</div>
-            </form>
-        </div>
-    </div>
-</div>
-<script>
+						<!-- Detalles de Alerta -->
+						<h5>Detalles de la Alerta</h5>
+						<a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
+						<table class="table table-bordered" id="detalles_alertas">
+							<thead>
+								<tr>
+									<th>Función ID</th>
+									<th>Fecha Desde</th>
+									<th>Fecha Hasta</th>
+									<th>Acciones</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- Filas dinámicas se añadirán aquí -->
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<a onclick="if (validarFormulario()) guardar_datos();" class="btn btn-primary">Guardar</a>
+						<a id="eliminar_filas" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script>
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
@@ -516,10 +515,52 @@
 			});
 		}
 
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
 		// Función para eliminar una fila de detalles
-		function remove_row(button) {
+		function remove_row(button) 
+		{
 			$(button).closest('tr').remove();
 		}
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function eliminarValores() 
+		{
+			console.log("Función eliminar_valores");
+
+			// Selecciona el botón de eliminar
+			const botonEliminar = document.querySelector("#eliminar_filas");
+			console.log('botonEliminar: ', botonEliminar);
+
+			if (botonEliminar) {
+				console.log('dentro del if: ', botonEliminar);
+
+				botonEliminar.addEventListener("click", function () {
+					console.log("Botón eliminar clickeado");
+
+					// Selecciona el tbody dentro de la tabla
+					const tablaBody = document.querySelector("#detalles_alertas tbody");
+					console.log('tablaBody: ', tablaBody);
+
+					if (tablaBody) {
+						// Elimina todas las filas dinámicas del tbody
+						while (tablaBody.firstChild) {
+							tablaBody.removeChild(tablaBody.firstChild);
+						}
+						console.log("Todas las filas en el tbody fueron eliminadas.");
+					} else {
+						console.error("No se encontró un <tbody> en la tabla.");
+					}
+				});
+			} else {
+				console.error("El botón con ID #eliminar_filas no existe en el DOM.");
+			}
+		}
+
+		// Llamar a la función eliminarValores
+		document.addEventListener("DOMContentLoaded", eliminarValores);
+
 	</script>
 
 </x-app-layout>
