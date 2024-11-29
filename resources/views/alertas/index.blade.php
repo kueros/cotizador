@@ -132,8 +132,8 @@
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		 function guardar_datos() {
-
+		 function guardar_datos() 
+		 {
 			let form_data = $('#form').serializeArray();
 			//console.log('Contenido de form_data (JSON):', JSON.stringify(form_data, null, 2));
 			console.log('accion: ', $('#accion').val());

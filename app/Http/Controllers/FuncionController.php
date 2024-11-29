@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class FuncionController extends Controller
 {
@@ -34,7 +36,8 @@ class FuncionController extends Controller
 	*******************************************************************************************************************************/
 	public function ajax_listado(Request $request)
 	{
-		$funciones = Funcion::all();
+		$funciones = Funcion::get();
+		#dd($funciones);
 		$data = array();
         foreach($funciones as $r) {
             $accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_funcion('."'".$r->id.
@@ -42,8 +45,9 @@ class FuncionController extends Controller
 
 			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_funcion('."'".$r->id.
 					"'".')"><i class="bi bi-trash"></i></a>';
+			$r->formula = str_replace(",", "", $r->formula);
 
-            $data[] = array(
+			$data[] = array(
                 $r->nombre,
                 $r->formula,
                 $accion
@@ -60,50 +64,75 @@ class FuncionController extends Controller
 
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
-	public function store(Request $request, MyController $myController): RedirectResponse
+	public function ajax_store(Request $request, MyController $myController)
     {
-	#dd($request->input('nombre'));
-/*     $permiso_agregar_funciones = $myController->tiene_permiso('add_funcion');
-    if (!$permiso_agregar_funciones) {
-        abort(403, '.');
-        return false;
-    }
- */
-    // Validar los datos del usuario
-    $validatedData = $request->validate([
-        'nombre' => 'required|string|max:255',
-        'formula' => 'required', 
-	], [
-		'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-		'nombre.unique' => 'Este nombre de funcion ya está en uso.',
-	]);
+		#dd($request->all());
+		#dd($request->input('nombre'));
+	/*     $permiso_agregar_funciones = $myController->tiene_permiso('add_funcion');
+		if (!$permiso_agregar_funciones) {
+			abort(403, '.');
+			return false;
+		}
+	*/
 
-    $campo = funcion::create($validatedData);
-	$campo->formula = $validatedData['formula'];
-	$campo->save();
+	// Validar los datos del usuario
+		$validatedData = $request->validate([
+			'nombre' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/|unique:funciones,nombre',
+			'formula' => 'required', 
+		], [
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+			'nombre.unique' => 'Este nombre de funcion ya está en uso.',
+			'nombre.required' => 'El nombre de la funcion es requerido.',
+			'formula.required' => 'La formula de la funcion es requerida.',
+		]);
+#dd($validatedData);
+		$campo = funcion::create($validatedData);
+		$campo->formula = $validatedData['formula'];
+		$campo->save();
 
-    $clientIP = \Request::ip();
-    $userAgent = \Request::userAgent();
-    $username = Auth::user()->username;
-    $message = $username . " creó la funcion " . $request->input('nombre');
-    $myController->loguear($clientIP, $userAgent, $username, $message);
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		$username = Auth::user()->username;
+		$message = $username . " creó la funcion " . $request->input('nombre');
+		$myController->loguear($clientIP, $userAgent, $username, $message);
 
-    return Redirect::route('funciones.index')->with('success', 'funcion creada exitosamente.');
-}
+		// Respuesta exitosa
+		$response = [
+			'status' => 1,
+			'message' => 'Función creada correctamente.'
+		];
+		#dd($response);
+		return response()->json($response);
+	}
 
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
 	public function ajax_edit($id){
-
-        $data = Funcion::find($id);
+        $funcion = Funcion::find($id);
+		if (is_null($funcion->formula)) {
+			$funcion->formula = [];  // Asegúrate de que sea un array vacío si no tiene valor
+		}
+		$formulaArray = collect(explode(',', rtrim($funcion->formula, ','))) // Separa y elimina la última coma
+		->map(function ($item) {
+			// Clasifica el elemento como operator o value
+			$type = is_numeric($item) ? 'value' : 'operator';
+			return ['type' => $type, 'value' => $item];
+		});
+		$resultado = [
+			'id' => $funcion->id,
+			'nombre' => $funcion->nombre,
+			'formula' => $formulaArray,
+		];
+		$data = json_encode($resultado, JSON_PRETTY_PRINT);
+		#dd($data);
 		return response()->json($data);
     }
 
     /*******************************************************************************************************************************
 	*******************************************************************************************************************************/
-	public function update(Request $request, Funcion $funcion, MyController $myController): RedirectResponse
+	public function funcionesupdate(Request $request, Funcion $funcion, MyController $myController): RedirectResponse
 	{
-		#dd($request->id);
+		#dd($request->all());
 /* 		$permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
 		if (!$permiso_editar_funciones) {
 			abort(403, '.');

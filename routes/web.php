@@ -204,7 +204,7 @@ Route::middleware('auth')->group(
 Route::middleware('auth')->group(
 	function () {
 		Route::get('/funciones', 								[FuncionController::class, 'index'])->name('funciones.index');
-		Route::post('/funciones', 								[FuncionController::class, 'store'])->name('funciones.store');
+		Route::post('/funciones/ajax_store', 					[FuncionController::class, 'ajax_store'])->name('funciones.ajax_store');
 		Route::put('/funciones/{id}', 							[FuncionController::class, 'update'])->name('funciones.update');
 		Route::get('/funciones/ajax_listado', 					[FuncionController::class, 'ajax_listado'])->name('funciones.ajax_listado');
 		Route::get('/funciones/ajax_edit/{id}', 				[FuncionController::class, 'ajax_edit'])->name('funciones.ajax_edit');
@@ -216,7 +216,7 @@ Route::middleware('auth')->group(
 	function () {
 		Route::get('/alertasIndex', 							[AlertaController::class, 'alertasIndex'])->name('alertasIndex');
 		Route::put('/alertasUpdate/{id}', 						[AlertaController::class, 'alertasUpdate'])->name('alertasUpdate');
-		Route::post('/alertas/ajax_store/', 			[AlertaController::class, 'ajax_store'])->name('alertas.ajax_store');
+		Route::post('/alertas/ajax_store/', 					[AlertaController::class, 'ajax_store'])->name('alertas.ajax_store');
 		Route::get('/alertas/ajax_listado', 					[AlertaController::class, 'ajax_listado'])->name('alertas.ajax_listado');
 		Route::get('/alertas/ajax_edit/{id}', 					[AlertaController::class, 'ajax_edit'])->name('alertas.ajax_edit');
 		Route::post('/alertas/ajax_delete/{id}', 				[AlertaController::class, 'ajax_delete'])->name('alertas.ajax_delete');
