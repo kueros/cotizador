@@ -83,14 +83,14 @@ class AlertaTipoController extends Controller
 			],
 		], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-			'nombre.unique' => 'Este nombre de tipo de alerta ya está en uso.',
+			'nombre.unique' => 'Este nombre ya está en uso.',
 		]);
 	
 		// Si la validación falla
 		if ($validatedData->fails()) {
 			return response()->json([
 				'status' => 0,
-				'message' => 'Error de Ingreso de Datos',
+				'message' => '',
 				'errors' => $validatedData->errors()
 			]);
 		}
@@ -125,7 +125,7 @@ class AlertaTipoController extends Controller
 
     /*******************************************************************************************************************************
 	*******************************************************************************************************************************/
-	public function update(Request $request, TipoAlerta $alertas_tipos, MyController $myController): RedirectResponse
+	public function update(Request $request, TipoAlerta $alertas_tipos, MyController $myController)
 	{
 		#dd($request->id);
 /* 		$permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
@@ -134,26 +134,50 @@ class AlertaTipoController extends Controller
 			return false;
 		}
 */
-		// Validar los datos
-
-
-		$validatedData = $request->validate([
-			'nombre' => 'required|string|max:255',
+		// Limpia el campo nombre
+		$request->merge([
+			'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
 		]);
-
+		// Reglas de validación
+		$validatedData = Validator::make($request->all(), [
+			'nombre' => [
+				'required',
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[a-zA-Z\s]+$/', // Solo letras y espacios
+				Rule::unique('tipos_alertas', 'nombre') // Verifica la unicidad en la tabla
+			],
+		], [
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+			'nombre.unique' => 'Este nombre ya está en uso.',
+		]);
+	
+		// Si la validación falla
+		if ($validatedData->fails()) {
+			return response()->json([
+				'status' => 0,
+				'message' => '',
+				'errors' => $validatedData->errors()
+			]);
+		}
+		$alertas_tipos_nombre_viejo = TipoAlerta::where('id', $request->id)->first()['nombre'];
 		// Obtener el modelo
-		$alertas_tipos = TipoAlerta::findOrFail($request->id);
-
+		$alertas_tipos = TipoAlerta::where('id', $request->id)->first();
+		$validated = $validatedData->validated(); // Obtiene los datos validados como array
 		// Actualizar el modelo con los datos validados
-		$alertas_tipos->update($validatedData);
+		$alertas_tipos->update($validated);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " actualizó el tipo de alerta " . $request->nombre;
+		$message = $username . " actualizó el tipo de alerta " . $alertas_tipos_nombre_viejo . ' a ' . $request->nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
-		return redirect()->route('alertas_tipos')->with('success', 'Tipo de Alerta actualizado correctamente.');
-
+		// Respuesta exitosa
+		return response()->json([
+			'status' => 1,
+			'message' => 'Tipo de Alerta actualizado correctamente.'
+		]);
 	}
 
 	/*******************************************************************************************************************************

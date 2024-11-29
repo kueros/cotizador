@@ -103,7 +103,7 @@ class AlertaController extends Controller
 			'funciones_id' => 'required|exists:funciones,id',
 		], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
-			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
+			'nombre.unique' => 'Este nombre  ya está en uso.',
 			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
 		]);
@@ -111,7 +111,7 @@ class AlertaController extends Controller
 		if ($validatedData->fails()) {
 			return response()->json([
 				'status' => 0,
-				'message' => 'Error de Ingreso de Datos',
+				'message' => '',
 				'errors' => $validatedData->errors()
 			]);
 		}
@@ -155,7 +155,6 @@ class AlertaController extends Controller
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
 	public function ajax_edit($id){
-
         $alerta = Alerta::where('id', $id)->first();
 		$alertasDetalles = AlertaDetalle::where('alertas_id', $id)->get();
 		$response = response()->json([
@@ -171,7 +170,7 @@ class AlertaController extends Controller
 	*******************************************************************************************************************************/
 	public function alertasUpdate(Request $request, Alerta $alerta, MyController $myController)
 	{
-		#dd(request()->all());
+		#dd($request->alertas_id);
 		/* $permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
 		if (!$permiso_editar_funciones) {
 			abort(403, '.');
@@ -205,6 +204,7 @@ class AlertaController extends Controller
 		#dd($request->alertas_id);
 		// Obtener el modelo
 		$alerta_id = Alerta::where('id',$request->alertas_id)->first()['id'];
+		#dd($alerta_id);
 		$updated_id = DB::table('alertas')
 		->where('id', $alerta_id)
 		->update
@@ -213,13 +213,15 @@ class AlertaController extends Controller
 			'descripcion' => $validated['descripcion'],
 			'tipos_alertas_id' => $validated['tipos_alertas_id'],
 		]);
+
 		DB::table('detalles_alertas')
 		->updateOrInsert(
-			['alertas_id' => $request->alertas_id],
-			['funciones_id' => implode(',', $validated['funciones_id']),
-			'fecha_desde' => $request['fecha_desde'][0] ?? null,
-			'fecha_hasta' => $request['fecha_hasta'][0] ?? null
+			['alertas_id' => $alerta_id],
+			['funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
+			'fecha_desde' => implode(',', $request['fecha_desde']),
+			'fecha_hasta' => implode(',', $request['fecha_hasta']),
 		]);
+
 		// Loguear la acción
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();

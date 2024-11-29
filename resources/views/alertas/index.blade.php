@@ -185,7 +185,8 @@
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		function validarFormulario() {
+		function validarFormulario() 
+		{
 			let errores = [];
 			let nombre = document.querySelector('input[name="nombre"]').value.trim();
 			let descripcion = document.querySelector('input[name="descripcion"]').value.trim();
@@ -204,22 +205,32 @@
 			if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
 			if (!tiposAlertasId || tiposAlertasId === "0") errores.push("Seleccione un 'Tipo de Alerta'.");
 
-			funcionesId.forEach((funcion, index) => {
+			// Bandera para errores en la fila
+			let filaError = false;
+
+			funcionesId.forEach((funcion) => {
 				if (!funcion.value || funcion.value === "0") {
-					errores.push(`Debe elegir un valor válido en 'Función'.`);
+					filaError = true;
 				}
 			});
 
-			fechasDesde.forEach((fecha, index) => {
-				if (!fecha.value) errores.push(`Debe elegir un valor válido en 'Fecha Desde'.`);
+			fechasDesde.forEach((fecha) => {
+				if (!fecha.value) {
+					filaError = true;
+				}
 			});
 
 			fechasHasta.forEach((fecha, index) => {
-				if (!fecha.value) errores.push(`Debe elegir un valor válido en 'Fecha Hasta'.`);
-				else if (new Date(fechasDesde[index].value) > new Date(fecha.value)) {
+				if (!fecha.value) {
+					filaError = true;
+				} else if (new Date(fechasDesde[index].value) > new Date(fecha.value)) {
 					errores.push(`En la fila ${index + 1}, 'Fecha Hasta' debe ser mayor o igual a 'Fecha Desde'.`);
 				}
 			});
+
+			if (filaError) {
+				errores.push("Debe completar todas las filas de la tabla correctamente.");
+			}
 
 			if (errores.length > 0) {
 				swal.fire("Aviso", "Errores:\n" + errores.join("\n"), "warning");
@@ -468,46 +479,50 @@
 					$('.modal-title').text('Editar Alerta');
 					// Limpiar la tabla de detalles antes de llenarla
 					$('#detalles_alertas tbody').empty();
+					
 					// Asignar los datos de detalles_alertas
 					if (response.alertas_detalles.length > 0) {
 						response.alertas_detalles.forEach(function(detalle) {
-							let opcionesFunciones = '';
-							response.funciones.forEach(function(funcion) {
-								const selected = funcion.id == detalle.funciones_id ? 'selected' : '';
-								opcionesFunciones += `<option value="${funcion.id}" ${selected}>${funcion.nombre}</option>`;
-								//console.log('funcion.id '+`<option value="${funcion.id}" ${funcion.id == detalle.funciones_id ? "selected" : ""}>${funcion.nombre}</option>`);
-							});
-							//console.log('selected '+opcionesFunciones);
-							const row = `
-								<tr>
+							// Dividir el campo 'funciones_id' en un arreglo de IDs
+							const funcionesIds = detalle.funciones_id.split(',');
+							// Dividir las fechas 'fecha_desde' y 'fecha_hasta' en arreglos
+							const fechasDesde = detalle.fecha_desde.split(',');
+							const fechasHasta = detalle.fecha_hasta.split(',');
+
+							// Iterar sobre los arrays de funciones y fechas
+							for (let i = 0; i < funcionesIds.length; i++) {
+								let opcionesFunciones = '';
+								response.funciones.forEach(function(funcion) {
+									const selected = funcion.id == funcionesIds[i] ? 'selected' : '';
+									opcionesFunciones += `<option value="${funcion.id}" ${selected}>${funcion.nombre}</option>`;
+								});
+
+								// Crear la fila con los datos correspondientes
+								const row = `
+									<tr>
 										<input type="hidden" name="detalles_id[]" value="${detalle.id}">
 										<input type="hidden" name="alertas_id[]" value="${detalle.alertas_id}">
-									<td>
-										<select class="form-control" name="funciones_id[]" required>
-											${opcionesFunciones}
-										</select>
-									</td>
-									<td>
-										<input type="date" class="form-control" name="fecha_desde[]" value="${detalle.fecha_desde}">
-									</td>
-									<td>
-										<input type="date" class="form-control" name="fecha_hasta[]" value="${detalle.fecha_hasta}">
-									</td>
-									<td>
-										<button type="button" class="btn btn-danger btn-sm" onclick="remove_row(this)">
-											<i class="fa fa-trash"></i>
-										</button>
-									</td>
-								</tr>`;
-							$('#detalles_alertas tbody').append(row);
+										<td>
+											<select class="form-control" name="funciones_id[]" required>
+												${opcionesFunciones}
+											</select>
+										</td>
+										<td>
+											<input type="date" class="form-control" name="fecha_desde[]" value="${fechasDesde[i]}">
+										</td>
+										<td>
+											<input type="date" class="form-control" name="fecha_hasta[]" value="${fechasHasta[i]}">
+										</td>
+										<td>
+											<button type="button" class="btn btn-danger btn-sm" onclick="remove_row(this)">
+												<i class="fa fa-trash"></i> Eliminar
+											</button>
+										</td>
+									</tr>`;
+
+								$('#detalles_alertas tbody').append(row);
+							}
 						});
-					}
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					if (jqXHR.status === 404) {
-						alert("El registro no fue encontrado.");
-					} else {
-						show_ajax_error_message(jqXHR, textStatus, errorThrown);
 					}
 				}
 			});

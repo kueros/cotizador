@@ -23,6 +23,7 @@ class AlertaDetalleController extends Controller
 	public function index($id, Request $request, MyController $myController): View
 	{
         $funciones = Funcion::all();
+		$alertas_nombre = Alerta::where('id', $id)->first()['nombre'];
 		$detalles_alertas = 
 							AlertaDetalle::
 								leftJoin('funciones', 'detalles_alertas.funciones_id', '=', 'funciones.id')->
@@ -31,7 +32,7 @@ class AlertaDetalleController extends Controller
 								orderBy('nombre', 'asc')->
 								paginate();
 		#dd($detalles_alertas);
-		return view('alertas_detalles.index', compact('detalles_alertas', 'id', 'funciones'))
+		return view('alertas_detalles.index', compact('detalles_alertas', 'id', 'funciones', 'alertas_nombre'))
 			->with('i', ($request->input('page', 1) - 1) * $detalles_alertas->perPage());
 	}
 

@@ -222,7 +222,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-				<h2>Detalle de la Alerta</h2>
+				<h2>Detalle de la Alerta "<?php echo $alertas_nombre ?>"</h2>
 				@include('layouts.partials.message')
 				@if ($errors->any())
 				<div class="alert alert-danger">
