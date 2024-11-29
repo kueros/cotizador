@@ -19,8 +19,13 @@
 
 			jQuery(document).ready(function($){
 			/*******************************************************************************************************************************
+			 * 
+			 * 
+			 * 										ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD 
+			 * 
+			 * 
 			 *******************************************************************************************************************************/
-				table = $('#funciones-table').DataTable({
+			table = $('#funciones-table').DataTable({
 					"ajax": {
 						url : "{{ url('funciones/ajax_listado') }}",
 						type : 'GET'
@@ -74,7 +79,7 @@
 			 *******************************************************************************************************************************/
 			function edit_funcion(id) {
 				save_method = 'update';
-				$('#form_edit')[0].reset();
+				$('#form_add')[0].reset();
 				$('.form-group').removeClass('has-error');
 				$('.help-block').empty();
 				$('#accion').val('edit');
@@ -86,59 +91,60 @@
 					success: function(data) {
 						console.log('Respuesta completa del servidor:', data);
 						// Si data es un string, intenta convertirlo a un objeto JSON
-					if (typeof data === 'string') {
-						try {
-							data = JSON.parse(data);
-						} catch (e) {
-							console.error('Error al parsear JSON:', e);
-							return;
-						}
-					}
+    if (typeof data === 'string') {
+        try {
+            data = JSON.parse(data);
+        } catch (e) {
+            console.error('Error al parsear JSON:', e);
+            return;
+        }
+    }
 
-					console.log('Tipo de data:', typeof data); // Asegúrate de que ahora es un objeto
+    console.log('Tipo de data:', typeof data); // Asegúrate de que ahora es un objeto
 
-					if (data && data.formula) {
-						console.log('Tipo de data.formula:', typeof data.formula);
-						console.log('data.formula:', data.formula);
+    if (data && data.formula) {
+        console.log('Tipo de data.formula:', typeof data.formula);
+        console.log('data.formula:', data.formula);
 
-						if (Array.isArray(data.formula)) {
-							data.formula.forEach(function(item) {
-								console.log(item);
-							});
-						} else {
-							console.error("La propiedad 'formula' no es un array.");
-						}
-					} else {
-						console.error("La propiedad 'formula' no existe en la respuesta.");
-					}
+        if (Array.isArray(data.formula)) {
+            data.formula.forEach(function(item) {
+                console.log(item);
+            });
+        } else {
+            console.error("La propiedad 'formula' no es un array.");
+        }
+    } else {
+        console.error("La propiedad 'formula' no existe en la respuesta.");
+    }
 
-					// Procesa los demás datos
-					$('[name="id"]').val(data.id);
-					$('[name="nombre"]').val(data.nombre);
+    // Procesa los demás datos
+    $('[name="id"]').val(data.id);
+    $('[name="nombre"]').val(data.nombre);
 
-					// Limpia los campos dinámicos anteriores
-					const container = document.getElementById('input-container_edit');
-					container.innerHTML = '';
+    // Limpia los campos dinámicos anteriores
+/*     const container = document.getElementById('input-container');
+    container.innerHTML = '';
+ */
+clearDynamicFields();
+	 // Genera los campos dinámicos según la fórmula
+    if (Array.isArray(data.formula)) {
+        data.formula.forEach(element => {
+			console.log('element: ', element);
+            if (element.type === 'value') {
+                addOption('Valor numérico', element.value);
+            } else if (element.type === 'operator') {
+                addOption('Operador', element.value);
+            } else {
+                addOption('Campo estático', element.value);
+            }
+        });
+    }
 
-					// Genera los campos dinámicos según la fórmula
-					if (Array.isArray(data.formula)) {
-						data.formula.forEach(element => {
-							console.log('element: ', element);
-							if (element.type === 'value') {
-								addOption('Valor numérico', element.value);
-							} else if (element.type === 'operator') {
-								addOption('Operador', element.value);
-							} else {
-								addOption('Campo estático', element.value);
-							}
-						});
-					}
-
-					$('#modal_form_edit').modal('show');
-					$('.modal-title').text('Editar función');
-					$('#form_edit').attr('action', "{{ url('funciones') }}" + "/" + id);
-					$('#method').val('PUT');
-				},
+    $('#modal_form_add').modal('show');
+    $('.modal-title').text('Editar función');
+    $('#form').attr('action', "{{ url('funciones') }}" + "/" + id);
+    $('#method').val('PUT');
+},
 					error: function(jqXHR, textStatus, errorThrown) {
 						show_ajax_error_message(jqXHR, textStatus, errorThrown);
 					}
@@ -307,16 +313,13 @@
 				if (optionText === 'Valor numérico') {
 					newInput.type = 'number';
 					newInput.value = defaultValue; // Asigna el valor predeterminado
-					console.log('newInput.value1: ', newInput.value);
 				} else if (optionText === 'Operador') {
 					newInput.type = 'text';
 					newInput.value = defaultValue; // Asigna el valor predeterminado
 					newInput.readOnly = true; // Solo lectura para operadores
-					console.log('newInput.value2: ', newInput.value);
 				} else {
 					newInput.type = 'text';
 					newInput.value = defaultValue; // Asigna el valor predeterminado
-					console.log('newInput.value3: ', newInput.value);
 				}
 				if (optionText === 'Valor numérico') {
 					newInput.placeholder = 'Ingrese un valor';
@@ -325,11 +328,11 @@
 					// Crear un objeto asociado en formulaElements
 					const elementIndex = formulaElements.length;
 					formulaElements.push({ type: 'value', value: '' }); // Inicializar en vacío
-					console.log('formulaElements0: ', formulaElements);
+
 					// Actualizar el valor en formulaElements cuando se cambie el input
 					newInput.oninput = function () {
 						formulaElements[elementIndex].value = newInput.value;
-						console.log('formulaElements1: ',formulaElements) 
+						console.log(formulaElements) 
 					};
 					newInput.removeAttribute('readonly');
 				} else if (optionText === 'Operador') {
@@ -360,7 +363,6 @@
 							newInput.value = op;
 							operatorDropdown.style.display = 'none';
 							formulaElements.push({ type: 'operator', value: op });
-							console.log('formulaElements2: ', formulaElements);
 						};
 						li.appendChild(button);
 						dropdownMenu.appendChild(li);
@@ -374,11 +376,20 @@
 					newInput.value = optionText;
 					//newInput.setAttribute('readonly', false); // Esto asegura que sea editable
 					formulaElements.push({ type: 'static', value: optionText });
-					console.log('formulaElements3: ', formulaElements);
 				}
-				console.log('formulaElements4: ', formulaElements);
+
 				wrapper.appendChild(newInput);
 				container.insertBefore(wrapper, container.lastElementChild);
+				// Verificar si el contenedor excede el ancho del modal
+				const modal = document.querySelector('.modal-dialog'); // Modal contenedor
+				const containerWidth = container.offsetWidth; // Ancho actual del contenedor
+				const modalWidth = modal.offsetWidth; // Ancho disponible en el modal
+
+				if (containerWidth > modalWidth) {
+					// Si excede el ancho del modal, ajusta dinámicamente
+					container.style.flexWrap = 'wrap';
+				}
+
 				serializeFormula();
 			}
 
@@ -457,6 +468,12 @@
 			line-height: 1.5;
 			border-radius: 0.2rem;
 		}
+		#input-container {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px; /* Espaciado entre elementos */
+			max-width: 100%; /* Limita el ancho al del modal */
+		}	
 	</style>
 
 	<!--LISTADO-->
@@ -561,70 +578,4 @@
 		</div>
 	</div>
 
-
-	<div class="modal fade modal-lg" id="modal_form_edit" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title_edit">Formulario funciones</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<form id="form_edit" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
-					@csrf
-					<input name="_method" type="hidden" id="method">
-					<input type="hidden" id="formula" name="formula">
-					<div class="modal-body form">
-						<input type="hidden" value="" name="id"/>
-						<input name="accion" id="accion" class="form-control" type="hidden">
-						<div class="form-body">
-							<div class="row">
-								<div class="col-md-3">&nbsp;</div>
-								<label class="col-form-label col-md-3">Nombre</label>
-								<div class="col-md-6">
-									<input name="nombre" maxlength="255" placeholder="Nombre de la función" class="form-control" type="text" />
-									<span class="help-block"></span>
-								</div>
-							</div>
-						</div>
-						<div class="form-body">
-							<div class="row align-items-center">
-								<div class="col-md-3 d-flex align-items-center">
-									<input name="segundo_nombre" maxlength="255" class="form-control" type="text" readonly="readonly" />
-									<button class="btn btn-info btn-sm ms-2" type="button" id="equalMenuButton" disabled>
-										<i class="fas fa-equals"></i>
-									</button>
-									<span class="help-block"></span>
-								</div>
-								<!-- Mueve el bloque input-container aquí -->
-								<div class="col-md-9 d-flex align-items-center" id="input-container_edit">
-									<!-- Dropdown -->
-									<div class="dropdown">
-										<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-											<i class="far fa-plus-square"></i>
-										</button>
-										<button class="btn btn-secondary" type="button" id="backMenuButton" onclick="backInput()">
-											<i class="fas fa-undo"></i>
-										</button>
-										<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-											<li><button class="dropdown-item" type="button" onclick="addOption('1')">Valor numérico</button></li>
-											<li><button class="dropdown-item" type="button" onclick="addOption('Operador')">Operador</button></li>
-											<li><button class="dropdown-item" type="button" onclick="addOption('Contador')">Contador</button></li>
-											<li><button class="dropdown-item" type="button" onclick="addOption('Acumulador')">Acumulador</button></li>
-											<li><button class="dropdown-item" type="button" onclick="addOption('Condición')">Condición</button></li>
-											<li><button class="dropdown-item" type="button" onclick="addOption('Otra función')">Otra función</button></li>
-										</ul>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="modal-footer">
-							<!--a onclick="if (validarFormulario()) guardar_datos();" class="btn btn-primary">Guardar</a-->
-							<a onclick=" guardar_datos();" class="btn btn-primary">Guardar</a>
-							<button type="button" class="btn btn-danger" onclick="clearDynamicFields()">Cancelar</button>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>	
 	</x-app-layout>
