@@ -155,7 +155,7 @@
 			$('.help-block').empty();
 			$('#modal_form_alerta_tipo').modal('show');
 			//$('#modal_form').modal('show');
-			$('.modal-title').text('Agregar Tipos de Alertas');
+			$('.modal-title').text('Agregar Tipo de Alerta');
 			$('#accion').val('add');
 			$('#form').attr('action', "{{ url('alertas_tipos') }}");
 			$('#method').val('POST');

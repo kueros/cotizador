@@ -155,7 +155,7 @@
 			$('.help-block').empty();
 			//$('#modal_form_campo_adicional').modal('show');
 			$('#modal_form_campo_adicional').modal('show');
-			$('.modal-title').text('Agregar campos adicionales');
+			$('.modal-title').text('Agregar campo adicional');
 			$('#accion').val('add');
 			$('#form_campo_adicional').attr('action', "{{ url('tipos_transacciones_campos_adicionales') }}");
 			$('#method').val('POST');

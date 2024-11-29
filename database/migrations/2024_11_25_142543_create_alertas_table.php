@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('alertas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->string('nombre')->unique();
             $table->text('descripcion');
             $table->string('tipos_alertas_id');
             $table->timestamps();

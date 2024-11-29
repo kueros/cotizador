@@ -94,7 +94,7 @@
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#modal_form_alertas_detalles').modal('show');
-			$('.modal-title').text('Agregar aletas');
+			$('.modal-title').text('Agregar alerta');
 			$('#accion').val('add');
 			$('#form').attr('action', "{{ url('alertas') }}");
 			$('#method').val('POST');

@@ -87,7 +87,7 @@
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#modal_form').modal('show');
-			$('.modal-title').text('Agregar tipos de transacciones');
+			$('.modal-title').text('Agregar tipo de transacción');
 			$('#accion').val('add');
 			$('#form').attr('action', "{{ url('tipos_transacciones') }}");
 			$('#method').val('POST');

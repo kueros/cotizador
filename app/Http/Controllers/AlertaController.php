@@ -84,30 +84,38 @@ class AlertaController extends Controller
 	 *******************************************************************************************************************************/
 	public function ajax_store(Request $request, MyController $myController)
 	{
-		#dd($request->all());
-		// Validar los datos del usuario
+		// Limpia el campo nombre
+		$request->merge([
+			'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
+		]);
+		// Validar los datos
 		$validatedData = Validator::make($request->all(), [
-			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
-				Rule::unique('alertas', 'nombre'),
+			'nombre' => [
+				'required',
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
+				Rule::unique('alertas', 'nombre'), // Asegura la unicidad
+			],
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
 			'funciones_id' => 'required|exists:funciones,id',
-			], [
+		], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
 			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
 			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
 		]);
-		#dd($validatedData);
+		// Si la validación falla
 		if ($validatedData->fails()) {
-			$response = [
+			return response()->json([
 				'status' => 0,
-				'message' => 'error en validacion',
+				'message' => 'Error de Ingreso de Datos',
 				'errors' => $validatedData->errors()
-			];
-			return response()->json($response);
+			]);
 		}
-
+		
 		$validated = $validatedData->validated(); // Obtiene los datos validados como array
 		#$inserted_id = Alerta::create($validated);
 
@@ -130,10 +138,10 @@ class AlertaController extends Controller
 		$username = Auth::user()->username;
 		$message = "$username creó una nueva alerta: $validated[nombre]";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-	
-			$response = [
-			'status' => 0,
-			'message' => $validatedData->errors()
+	#dd($validatedData->errors());
+		$response = [
+		'status' => 0,
+		'message' => $validatedData->errors()
 		];
 	// Respuesta exitosa
 		$response = [
@@ -155,7 +163,6 @@ class AlertaController extends Controller
 			'alertas_detalles' => $alertasDetalles,
 			'funciones' => Funcion::all(), // Todas las funciones disponibles
 		]);
-		#dd($alertasDetalles,$id);
 		return $response;
 	}
 

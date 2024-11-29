@@ -97,7 +97,7 @@
 			$('.help-block').empty();
 			$('#modal_form_alertas').modal('show');
 			//$('#modal_form').modal('show');
-			$('.modal-title').text('Agregar alertas');
+			$('.modal-title').text('Agregar alerta');
 			$('#accion').val('add');
 			$('#form').attr('action', "{{ url('alertas') }}");
 			$('#method').val('POST');
@@ -132,69 +132,57 @@
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		 function guardar_datos() 
-		 {
+		function guardar_datos() {
 			let form_data = $('#form').serializeArray();
-			//console.log('Contenido de form_data (JSON):', JSON.stringify(form_data, null, 2));
-			console.log('accion: ', $('#accion').val());
 			let url_guarda_datos = "{{ url('alertas/ajax_store') }}";
-			//let url_guarda_datos = "{{ url('alertasIndex') }}";
 			let type_guarda_datos = "POST";
 
 			if ($('#accion').val() != "add") {
-				console.log('form_data: ', form_data);
 				let alertasIdValue = form_data.find(item => item.name == 'alertas_id')?.value;
-				console.log('alertasIdValue: ', alertasIdValue);
 				url_guarda_datos = "{{ url('alertasUpdate') }}" + "/" + alertasIdValue;
 				type_guarda_datos = "PUT";
 				form_data.push({ name: '_method', value: 'PUT' });
-				console.log('url_guarda_datos: ', url_guarda_datos);
 			}
 
 			show_loading();
 			$.ajax({
 				url: url_guarda_datos,
 				type: type_guarda_datos,
-				data: $.param(form_data), 
+				data: $.param(form_data),
 				dataType: "JSON",
 				headers: {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				},
 				success: function(data) {
 					hide_loading();
-					if (data.status == 0) {
-						let errorMessage = data.message + "</br>";
-						mostrarErroresPorFila(data.errors);
-						if (data.errors && Object.keys(data.errors).length > 0) {
-							// Recorre cada campo y sus mensajes de error
+					if (data.status === 0) {
+						let errorMessage = data.message + "<br/>";
+						if (data.errors) {
 							for (let field in data.errors) {
 								if (data.errors.hasOwnProperty(field)) {
-									errorMessage += `${field}: ${data.errors[field].join(", ")}</br>`;
+									errorMessage += `${field}: ${data.errors[field].join(", ")}<br/>`;
 								}
 							}
-						} else {
-							errorMessage += "No se encontraron errores específicos para los campos.";
 						}
-
 						swal.fire("Aviso", errorMessage, "warning");
-						return false;
 					} else {
 						swal.fire({
 							title: "Aviso",
 							text: data.message,
 							icon: "success"
 						}).then(() => {
-							// Recargar la tabla DataTables al cerrar el modal de éxito
-							location.reload();
+							$('#modal_form_alertas').modal('hide');
+							reload_table();
 						});
 					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					show_ajax_error_message(jqXHR, textStatus, errorThrown);
+					hide_loading();
+					swal.fire("Error", "Ocurrió un problema en la solicitud. Intenta nuevamente.", "error");
+					console.error(jqXHR.responseText);
 				}
 			});
 		}
-
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
@@ -219,16 +207,16 @@
 
 			funcionesId.forEach((funcion, index) => {
 				if (!funcion.value || funcion.value === "0") {
-					errores.push(`La fila ${index + 1} necesita un valor válido en 'Función ID'.`);
+					errores.push(`Debe elegir un valor válido en 'Función'.`);
 				}
 			});
 
 			fechasDesde.forEach((fecha, index) => {
-				if (!fecha.value) errores.push(`La fila ${index + 1} necesita una 'Fecha Desde'.`);
+				if (!fecha.value) errores.push(`Debe elegir un valor válido en 'Fecha Desde'.`);
 			});
 
 			fechasHasta.forEach((fecha, index) => {
-				if (!fecha.value) errores.push(`La fila ${index + 1} necesita una 'Fecha Hasta'.`);
+				if (!fecha.value) errores.push(`Debe elegir un valor válido en 'Fecha Hasta'.`);
 				else if (new Date(fechasDesde[index].value) > new Date(fecha.value)) {
 					errores.push(`En la fila ${index + 1}, 'Fecha Hasta' debe ser mayor o igual a 'Fecha Desde'.`);
 				}
@@ -367,7 +355,7 @@
 								<path d="M8 4v8m4-4H4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 							</svg> {{ __('Agregar Alerta') }}
 						</button>
-						<a class="btn btn-primary" href="{{ route('alertas_tipos') }}" title="Detalle Alerta">{{ __('Administrar Tipos de Alertas') }}</a>
+						<a class="btn btn-primary" href="{{ route('alertas_tipos') }}" title="Detalle Alerta">{{ __('Administrar Tipos de Alerta') }}</a>
 					</div>
 
 					<table id="alertas_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -435,7 +423,7 @@
 						<table class="table table-bordered" id="detalles_alertas" style="margin-top:15px; margin-bottom:15px;">
 							<thead>
 								<tr>
-									<th>Función ID</th>
+									<th>Función</th>
 									<th>Fecha Desde</th>
 									<th>Fecha Hasta</th>
 									<th>Acciones</th>
@@ -473,21 +461,14 @@
 				type: "GET",
 				dataType: "JSON",
 				success: function(response) {
-					//$('#form [name="id"]').val(response.alerta.id);
 					$('#form [name="nombre"]').val(response.alertas.nombre);
 					$('#form [name="descripcion"]').val(response.alertas.descripcion);
 					$('#form [name="tipos_alertas_id"]').val(response.alertas.tipos_alertas_id);
-
 					// Mostrar la modal
 					$('#modal_form_alertas').modal('show');
 					$('.modal-title').text('Editar Alerta');
-					//$('#form').attr('action', "{{ url('alertas') }}" + "/" + id);
-					//$('#method').val('PUT');
-
 					// Limpiar la tabla de detalles antes de llenarla
 					$('#detalles_alertas tbody').empty();
-					//console.log('funciones ' + response.funciones.length);
-
 					// Asignar los datos de detalles_alertas
 					if (response.alertas_detalles.length > 0) {
 						response.alertas_detalles.forEach(function(detalle) {

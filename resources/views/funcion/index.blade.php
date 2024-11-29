@@ -69,7 +69,7 @@
 				$('.form-group').removeClass('has-error');
 				$('.help-block').empty();
 				$('#modal_form_add').modal('show');
-				$('.modal-title').text('Agregar funciones');
+				$('.modal-title').text('Agregar función');
 				$('#accion').val('add');
 				$('#form_add').attr('action', "{{ url('funciones') }}");
 				$('#method').val('POST');
@@ -494,7 +494,7 @@ clearDynamicFields();
 				<div class="table-responsive">
 					<div class="float-right">
 						<button id="agregar" class="btn btn-success" onclick="add_funcion()">
-							<i class="bi bi-plus"></i> {{ __('Agregar funcion') }}
+							<i class="bi bi-plus"></i> {{ __('Agregar función') }}
 						</button>
 					</div>
 					<br>

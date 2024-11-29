@@ -140,7 +140,7 @@
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#modal_form_parametro').modal('show');
-			$('.modal-title_parametro').text('Agregar parametro');
+			$('.modal-title_parametro').text('Agregar parámetro');
 			$('#accion_parametro').val('add');
 		}
 
@@ -300,7 +300,7 @@
 										Para conocer las configuraciones disponibles de la libreria siga <a class="alert-link" target="_blank" href="#">este enlace</a> y baje hasta la sección con el título "Email Preferences"
 									</div>
 									<button type="button" class="btn btn-success" onclick="add_parametro()">
-										Agregar parametro
+										Agregar parámetro
 									</button>
 									<br>
 									<br>

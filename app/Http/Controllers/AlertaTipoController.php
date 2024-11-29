@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+
 
 class AlertaTipoController extends Controller
 {
@@ -65,49 +67,51 @@ class AlertaTipoController extends Controller
 	 *******************************************************************************************************************************/
 	public function ajax_store(Request $request, MyController $myController)
 	{
-		#dd($request->all());
-		// Validar los datos del usuario
+		// Limpia el campo nombre
+		$request->merge([
+			'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
+		]);
+		// Reglas de validación
 		$validatedData = Validator::make($request->all(), [
-			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
-				Rule::unique('alertas_tipos', 'nombre'),
-			], [
-			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
-			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
+			'nombre' => [
+				'required',
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[a-zA-Z\s]+$/', // Solo letras y espacios
+				Rule::unique('tipos_alertas', 'nombre') // Verifica la unicidad en la tabla
+			],
+		], [
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+			'nombre.unique' => 'Este nombre de tipo de alerta ya está en uso.',
 		]);
-		#dd($validatedData);
-		// Verificar si la validación falla
+	
+		// Si la validación falla
 		if ($validatedData->fails()) {
-			$response = [
+			return response()->json([
 				'status' => 0,
-				'message' => 'error en validacion',
+				'message' => 'Error de Ingreso de Datos',
 				'errors' => $validatedData->errors()
-			];
-			return response()->json($response);
+			]);
 		}
-
-		$validated = $validatedData->validated(); // Obtiene los datos validados como array
-		#$inserted_id = Alerta::create($validated);
-
+	
+		// Crear el registro
 		$alerta = TipoAlerta::create([
-			'nombre' => $validated['nombre'],
+			'nombre' => $request->input('nombre'),
 		]);
+	
 		// Loguear la acción
 		$clientIP = $request->ip();
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
-		$message = "$username creó un nuevo tipo de alerta: $validated[nombre]";
+		$message = "$username creó un nuevo tipo de alerta: {$alerta->nombre}";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 	
-			$response = [
-			'status' => 0,
-			'message' => $validatedData->errors()
-		];
-	// Respuesta exitosa
-		$response = [
+		// Respuesta exitosa
+		return response()->json([
 			'status' => 1,
 			'message' => 'Tipo de Alerta creado correctamente.'
-		];
-		return response()->json($response);
+		]);
 	}
 
 
@@ -154,21 +158,32 @@ class AlertaTipoController extends Controller
 
 	/*******************************************************************************************************************************
 	*******************************************************************************************************************************/
-	public function ajax_delete($id, MyController $myController){
-/*         $permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
-		if (!$permiso_eliminar_roles) {
-			return response()->json(["error"=>"No tienes permiso para realizar esta acción, contáctese con un administrador."], "405");
-		}
-*/
+	public function ajax_delete($id, MyController $myController) {
+		// Validar si existe el tipo de alerta
 		$alerta_tipo = TipoAlerta::find($id);
+		if (!$alerta_tipo) {
+			return response()->json(["error" => "El tipo de alerta no existe."], 404);
+		}
+	
+		// Verificar si el tipo de alerta está siendo usado en la tabla alertas
+		$usado = Alerta::where('tipos_alertas_id', $id)->exists();
+		if ($usado) {
+			return response()->json([
+				"error" => "No se puede eliminar el tipo de alerta porque está siendo usado en la tabla alertas."
+			], 400);
+		}
+	
+		// Datos para el log
 		$nombre = $alerta_tipo->nombre;
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
 		$message = $username . " borró el tipo de alerta " . $nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-
+	
+		// Eliminar el tipo de alerta
 		$alerta_tipo->delete();
-		return response()->json(["status"=>true]);
-    }
+	
+		return response()->json(["status" => true]);
+	}
 }

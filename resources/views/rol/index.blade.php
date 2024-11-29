@@ -76,7 +76,7 @@
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			$('#modal_form').modal('show');
-			$('.modal-title').text('Agregar roles');
+			$('.modal-title').text('Agregar rol');
 			$('#accion').val('add');
 			$('#form').attr('action', "{{ url('roles') }}");
     		$('#method').val('POST');
