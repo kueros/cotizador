@@ -180,7 +180,6 @@ class AlertaController extends Controller
 	
 	
 		// Validación de los datos
-		#$validatedData = $request->validate([
 		$validatedData = Validator::make($request->all(), [
 			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
 			Rule::unique('alertas', 'nombre'),
@@ -214,15 +213,6 @@ class AlertaController extends Controller
 			'descripcion' => $validated['descripcion'],
 			'tipos_alertas_id' => $validated['tipos_alertas_id'],
 		]);
-
-/* 		$alerta = Alerta::update([
-			'nombre' => $validatedData['nombre'],
-			'descripcion' => $validatedData['descripcion'],
-			'tipos_alertas_id' => $validatedData['tipos_alertas_id'],
-		]);
- */#	dd($validated['funciones_id']);
-		#dd($request->alertas_id[0]);
-
 		DB::table('detalles_alertas')
 		->updateOrInsert(
 			['alertas_id' => $request->alertas_id],
@@ -230,38 +220,17 @@ class AlertaController extends Controller
 			'fecha_desde' => $request['fecha_desde'][0] ?? null,
 			'fecha_hasta' => $request['fecha_hasta'][0] ?? null
 		]);
-
-/* 		$alerta_detalle_id = AlertaDetalle::where('alertas_id',$request->alertas_id)->first()['id'];
-		$alertas_id = AlertaDetalle::where('alertas_id',$request->alertas_id)->first()['alertas_id'];
-		#dd($alertas_id);
-		$updated_id = DB::table('detalles_alertas')
-		->where('id', $alerta_detalle_id)
-		->update
-		([
-			'alertas_id' => $alertas_id,
-			'funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
-			'fecha_desde' => $request['fecha_desde'][0] ?? null, // Usar el primer valor del arreglo, o null si no existe
-			'fecha_hasta' => $request['fecha_hasta'][0] ?? null, // Usar el primer valor del arreglo, o null si no existe
-		]);
- */
-
-
-
-
 		// Loguear la acción
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
 		$message = $username . " actualizó el alerta " . $request->nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-	
-		#return redirect()->route('alertasIndex')->with('success', 'alerta actualizada correctamente.');
 		$response = [
 			'status' => 1,
 			'message' => 'Alerta actualizada correctamente.'
 		];
 		return response()->json($response);
-
 	}
 
 	/*******************************************************************************************************************************

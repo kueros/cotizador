@@ -205,7 +205,7 @@ Route::middleware('auth')->group(
 	function () {
 		Route::get('/funciones', 								[FuncionController::class, 'index'])->name('funciones.index');
 		Route::post('/funciones/ajax_store', 					[FuncionController::class, 'ajax_store'])->name('funciones.ajax_store');
-		Route::put('/funciones/{id}', 							[FuncionController::class, 'update'])->name('funciones.update');
+		Route::put('/funcionesUpdate/{id}', 					[FuncionController::class, 'funcionesUpdate'])->name('funcionesUpdate');
 		Route::get('/funciones/ajax_listado', 					[FuncionController::class, 'ajax_listado'])->name('funciones.ajax_listado');
 		Route::get('/funciones/ajax_edit/{id}', 				[FuncionController::class, 'ajax_edit'])->name('funciones.ajax_edit');
 		Route::post('/funciones/ajax_delete/{id}', 				[FuncionController::class, 'ajax_delete'])->name('funciones.ajax_delete');

@@ -90,61 +90,46 @@
 					dataType: "JSON",
 					success: function(data) {
 						console.log('Respuesta completa del servidor:', data);
-						// Si data es un string, intenta convertirlo a un objeto JSON
-    if (typeof data === 'string') {
-        try {
-            data = JSON.parse(data);
-        } catch (e) {
-            console.error('Error al parsear JSON:', e);
-            return;
-        }
-    }
-
-    console.log('Tipo de data:', typeof data); // Asegúrate de que ahora es un objeto
-
-    if (data && data.formula) {
-        console.log('Tipo de data.formula:', typeof data.formula);
-        console.log('data.formula:', data.formula);
-
-        if (Array.isArray(data.formula)) {
-            data.formula.forEach(function(item) {
-                console.log(item);
-            });
-        } else {
-            console.error("La propiedad 'formula' no es un array.");
-        }
-    } else {
-        console.error("La propiedad 'formula' no existe en la respuesta.");
-    }
-
-    // Procesa los demás datos
-    $('[name="id"]').val(data.id);
-    $('[name="nombre"]').val(data.nombre);
-
-    // Limpia los campos dinámicos anteriores
-/*     const container = document.getElementById('input-container');
-    container.innerHTML = '';
- */
-clearDynamicFields();
-	 // Genera los campos dinámicos según la fórmula
-    if (Array.isArray(data.formula)) {
-        data.formula.forEach(element => {
-			console.log('element: ', element);
-            if (element.type === 'value') {
-                addOption('Valor numérico', element.value);
-            } else if (element.type === 'operator') {
-                addOption('Operador', element.value);
-            } else {
-                addOption('Campo estático', element.value);
-            }
-        });
-    }
-
-    $('#modal_form_add').modal('show');
-    $('.modal-title').text('Editar función');
-    $('#form').attr('action', "{{ url('funciones') }}" + "/" + id);
-    $('#method').val('PUT');
-},
+						if (typeof data === 'string') {
+							try {
+								data = JSON.parse(data);
+							} catch (e) {
+								console.error('Error al parsear JSON:', e);
+								return;
+							}
+						}
+						if (data && data.formula) {
+							if (Array.isArray(data.formula)) {
+								data.formula.forEach(function(item) {
+									console.log(item);
+								});
+							} else {
+								console.error("La propiedad 'formula' no es un array.");
+							}
+						} else {
+							console.error("La propiedad 'formula' no existe en la respuesta.");
+						}
+						$('[name="id"]').val(data.id);
+						$('[name="nombre"]').val(data.nombre);
+						clearDynamicFields();
+						// Genera los campos dinámicos según la fórmula
+						if (Array.isArray(data.formula)) {
+							data.formula.forEach(element => {
+								console.log('element: ', element);
+								if (element.type === 'value') {
+									addOption('Valor numérico', element.value);
+								} else if (element.type === 'operator') {
+									addOption('Operador', element.value);
+								} else {
+									addOption('Campo estático', element.value);
+								}
+							});
+						}
+						$('#modal_form_add').modal('show');
+						$('.modal-title').text('Editar función');
+						$('#form').attr('action', "{{ url('funciones') }}" + "/" + id);
+						$('#method').val('PUT');
+					},
 					error: function(jqXHR, textStatus, errorThrown) {
 						show_ajax_error_message(jqXHR, textStatus, errorThrown);
 					}
@@ -185,27 +170,17 @@ clearDynamicFields();
 			function guardar_datos() 
 			{
 				if (!cargarFormula()) {
-					console.log('añsdkjfañdkfjañdkjfañdkfjañdkfjañldkfjañdkjf')
 					return false;
 				}
 				let form_data = $('#form_add').serializeArray();
-				console.log('Contenido de form_data (JSON):', JSON.stringify(form_data, null, 2));
-				console.log('accion: ', $('#accion').val());
 				let url_guarda_datos = "{{ url('funciones/ajax_store') }}";
-				//let url_guarda_datos = "{{ url('alertasIndex') }}";
 				let type_guarda_datos = "POST";
 
 				if ($('#accion').val() != "add") {
-					console.log('form_data: ', form_data);
-/* 					let alertasIdValue = form_data.find(item => item.name == 'alertas_id')?.value;
-					console.log('alertasIdValue: ', alertasIdValue);
-*/
 					url_guarda_datos = "{{ url('funcionesUpdate') }}" + "/" + 2;
 					type_guarda_datos = "PUT";
 					form_data.push({ name: '_method', value: 'PUT' });
-					console.log('url_guarda_datos: ', url_guarda_datos);
 				}
-
 				show_loading();
 				$.ajax({
 					url: url_guarda_datos,
@@ -216,35 +191,29 @@ clearDynamicFields();
 						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 					},
 					success: function(data) {
-						hide_loading();
-						if (data.status == 0) {
-							let errorMessage = data.message + "</br>";
-							mostrarErroresPorFila(data.errors);
-							if (data.errors && Object.keys(data.errors).length > 0) {
-								// Recorre cada campo y sus mensajes de error
-								for (let field in data.errors) {
-									if (data.errors.hasOwnProperty(field)) {
-										errorMessage += `${field}: ${data.errors[field].join(", ")}</br>`;
-									}
+					hide_loading();
+					if (data.status === 0) {
+						let errorMessage = data.message + "<br/>";
+						if (data.errors) {
+							for (let field in data.errors) {
+								if (data.errors.hasOwnProperty(field)) {
+									errorMessage += `${field}: ${data.errors[field].join(", ")}<br/>`;
 								}
-							} else {
-								errorMessage += "No se encontraron errores específicos para los campos.";
 							}
-
-							swal.fire("Aviso", errorMessage, "warning");
-							return false;
-						} else {
-							swal.fire({
-								title: "Aviso",
-								text: data.message,
-								icon: "success"
-							}).then(() => {
-								// Recargar la tabla DataTables al cerrar el modal de éxito
-								location.reload();
-							});
 						}
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
+						swal.fire("Aviso", errorMessage, "warning");
+					} else {
+						swal.fire({
+							title: "Aviso",
+							text: data.message,
+							icon: "success"
+						}).then(() => {
+							$('#modal_form_alertas').modal('hide');
+							reload_table();
+						});
+					}
+				},
+ 					error: function(jqXHR, textStatus, errorThrown) {
 						show_ajax_error_message(jqXHR, textStatus, errorThrown);
 					}
 				});
@@ -317,6 +286,10 @@ clearDynamicFields();
 					newInput.type = 'text';
 					newInput.value = defaultValue; // Asigna el valor predeterminado
 					newInput.readOnly = true; // Solo lectura para operadores
+				} else if (optionText === 'Condición') {
+					newInput.type = 'text';
+					newInput.value = defaultValue; // Asigna el valor predeterminado
+					newInput.readOnly = true; // Solo lectura para operadores
 				} else {
 					newInput.type = 'text';
 					newInput.value = defaultValue; // Asigna el valor predeterminado
@@ -353,6 +326,43 @@ clearDynamicFields();
 					dropdownMenu.setAttribute('aria-labelledby', dropdownButton.id);
 
 					const operators = ['+', '-', '*', '/'];
+					operators.forEach(op => {
+						const li = document.createElement('li');
+						const button = document.createElement('button');
+						button.className = 'dropdown-item';
+						button.type = 'button';
+						button.innerText = op;
+						button.onclick = () => {
+							newInput.value = op;
+							operatorDropdown.style.display = 'none';
+							formulaElements.push({ type: 'operator', value: op });
+						};
+						li.appendChild(button);
+						dropdownMenu.appendChild(li);
+					});
+
+					operatorDropdown.appendChild(dropdownButton);
+					operatorDropdown.appendChild(dropdownMenu);
+
+					wrapper.appendChild(operatorDropdown);
+				} else if (optionText === 'Condición') {
+					newInput.setAttribute('readonly', true);
+					newInput.type = 'text';
+					const operatorDropdown = document.createElement('div');
+					operatorDropdown.className = 'dropdown ms-2';
+
+					const dropdownButton = document.createElement('button');
+					dropdownButton.className = 'btn btn-primary dropdown-toggle';
+					dropdownButton.type = 'button';
+					dropdownButton.id = `dropdownOperator-${Date.now()}`;
+					dropdownButton.setAttribute('data-bs-toggle', 'dropdown');
+					dropdownButton.innerText = 'Seleccionar condición';
+
+					const dropdownMenu = document.createElement('ul');
+					dropdownMenu.className = 'dropdown-menu';
+					dropdownMenu.setAttribute('aria-labelledby', dropdownButton.id);
+
+					const operators = ['=', '<', '>', 'SI', 'AND', 'OR', 'NOT', '<=', '>=', '!='];
 					operators.forEach(op => {
 						const li = document.createElement('li');
 						const button = document.createElement('button');

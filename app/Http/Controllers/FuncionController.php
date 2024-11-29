@@ -66,8 +66,6 @@ class FuncionController extends Controller
 	*******************************************************************************************************************************/
 	public function ajax_store(Request $request, MyController $myController)
     {
-		#dd($request->all());
-		#dd($request->input('nombre'));
 	/*     $permiso_agregar_funciones = $myController->tiene_permiso('add_funcion');
 		if (!$permiso_agregar_funciones) {
 			abort(403, '.');
@@ -75,34 +73,44 @@ class FuncionController extends Controller
 		}
 	*/
 
-	// Validar los datos del usuario
-		$validatedData = $request->validate([
+		// Validar los datos del usuario manualmente
+		$validator = \Validator::make($request->all(), [
 			'nombre' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/|unique:funciones,nombre',
-			'formula' => 'required', 
+			'formula' => 'required',
 		], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-			'nombre.unique' => 'Este nombre de funcion ya está en uso.',
-			'nombre.required' => 'El nombre de la funcion es requerido.',
-			'formula.required' => 'La formula de la funcion es requerida.',
+			'nombre.unique' => 'Este nombre de función ya está en uso.',
+			'nombre.required' => 'El nombre de la función es requerido.',
+			'formula.required' => 'La fórmula de la función es requerida.',
 		]);
-#dd($validatedData);
+	
+		// Si la validación falla, devolver errores
+		if ($validator->fails()) {
+			return response()->json([
+				'status' => 0,
+				'message' => 'Error de ingreso de datos',
+				'errors' => $validator->errors()
+			]);
+		}
+	
+		// Crear la función si la validación es exitosa
+		$validatedData = $validator->validated();
 		$campo = funcion::create($validatedData);
 		$campo->formula = $validatedData['formula'];
 		$campo->save();
-
+	
+		// Loguear la acción
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " creó la funcion " . $request->input('nombre');
+		$message = $username . " creó la función " . $request->input('nombre');
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-
+	
 		// Respuesta exitosa
-		$response = [
+		return response()->json([
 			'status' => 1,
 			'message' => 'Función creada correctamente.'
-		];
-		#dd($response);
-		return response()->json($response);
+		]);
 	}
 
 	/*******************************************************************************************************************************
@@ -130,7 +138,7 @@ class FuncionController extends Controller
 
     /*******************************************************************************************************************************
 	*******************************************************************************************************************************/
-	public function funcionesupdate(Request $request, Funcion $funcion, MyController $myController): RedirectResponse
+	public function funcionesUpdate(Request $request, Funcion $funcion, MyController $myController)
 	{
 		#dd($request->all());
 /* 		$permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
@@ -139,26 +147,45 @@ class FuncionController extends Controller
 			return false;
 		}
 */
-		// Validar los datos
-		$validatedData = $request->validate([
-			'nombre' => 'required|string|max:255',
-		]);
+		// Validación de los datos
+		$validatedData = Validator::make($request->all(), [
+			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
+			Rule::unique('alertas', 'nombre'),
+			'formula' => 'required|string|max:255',
+			], [
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
+			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
+			'formula.required' => 'Este campo no puede quedar vacío.',
+		]);	
+		if ($validatedData->fails()) {
+			$response = [
+				'status' => 0,
+				'message' => 'error en validacion',
+				'errors' => $validatedData->errors()
+			];
+			return response()->json($response);
+		}
 
+		$validated = $validatedData->validated(); // Obtiene los datos validados como array
 		// Obtener el modelo
-		$funcion = Funcion::findOrFail($request->id);
-
-		// Actualizar el modelo con los datos validados
-		$funcion->update($validatedData);
+		$funciones_id = Funcion::where('id',$request->id)->first()['id'];
+		$updated_id = DB::table('funciones')
+		->where('id', $funciones_id)
+		->update
+		([
+			'nombre' => $validated['nombre'],
+			'formula' => $validated['formula'],
+		]);
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
 		$message = $username . " actualizó la función " . $request->nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-
-		return redirect()->route('funciones.index')->with('success', 'Función actualizado correctamente.');
-
-		#return Redirect::route('funciones.index')
-		#	->with('success', 'Función editada con éxito.');
+		$response = [
+			'status' => 1,
+			'message' => 'Función actualizada correctamente.'
+		];
+		return response()->json($response);
 	}
 
 	/*******************************************************************************************************************************

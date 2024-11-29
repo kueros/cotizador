@@ -143,7 +143,6 @@
 				type_guarda_datos = "PUT";
 				form_data.push({ name: '_method', value: 'PUT' });
 			}
-
 			show_loading();
 			$.ajax({
 				url: url_guarda_datos,
