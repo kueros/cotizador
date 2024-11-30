@@ -244,13 +244,14 @@ class AlertaController extends Controller
 		}
 */
 		$alerta = Alerta::find($id);
-		$nombre = $alerta->nombre;
+		$alertas_detalles = AlertaDetalle::where('alertas_id', $alerta->id)->first();
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " borró el alerta " . $nombre;
+		$message = $username . " borró el alerta " . $alerta->nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
+		$alertas_detalles->delete();
 		$alerta->delete();
 		return response()->json(["status"=>true]);
     }

@@ -22,18 +22,36 @@ class AlertaDetalleController extends Controller
 	*******************************************************************************************************************************/
 	public function index($id, Request $request, MyController $myController): View
 	{
-        $funciones = Funcion::all();
+		#dd($request);
+		$funciones = Funcion::all()->keyBy('id'); // Indexar por ID para un acceso rápido
 		$alertas_nombre = Alerta::where('id', $id)->first()['nombre'];
-		$detalles_alertas = 
-							AlertaDetalle::
-								leftJoin('funciones', 'detalles_alertas.funciones_id', '=', 'funciones.id')->
-								select( 'funciones.nombre as nombre_funcion', 'detalles_alertas.*')->
-								where('alertas_id', $id)->
-								orderBy('nombre', 'asc')->
-								paginate();
-		#dd($detalles_alertas);
-		return view('alertas_detalles.index', compact('detalles_alertas', 'id', 'funciones', 'alertas_nombre'))
-			->with('i', ($request->input('page', 1) - 1) * $detalles_alertas->perPage());
+	
+		// Obtener los detalles de las alertas
+		$alertas_detalles = AlertaDetalle::where('alertas_id', $id)->get();
+	
+		// Transformar los detalles
+		$detalles = $alertas_detalles->flatMap(function ($detalle) use ($funciones) {
+			$funcionesIds = explode(',', $detalle->funciones_id);
+			$fechasDesde = explode(',', $detalle->fecha_desde);
+			$fechasHasta = explode(',', $detalle->fecha_hasta);
+	
+			$rows = [];
+			foreach ($funcionesIds as $index => $funcionId) {
+				$nombreFuncion = $funciones[$funcionId]->nombre ?? null; // Obtener nombre de la función
+				$rows[] = [
+					'nombre_funcion' => $nombreFuncion,
+					'alertas_id' => $detalle->alertas_id,
+					'fecha_desde' => $fechasDesde[$index] ?? null,
+					'fecha_hasta' => $fechasHasta[$index] ?? null,
+					'created_at' => $detalle->created_at,
+					'updated_at' => $detalle->updated_at,
+				];
+			}
+			return $rows;
+		})->toArray();
+	#dd($detalles);
+		return view('alertas_detalles.index', compact('detalles', 'id', 'funciones', 'alertas_nombre'))
+			->with('i', ($request->input('page', 1) - 1) * $alertas_detalles->count());
 	}
 
 
@@ -41,80 +59,50 @@ class AlertaDetalleController extends Controller
 	*******************************************************************************************************************************/
 	public function ajax_listado(Request $request)
 	{
-		#dd($request);
+		#dd($request->alertas_id);
 		$alertas_id = $request->input('alertas_id');
-		$detalles_alertas = 
-							AlertaDetalle::
-								leftJoin('funciones', 'detalles_alertas.funciones_id', '=', 'funciones.id')->
-								select( 'funciones.nombre as nombre_funcion', 'detalles_alertas.*')->
-								where('alertas_id', $alertas_id)->
-								orderBy('nombre', 'asc')->
-								get();
-		#dd($detalles_alertas['nombre_funcion']);
-		#dd($detalles_alertas);
-
-
-		$datos = $detalles_alertas->map(function ($detalle) {
-			return [
-  				'funciones_id' => explode(',', $detalle->funciones_id),
-				'fecha_desde' => explode(',', $detalle->fecha_desde),
-				'fecha_hasta' => explode(',', $detalle->fecha_hasta),
-			];
-		})->toArray();
-		
-		
-		
-		$detalles = $detalles_alertas->map(function ($detalle) {
-			// Separar los valores de los campos con comas
-			$funciones = explode(',', $detalle->funciones_id);
+		if (!$alertas_id) {
+			return response()->json(['error' => 'El ID de la alerta es requerido'], 400);
+		}
+		#dd($alertas_id);	
+		$funciones = Funcion::all()->keyBy('id'); // Indexar por ID para un acceso rápido
+		$alertas_nombre = Alerta::where('id', $alertas_id)->first()['nombre'];
+	
+		// Obtener los detalles de las alertas
+		$alertas_detalles = AlertaDetalle::where('alertas_id', $alertas_id)->get();
+		if ($alertas_detalles->isEmpty()) {
+			return response()->json(['data' => [], 'recordsTotal' => 0, 'recordsFiltered' => 0]);
+		}		
+	
+		// Transformar los detalles
+		$detalles = $alertas_detalles->flatMap(function ($detalle) use ($funciones) {
+			$funcionesIds = explode(',', $detalle->funciones_id);
 			$fechasDesde = explode(',', $detalle->fecha_desde);
 			$fechasHasta = explode(',', $detalle->fecha_hasta);
-		
-			// Construir filas para cada elemento
+	
 			$rows = [];
-			for ($i = 0; $i < count($funciones); $i++) {
+			foreach ($funcionesIds as $index => $funcionId) {
+				$nombreFuncion = $funciones[$funcionId]->nombre ?? null; // Obtener nombre de la función
 				$rows[] = [
-					$detalle->nombre_funcion, // Nombre de la función
-					$fechasDesde[$i] ?? null, // Fecha desde
-					$fechasHasta[$i] ?? null, // Fecha hasta
+					'nombre_funcion' => $nombreFuncion,
+					'alertas_id' => $detalle->alertas_id,
+					'fecha_desde' => $fechasDesde[$index] ?? null,
+					'fecha_hasta' => $fechasHasta[$index] ?? null,
+					'created_at' => $detalle->created_at,
+					'updated_at' => $detalle->updated_at,
 				];
 			}
 			return $rows;
-		})->flatten(1)->toArray();
-		
-/* 		// Resultado final
-		return view('tu.vista', compact('detalles'));		
- */		
-		
+		})->toArray();
 		
 		#dd($detalles);
 
-/* 
-		$data = array();
-		for ($i = 0; $i < count($funciones); $i++) {
-			$accion = "";
-			#$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_alertas_detalles('."'".$r->id.
-			#		"'".')"><i class="bi bi-pencil-fill"></i></a>';
-
-			#$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_alertas_detalles('."'".$r->id.
-			#		"'".')"><i class="bi bi-trash"></i></a>';
-			$data[] = [
-				'funcion_id' => $funciones[$i],
-				'fecha_desde' => $fechasDesde[$i],
-				'fecha_hasta' => $fechasHasta[$i],
-			];
-		}
- */
-
-
-
 
 		$output = array(
-			"recordsTotal" => $detalles_alertas->count(),
-			"recordsFiltered" => $detalles_alertas->count(),
+			"recordsTotal" => count($detalles),
+			"recordsFiltered" => count($detalles),
 			"data" => $detalles
 		);
-
 		return response()->json($output);
 	}
 

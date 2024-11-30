@@ -23,20 +23,27 @@
 
 		jQuery(document).ready(function($) {
 			table = $('#detalles_alertas_table').DataTable({
-				"ajax": {
+				processing: true,
+				serverSide: true,
+ 				ajax: {
 					url: "{{ url('alertas_detalles/ajax_listado') }}",
 					type: 'GET',
-					data: function(d) { // Agrega parámetros adicionales a la solicitud
+ 					data: function(d) {
 						d.alertas_id = alertas_id;
-        			}
+					}
 				},
+				columns: [
+					{ data: 'nombre_funcion', title: 'Función' },
+					{ data: 'fecha_desde', title: 'Fecha Desde' },
+					{ data: 'fecha_hasta', title: 'Fecha Hasta' }
+				],
 				language: traduccion_datatable,
 				//dom: 'Bfrtip',
 				columnDefs: [{
 					"targets": 'no-sort',
 					"orderable": false
 				}],
-				layout: {
+ 				layout: {
 					topStart: {
 						buttons: [{
 								"extend": 'pdf',
@@ -112,7 +119,8 @@
 				url: "{{ route('alertas_detalles.ajax_edit', ':id') }}".replace(':id', id),
 				type: "GET",
 				dataType: "JSON",
-				success: function(data) {
+				success: function(detalles) {
+					console.log('data :',data);
 					$('[name="id"]').val(data.id);
 					$('[name="funciones_id"]').val(data.funciones_id);
 					$('[name="fecha_desde"]').val(data.fecha_desde);
@@ -217,7 +225,7 @@
 
 
 	</script>
-
+<?php #dd($detalles); ?>
 	<!--LISTADO-->
 	<div class="container">
 		<div class="row">
