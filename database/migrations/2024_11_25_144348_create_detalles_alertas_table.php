@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('alertas_id');
             $table->string('funciones_id');
-            $table->date('fecha_desde');
-            $table->date('fecha_hasta');
+            $table->string('fecha_desde');
+            $table->string('fecha_hasta');
             $table->timestamps();
         });
     }
