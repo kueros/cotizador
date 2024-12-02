@@ -203,14 +203,36 @@
 			if (!tbody || tbody.children.length === 0) {
 				errores.push("La tabla 'Detalles de la Alerta' debe tener al menos una fila de datos.");
 			}
+			// Verificar si el tbody de la tabla tiene al menos un hijo
+			let tbody = document.querySelector('#detalles_alertas tbody');
+			if (!tbody || tbody.children.length === 0) {
+				errores.push("La tabla 'Detalles de la Alerta' debe tener al menos una fila de datos.");
+			}
 
+			if (!nombre) errores.push("El campo 'Nombre' es obligatorio.");
+			if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
+			if (!tiposAlertasId || tiposAlertasId === "0") errores.push("Seleccione un 'Tipo de Alerta'.");
 			if (!nombre) errores.push("El campo 'Nombre' es obligatorio.");
 			if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
 			if (!tiposAlertasId || tiposAlertasId === "0") errores.push("Seleccione un 'Tipo de Alerta'.");
 
 			// Bandera para errores en la fila
 			let filaError = false;
+			// Bandera para errores en la fila
+			let filaError = false;
 
+			// Validar duplicados en funciones_id
+			let funcionesIdsVistos = new Set();
+			funcionesId.forEach((funcion, index) => {
+				let valor = funcion.value;
+				if (!valor || valor === "0") {
+					filaError = true;
+				} else if (funcionesIdsVistos.has(valor)) {
+					errores.push(`El valor de 'Función' en la fila ${index + 1} está duplicado.`);
+				} else {
+					funcionesIdsVistos.add(valor);
+				}
+			});
 			// Validar duplicados en funciones_id
 			let funcionesIdsVistos = new Set();
 			funcionesId.forEach((funcion, index) => {
@@ -242,11 +264,18 @@
 					errores.push(`En la fila ${index + 1}, 'Fecha Hasta' debe ser mayor o igual a 'Fecha Desde'.`);
 				}
 			});
+			fechasHasta.forEach((fecha, index) => {
+				if (!fecha.value) {
+					filaError = true;
+				} else if (new Date(fechasDesde[index].value) > new Date(fecha.value)) {
+					errores.push(`En la fila ${index + 1}, 'Fecha Hasta' debe ser mayor o igual a 'Fecha Desde'.`);
+				}
+			});
 
 			if (filaError) {
 				errores.push("Debe completar todas las filas de la tabla correctamente.");
 			}
-			console.log('errores: ', errores);
+
 			if (errores.length > 0) {
 				swal.fire("Aviso", "Errores:\n" + errores.join("\n"), "warning");
 				return false;
@@ -381,6 +410,7 @@
 							</svg> {{ __('Agregar Alerta') }}
 						</button>
 						<a class="btn btn-primary" href="{{ route('alertas_tipos') }}" title="Detalle Alerta">{{ __('Administrar Tipos de Alerta') }}</a>
+						<a class="btn btn-primary" href="{{ route('alertas_tipos_tratamientos') }}" title="Tipos de Tratamientos">{{ __('Administrar Tipos de Tratamientos') }}</a>
 					</div>
 
 					<table id="alertas_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -388,6 +418,7 @@
 							<th>Nombre</th>
 							<th>Descripción</th>
 							<th>Tipo de alerta</th>
+							<th>Tipo de tratamiento</th>
 							<th style="width:20%;" class="no-sort">Acción</th>
 						</thead>
 						<tbody>
@@ -422,23 +453,43 @@
 							<input type="text" class="form-control" name="descripcion" required>
 						</div>
 						<div class="form-body">
-								<div class="mb-3 row">
-									<label class="col-form-label col-md-3">{{ __('Tipo de Alerta') }}</label>
-									<div class="col-md-9">
-										<select id="tipos_alertas_id" name="tipos_alertas_id" class="mt-1 block w-full form-control" required>
-											<option value="0">
-												{{ __('Elija un Tipo de Alerta') }}
-											</option>
-											@foreach($tipos_alertas as $tipo_alerta)
-											<option value="{{ $tipo_alerta->id }}">
-												{{ $tipo_alerta->nombre }}
-											</option>
-											@endforeach
-										</select>
-										<span class="help-block"></span>
-									</div>
+							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Tipo de Alerta') }}</label>
+								<div class="col-md-9">
+									<select id="tipos_alertas_id" name="tipos_alertas_id" class="mt-1 block w-full form-control" required>
+										<option value="0">
+											{{ __('Elija un Tipo de Alerta') }}
+										</option>
+										@foreach($tipos_alertas as $tipo_alerta)
+										<option value="{{ $tipo_alerta->id }}">
+											{{ $tipo_alerta->nombre }}
+										</option>
+										@endforeach
+									</select>
+									<span class="help-block"></span>
 								</div>
 							</div>
+						</div>
+
+						<div class="form-body">
+							<div class="mb-3 row">
+								<label class="col-form-label col-md-3">{{ __('Tipo de Tratamiento') }}</label>
+								<div class="col-md-9">
+									<select id="tipos_tratamientos_id" name="tipos_tratamientos_id" class="mt-1 block w-full form-control" required>
+										<option value="0">
+											{{ __('Elija un Tipo de Tratamiento') }}
+										</option>
+										@foreach($alertas_tipos_tratamientos as $alerta_tipo_tratamiento)
+										<option value="{{ $alerta_tipo_tratamiento->id }}">
+											{{ $alerta_tipo_tratamiento->nombre }}
+										</option>
+										@endforeach
+									</select>
+									<span class="help-block"></span>
+								</div>
+							</div>
+						</div>
+
 
 						<!-- Detalles de Alerta -->
 						 <div  style="margin-top:15px; margin-bottom:15px;">
@@ -489,6 +540,7 @@
 					$('#form [name="nombre"]').val(response.alertas.nombre);
 					$('#form [name="descripcion"]').val(response.alertas.descripcion);
 					$('#form [name="tipos_alertas_id"]').val(response.alertas.tipos_alertas_id);
+					$('#form [name="tipos_tratamientos_id"]').val(response.alertas.tipos_tratamientos_id);
 					// Mostrar la modal
 					$('#modal_form_alertas').modal('show');
 					$('.modal-title').text('Editar Alerta');

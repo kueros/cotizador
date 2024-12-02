@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nombre')->unique();
             $table->text('descripcion');
             $table->string('tipos_alertas_id');
+            $table->string('tipos_tratamientos_id');
             $table->timestamps();
         });
     }
