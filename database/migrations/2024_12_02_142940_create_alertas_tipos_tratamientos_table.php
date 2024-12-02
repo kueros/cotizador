@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('alerta_tipo_tratamientos', function (Blueprint $table) {
+        Schema::create('alertas_tipos_tratamientos', function (Blueprint $table) {
             $table->id();
+            $table->string('nombre');
             $table->timestamps();
         });
     }
@@ -22,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('alerta_tipo_tratamientos');
+        Schema::dropIfExists('alertas_tipos_tratamientos');
     }
 };

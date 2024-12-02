@@ -15,6 +15,7 @@ use App\Http\Controllers\FuncionController;
 use App\Http\Controllers\AlertaController;
 use App\Http\Controllers\AlertaDetalleController;
 use App\Http\Controllers\AlertaTipoController;
+use App\Http\Controllers\AlertaTipoTratamientoController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -239,11 +240,23 @@ Route::middleware('auth')->group(
 	function () {
 		Route::get('/alertas_tipos/ajax_listado', 				[AlertaTipoController::class, 'ajax_listado'])->name('alertas_tipos.ajax_listado');
 		Route::get('/alertas_tipos', 							[AlertaTipoController::class, 'index'])->name('alertas_tipos');
-		Route::post('/alertas_tipos/ajax_store/', 	[AlertaTipoController::class, 'ajax_store'])->name('alertas_tipos.ajax_store');
+		Route::post('/alertas_tipos/ajax_store/', 				[AlertaTipoController::class, 'ajax_store'])->name('alertas_tipos.ajax_store');
 		Route::get('/alertas_tipos/ajax_edit/{id}', 			[AlertaTipoController::class, 'ajax_edit'])->name('alertas_tipos.ajax_edit');
 		Route::post('/alertas_tipos/ajax_delete/{id}', 			[AlertaTipoController::class, 'ajax_delete'])->name('alertas_tipos.ajax_delete');
 		Route::post('/alertas_tipos', 							[AlertaTipoController::class, 'store'])->name('alertas_tipos.store');
 		Route::put('/alertas_tipos/{id}',						[AlertaTipoController::class, 'update'])->name('alertas_tipos.update');
+	}
+);
+
+Route::middleware('auth')->group(
+	function () {
+		Route::get('/alertas_tipos_tratamientos/ajax_listado', 				[AlertaTipoTratamientoController::class, 'ajax_listado'])->name('alertas_tipos_tratamientos.ajax_listado');
+		Route::get('/alertas_tipos_tratamientos', 							[AlertaTipoTratamientoController::class, 'index'])->name('alertas_tipos_tratamientos');
+		Route::post('/alertas_tipos_tratamientos/ajax_store/', 				[AlertaTipoTratamientoController::class, 'ajax_store'])->name('alertas_tipos_tratamientos.ajax_store');
+		Route::get('/alertas_tipos_tratamientos/ajax_edit/{id}', 			[AlertaTipoTratamientoController::class, 'ajax_edit'])->name('alertas_tipos_tratamientos.ajax_edit');
+		Route::post('/alertas_tipos_tratamientos/ajax_delete/{id}', 		[AlertaTipoTratamientoController::class, 'ajax_delete'])->name('alertas_tipos_tratamientos.ajax_delete');
+		Route::post('/alertas_tipos_tratamientos', 							[AlertaTipoTratamientoController::class, 'store'])->name('alertas_tipos_tratamientos.store');
+		Route::put('/alertas_tipos_tratamientos/{id}',						[AlertaTipoTratamientoController::class, 'update'])->name('alertas_tipos_tratamientos.update');
 	}
 );
 

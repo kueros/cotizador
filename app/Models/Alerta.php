@@ -12,6 +12,7 @@ class Alerta extends Model
         'nombre',
         'descripcion',
         'tipos_alertas_id',
+        'tipos_tratamientos_id',
     ];
 
     protected $primaryKey = 'id';

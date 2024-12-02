@@ -6,6 +6,7 @@ use App\Models\Alerta;
 use App\Models\TipoAlerta;
 use App\Models\AlertaDetalle;
 use App\Models\Funcion;
+use App\Models\AlertaTipoTratamiento;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -13,6 +14,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
+use App\Http\Controllers\AlertaTipoTratamientoController;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -31,14 +33,17 @@ class AlertaController extends Controller
  */		
 		$funciones = Funcion::all();
         $tipos_alertas = TipoAlerta::all();
+        $alertas_tipos_tratamientos = AlertaTipoTratamiento::all();
+		
         $alertas = 
             Alerta::
-                leftJoin('tipos_alertas', 'alertas.tipos_alertas_id', '=', 'tipos_alertas.id')->
-                select( 'alertas.nombre', 'alertas.*')->
+					leftJoin('tipos_alertas', 'alertas.tipos_alertas_id', '=', 'tipos_alertas.id')->
+					leftJoin('alertas_tipos_tratamientos', 'alertas.tipos_tratamientos_id', '=', 'alertas_tipos_tratamientos.id')->
+					select( 'tipos_alertas.nombre', 'alertas_tipos_tratamientos.nombre', 'alertas.*')->
                 #where('tipo_transaccion_id', $tipo_transaccion_id)->
                 #orderBy('nombre', 'asc')->
                 paginate();
-        return view('alertas.index', compact('alertas', 'tipos_alertas', 'funciones'))
+        return view('alertas.index', compact('alertas', 'tipos_alertas', 'alertas_tipos_tratamientos', 'funciones'))
 			->with('i', ($request->input('page', 1) - 1) * $alertas->perPage());
 	}
 
@@ -46,15 +51,17 @@ class AlertaController extends Controller
 	*******************************************************************************************************************************/
 	public function ajax_listado(Request $request)
 	{
-		$alertas = Alerta::leftJoin('tipos_alertas', 'alertas.tipos_alertas_id', '=', 'tipos_alertas.id')
-        ->select('tipos_alertas.nombre as tipo_nombre', 'alertas.*')
-        #->where('tipo_transaccion_id', $tipo_transaccion_id)
-        ->orderBy('nombre', 'asc')
-        ->get();
+		$alertas = 
+			Alerta::
+					leftJoin('tipos_alertas', 'alertas.tipos_alertas_id', '=', 'tipos_alertas.id')->
+					leftJoin('alertas_tipos_tratamientos', 'alertas.tipos_tratamientos_id', '=', 'alertas_tipos_tratamientos.id')->
+					select( 'tipos_alertas.nombre as tipo_alerta', 'alertas_tipos_tratamientos.nombre as tipo_tratamiento', 'alertas.*')->
+					orderBy('nombre', 'asc')->
+			        get();
 		$data = array();
 		#dd($alertas);
         foreach($alertas as $r) {
- 			$detalleAlerta = route('alertas_detalles', ['id' => $r->id]); 
+			$detalleAlerta = route('alertas_detalles', ['id' => $r->id]); 
 			$accion = '<a class="btn btn-sm btn-info" href="' . $detalleAlerta . '" title="Detalle Alerta">Detalle Alerta</a>';
 
             $accion .= '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_alertas('."'".$r->id.
@@ -66,7 +73,8 @@ class AlertaController extends Controller
             $data[] = array(
                 $r->nombre,
                 $r->descripcion,
-                $r->tipo_nombre,
+                $r->tipo_alerta,
+				$r->tipo_tratamiento,
                 $accion
             );
         }
@@ -100,12 +108,15 @@ class AlertaController extends Controller
 			],
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
+			'tipos_tratamientos_id' => 'required|integer|exists:alertas_tipos_tratamientos,id',
 			'funciones_id' => 'required|exists:funciones,id',
 		], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
 			'nombre.unique' => 'Este nombre  ya está en uso.',
 			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
+			'tipos_tratamientos_id.required' => 'Este campo no puede quedar vacío.',
+			'tipos_tratamientos_id.exists' => 'El tipo de campo seleccionado no es válido.',
 		]);
 		// Si la validación falla
 		if ($validatedData->fails()) {
@@ -123,6 +134,7 @@ class AlertaController extends Controller
 			'nombre' => $validated['nombre'],
 			'descripcion' => $validated['descripcion'],
 			'tipos_alertas_id' => $validated['tipos_alertas_id'],
+			'tipos_tratamientos_id' => $validated['tipos_tratamientos_id'],
 		]);
 	#dd($alerta->id);
 		AlertaDetalle::create([
@@ -161,6 +173,7 @@ class AlertaController extends Controller
 			'alertas' => $alerta,
 			'alertas_detalles' => $alertasDetalles,
 			'funciones' => Funcion::all(), // Todas las funciones disponibles
+			'alertas_tipos_tratamientos' => AlertaTipoTratamiento::all(), // Todos los tipos de tratamiento disponibles
 		]);
 		return $response;
 	}
@@ -184,12 +197,15 @@ class AlertaController extends Controller
 			Rule::unique('alertas', 'nombre'),
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
+			'tipos_tratamientos_id' => 'required|integer|exists:alertas_tipos_tratamientos,id',
 			'funciones_id' => 'required|exists:funciones,id',
 			], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
 			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
 			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
+			'tipos_tratamientos_id.required' => 'Este campo no puede quedar vacío.',
+			'tipos_tratamientos_id.exists' => 'El tipo de campo seleccionado no es válido.',
 		]);	
 		if ($validatedData->fails()) {
 			$response = [
@@ -212,6 +228,7 @@ class AlertaController extends Controller
 			'nombre' => $validated['nombre'],
 			'descripcion' => $validated['descripcion'],
 			'tipos_alertas_id' => $validated['tipos_alertas_id'],
+			'tipos_tratamientos_id' => $validated['tipos_tratamientos_id'],
 		]);
 
 		DB::table('detalles_alertas')
