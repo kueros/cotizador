@@ -136,7 +136,7 @@ class AlertaController extends Controller
 		$clientIP = $request->ip();
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
-		$message = "$username creó una nueva alerta: $validated[nombre]";
+		$message = "creó una alerta: $validated[nombre]";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 	#dd($validatedData->errors());
 		$response = [

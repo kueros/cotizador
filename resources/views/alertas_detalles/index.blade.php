@@ -162,9 +162,6 @@
 			}
 		}
 
-
-
-
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function guardar_datos() {
@@ -222,8 +219,6 @@
 				}
 			});
 		}
-
-
 	</script>
 <?php #dd($detalles); ?>
 	<!--LISTADO-->
@@ -257,7 +252,6 @@
 		</div>
 	</div>
 
-
 	<div class="modal fade" id="modal_form_alertas_detalles" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -272,9 +266,6 @@
 					<div class="modal-body form">
 						<input type="hidden" value="" name="id" />
 						<input name="accion" id="accion" class="form-control" type="hidden">
-<?php 
-#dd($funciones);
-?>
 						<div class="form-body">
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Función') }}</label>
@@ -293,8 +284,6 @@
 								</div>
 							</div>
 						</div>
-
-
 						<div class="mb-3 row">
 							<label class="col-form-label col-md-3">Fecha Desde</label>
 							<div class="col-md-9">
@@ -310,7 +299,6 @@
 								<span class="help-block"></span>
 							</div>
 						</div>
-
 						<div class="mb-3 row">
 							<label class="col-form-label col-md-3">Fecha Hasta</label>
 							<div class="col-md-9">
@@ -326,7 +314,6 @@
 								<span class="help-block"></span>
 							</div>
 						</div>
-
 					</div>
 					<div class="modal-footer">
 						<a onclick="guardar_datos()" class="btn btn-primary">{{ __('Guardar') }}</a>

@@ -382,6 +382,48 @@
 					operatorDropdown.appendChild(dropdownMenu);
 
 					wrapper.appendChild(operatorDropdown);
+				} else if (optionText === 'Contador') {
+
+					/* 
+					Crear tabla transacciones para utilizar en este contador.
+					
+					*/
+					newInput.setAttribute('readonly', true);
+					newInput.type = 'text';
+					const operatorDropdown = document.createElement('div');
+					operatorDropdown.className = 'dropdown ms-2';
+
+					const dropdownButton = document.createElement('button');
+					dropdownButton.className = 'btn btn-primary dropdown-toggle';
+					dropdownButton.type = 'button';
+					dropdownButton.id = `dropdownOperator-${Date.now()}`;
+					dropdownButton.setAttribute('data-bs-toggle', 'dropdown');
+					dropdownButton.innerText = 'Seleccionar condición';
+
+					const dropdownMenu = document.createElement('ul');
+					dropdownMenu.className = 'dropdown-menu';
+					dropdownMenu.setAttribute('aria-labelledby', dropdownButton.id);
+
+					const operators = ['=', '<', '>', 'SI', 'AND', 'OR', 'NOT', '<=', '>=', '!='];
+					operators.forEach(op => {
+						const li = document.createElement('li');
+						const button = document.createElement('button');
+						button.className = 'dropdown-item';
+						button.type = 'button';
+						button.innerText = op;
+						button.onclick = () => {
+							newInput.value = op;
+							operatorDropdown.style.display = 'none';
+							formulaElements.push({ type: 'operator', value: op });
+						};
+						li.appendChild(button);
+						dropdownMenu.appendChild(li);
+					});
+
+					operatorDropdown.appendChild(dropdownButton);
+					operatorDropdown.appendChild(dropdownMenu);
+
+					wrapper.appendChild(operatorDropdown);
 				} else {
 					newInput.value = optionText;
 					//newInput.setAttribute('readonly', false); // Esto asegura que sea editable
@@ -426,7 +468,16 @@
 
 					// Lo eliminamos del contenedor
 					lastInputDiv.remove();
+					// Lo eliminamos del contenedor
+					lastInputDiv.remove();
 
+					// También eliminamos el último elemento del array formulaElements
+					formulaElements.pop();
+					serializeFormula(); // Actualizamos el campo de fórmula serializada
+				} else {
+					console.warn('No hay elementos para eliminar');
+				}
+			}
 					// También eliminamos el último elemento del array formulaElements
 					formulaElements.pop();
 					serializeFormula(); // Actualizamos el campo de fórmula serializada
