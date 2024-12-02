@@ -186,59 +186,66 @@
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function validarFormulario() 
-		{
-			let errores = [];
-			let nombre = document.querySelector('input[name="nombre"]').value.trim();
-			let descripcion = document.querySelector('input[name="descripcion"]').value.trim();
-			let tiposAlertasId = document.querySelector('select[name="tipos_alertas_id"]').value;
-			let funcionesId = document.querySelectorAll('select[name="funciones_id[]"]');
-			let fechasDesde = document.querySelectorAll('input[name="fecha_desde[]"]');
-			let fechasHasta = document.querySelectorAll('input[name="fecha_hasta[]"]');
+{
+	let errores = [];
+	let nombre = document.querySelector('input[name="nombre"]').value.trim();
+	let descripcion = document.querySelector('input[name="descripcion"]').value.trim();
+	let tiposAlertasId = document.querySelector('select[name="tipos_alertas_id"]').value;
+	let funcionesId = document.querySelectorAll('select[name="funciones_id[]"]');
+	let fechasDesde = document.querySelectorAll('input[name="fecha_desde[]"]');
+	let fechasHasta = document.querySelectorAll('input[name="fecha_hasta[]"]');
 
-			// Verificar si el tbody de la tabla tiene al menos un hijo
-			let tbody = document.querySelector('#detalles_alertas tbody');
-			if (!tbody || tbody.children.length === 0) {
-				errores.push("La tabla 'detalles_alertas' debe tener al menos una fila.");
-			}
+	// Verificar si el tbody de la tabla tiene al menos un hijo
+	let tbody = document.querySelector('#detalles_alertas tbody');
+	if (!tbody || tbody.children.length === 0) {
+		errores.push("La tabla 'Detalles de la Alerta' debe tener al menos una fila de datos.");
+	}
 
-			if (!nombre) errores.push("El campo 'Nombre' es obligatorio.");
-			if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
-			if (!tiposAlertasId || tiposAlertasId === "0") errores.push("Seleccione un 'Tipo de Alerta'.");
+	if (!nombre) errores.push("El campo 'Nombre' es obligatorio.");
+	if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
+	if (!tiposAlertasId || tiposAlertasId === "0") errores.push("Seleccione un 'Tipo de Alerta'.");
 
-			// Bandera para errores en la fila
-			let filaError = false;
+	// Bandera para errores en la fila
+	let filaError = false;
 
-			funcionesId.forEach((funcion) => {
-				if (!funcion.value || funcion.value === "0") {
-					filaError = true;
-				}
-			});
-
-			fechasDesde.forEach((fecha) => {
-				if (!fecha.value) {
-					filaError = true;
-				}
-			});
-
-			fechasHasta.forEach((fecha, index) => {
-				if (!fecha.value) {
-					filaError = true;
-				} else if (new Date(fechasDesde[index].value) > new Date(fecha.value)) {
-					errores.push(`En la fila ${index + 1}, 'Fecha Hasta' debe ser mayor o igual a 'Fecha Desde'.`);
-				}
-			});
-
-			if (filaError) {
-				errores.push("Debe completar todas las filas de la tabla correctamente.");
-			}
-
-			if (errores.length > 0) {
-				swal.fire("Aviso", "Errores:\n" + errores.join("\n"), "warning");
-				return false;
-			}
-
-			return true;
+	// Validar duplicados en funciones_id
+	let funcionesIdsVistos = new Set();
+	funcionesId.forEach((funcion, index) => {
+		let valor = funcion.value;
+		if (!valor || valor === "0") {
+			filaError = true;
+		} else if (funcionesIdsVistos.has(valor)) {
+			errores.push(`El valor de 'Función' en la fila ${index + 1} está duplicado.`);
+		} else {
+			funcionesIdsVistos.add(valor);
 		}
+	});
+
+	fechasDesde.forEach((fecha) => {
+		if (!fecha.value) {
+			filaError = true;
+		}
+	});
+
+	fechasHasta.forEach((fecha, index) => {
+		if (!fecha.value) {
+			filaError = true;
+		} else if (new Date(fechasDesde[index].value) > new Date(fecha.value)) {
+			errores.push(`En la fila ${index + 1}, 'Fecha Hasta' debe ser mayor o igual a 'Fecha Desde'.`);
+		}
+	});
+
+	if (filaError) {
+		errores.push("Debe completar todas las filas de la tabla correctamente.");
+	}
+
+	if (errores.length > 0) {
+		swal.fire("Aviso", "Errores:\n" + errores.join("\n"), "warning");
+		return false;
+	}
+
+	return true;
+}
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
