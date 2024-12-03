@@ -137,20 +137,25 @@ class AlertaController extends Controller
 			'tipos_tratamientos_id' => $validated['tipos_tratamientos_id'],
 		]);
 	#dd($alerta->id);
-		AlertaDetalle::create([
-			'alertas_id' => $alerta->id,
-			'funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
-			'fecha_desde' => implode(',', $request['fecha_desde']),
-			'fecha_hasta' => implode(',', $request['fecha_hasta']),
-		]);
+	AlertaDetalle::create([
+		'alertas_id' => $alerta->id,
+		'funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
+		'fecha_desde' => implode(',', array_map(function ($fecha) {
+			return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
+		}, $request['fecha_desde'])),
+		'fecha_hasta' => implode(',', array_map(function ($fecha) {
+			return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
+		}, $request['fecha_hasta'])),
+	]);
 
 		// Loguear la acción
-		$clientIP = $request->ip();
+		$clientIP = \Request::ip();
+		$clientIP_sc = str_replace('"', '', $clientIP);
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
 		$message = "creó una alerta: $validated[nombre]";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-	#dd($validatedData->errors());
+		#dd($clientIP_sc);
 		$response = [
 		'status' => 0,
 		'message' => $validatedData->errors()
@@ -183,73 +188,81 @@ class AlertaController extends Controller
 	*******************************************************************************************************************************/
 	public function alertasUpdate(Request $request, Alerta $alerta, MyController $myController)
 	{
-		#dd($request->alertas_id);
-		/* $permiso_editar_funciones = $myController->tiene_permiso('edit_funcion');
-		if (!$permiso_editar_funciones) {
-			abort(403, '.');
-			return false;
-		} */
-	
-	
 		// Validación de los datos
 		$validatedData = Validator::make($request->all(), [
-			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
+			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/',
 			Rule::unique('alertas', 'nombre'),
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
 			'tipos_tratamientos_id' => 'required|integer|exists:alertas_tipos_tratamientos,id',
-			'funciones_id' => 'required|exists:funciones,id',
-			], [
+			'funciones_id' => 'required|array',
+			'funciones_id.*' => 'exists:funciones,id',
+		], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
 			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
 			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
 			'tipos_tratamientos_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_tratamientos_id.exists' => 'El tipo de campo seleccionado no es válido.',
-		]);	
+		]);
+	
 		if ($validatedData->fails()) {
-			$response = [
+			return response()->json([
 				'status' => 0,
-				'message' => 'error en validacion',
+				'message' => 'Error en validación',
 				'errors' => $validatedData->errors()
-			];
-			return response()->json($response);
+			]);
 		}
-
-		$validated = $validatedData->validated(); // Obtiene los datos validados como array
-		#dd($request->alertas_id);
-		// Obtener el modelo
-		$alerta_id = Alerta::where('id',$request->alertas_id)->first()['id'];
-		#dd($alerta_id);
-		$updated_id = DB::table('alertas')
-		->where('id', $alerta_id)
-		->update
-		([
-			'nombre' => $validated['nombre'],
-			'descripcion' => $validated['descripcion'],
-			'tipos_alertas_id' => $validated['tipos_alertas_id'],
-			'tipos_tratamientos_id' => $validated['tipos_tratamientos_id'],
-		]);
-
+	
+		$validated = $validatedData->validated();
+	
+		// Obtener el registro existente (usando findOrFail para garantizar un modelo único)
+		$alertaExistente = Alerta::where('id', $request->alertas_id)->first();
+		if (!$alertaExistente) {
+			return response()->json([
+				'status' => 0,
+				'message' => 'Alerta no encontrada.'
+			]);
+		}
+	
+		// Construir el mensaje de cambios
+		$cambios = [];
+		foreach (['nombre', 'descripcion', 'tipos_alertas_id', 'tipos_tratamientos_id'] as $campo) {
+			if ($alertaExistente->$campo != $validated[$campo]) {
+				$cambios[] = "cambiando $campo de \"{$alertaExistente->$campo}\" a \"{$validated[$campo]}\"";
+			}
+		}
+	
+		$mensajeCambios = implode(', ', $cambios);
+		$username = Auth::user()->username;
+		$message = "El usuario $username modificó el alerta \"{$alertaExistente->nombre}\" $mensajeCambios.";
+	
+		// Actualizar los datos
+		$alertaExistente->update($validated);
+	
 		DB::table('detalles_alertas')
-		->updateOrInsert(
-			['alertas_id' => $alerta_id],
-			['funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
-			'fecha_desde' => implode(',', $request['fecha_desde']),
-			'fecha_hasta' => implode(',', $request['fecha_hasta']),
-		]);
-
+			->updateOrInsert(
+				['alertas_id' => $alertaExistente->id],
+				[
+					'funciones_id' => implode(',', $validated['funciones_id']),
+					'fecha_desde' => implode(',', array_map(function ($fecha) {
+						return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
+					}, $request['fecha_desde'])),
+					'fecha_hasta' => implode(',', array_map(function ($fecha) {
+						return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
+					}, $request['fecha_hasta'])),
+				]
+			);
+	
 		// Loguear la acción
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
-		$username = Auth::user()->username;
-		$message = $username . " actualizó el alerta " . $request->nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-		$response = [
+	
+		return response()->json([
 			'status' => 1,
 			'message' => 'Alerta actualizada correctamente.'
-		];
-		return response()->json($response);
+		]);
 	}
 
 	/*******************************************************************************************************************************

@@ -19,7 +19,7 @@ class MyController extends Controller
 		$log = LogAdministracion::create([
 			'username' => $username,
 			'detalle' => $message,
-			'ip_address' => json_encode($clientIP),
+			'ip_address' => $clientIP,
 			'user_agent' => json_encode($userAgent)
 		]);
 		Log::info($message);

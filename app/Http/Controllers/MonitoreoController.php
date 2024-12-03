@@ -75,7 +75,7 @@ class MonitoreoController extends Controller
 				$r->id,
 				$r->username,
 				$r->detalle,
-				$r->created_at->format('Y-m-d H:i:s'), // Formato ajustado de fecha
+				$r->created_at->format('d-m-Y H:i:s'), // Formato ajustado de fecha
 				$r->ip_address
 			);
 		}

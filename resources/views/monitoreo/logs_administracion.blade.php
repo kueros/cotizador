@@ -78,8 +78,6 @@
 		<div class="row table-responsive">
 			<div class="col-md-12">
 				<h2>Log de acciones</h2>
-				<br>
-				<br>
 				<table id="log-acciones-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
 					<thead>
 						<th>ID</th>

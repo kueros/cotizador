@@ -159,8 +159,8 @@
 						if (data.errors) {
 							for (let field in data.errors) {
 								if (data.errors.hasOwnProperty(field)) {
-									//errorMessage += `${field}: ${data.errors[field].join(", ")}<br/>`;
-									errorMessage += `${field.charAt(0).toUpperCase()}${field.slice(1).toLowerCase()}: ${data.errors[field].join(", ")}<br/>`;
+									errorMessage += `${data.errors[field].join(", ")}<br/>`;
+									//errorMessage += `${field.charAt(0).toUpperCase()}${field.slice(1).toLowerCase()}: ${data.errors[field].join(", ")}<br/>`;
 								}
 							}
 						}
@@ -203,11 +203,6 @@
 			if (!tbody || tbody.children.length === 0) {
 				errores.push("La tabla 'Detalles de la Alerta' debe tener al menos una fila de datos.");
 			}
-			// Verificar si el tbody de la tabla tiene al menos un hijo
-			let tbody = document.querySelector('#detalles_alertas tbody');
-			if (!tbody || tbody.children.length === 0) {
-				errores.push("La tabla 'Detalles de la Alerta' debe tener al menos una fila de datos.");
-			}
 
 			if (!nombre) errores.push("El campo 'Nombre' es obligatorio.");
 			if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
@@ -216,8 +211,6 @@
 			if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
 			if (!tiposAlertasId || tiposAlertasId === "0") errores.push("Seleccione un 'Tipo de Alerta'.");
 
-			// Bandera para errores en la fila
-			let filaError = false;
 			// Bandera para errores en la fila
 			let filaError = false;
 
@@ -233,18 +226,7 @@
 					funcionesIdsVistos.add(valor);
 				}
 			});
-			// Validar duplicados en funciones_id
-			let funcionesIdsVistos = new Set();
-			funcionesId.forEach((funcion, index) => {
-				let valor = funcion.value;
-				if (!valor || valor === "0") {
-					filaError = true;
-				} else if (funcionesIdsVistos.has(valor)) {
-					errores.push(`El valor de 'Función' en la fila ${index + 1} está duplicado.`);
-				} else {
-					funcionesIdsVistos.add(valor);
-				}
-			});
+
 
 			fechasDesde.forEach((fecha, index) => {
 				if (!fecha.value) {
@@ -277,7 +259,7 @@
 			}
 
 			if (errores.length > 0) {
-				swal.fire("Aviso", "Errores:\n" + errores.join("\n"), "warning");
+				swal.fire("Aviso", errores.join("\n"), "warning");
 				return false;
 			}
 
@@ -436,13 +418,13 @@
 					<h5 class="modal-title">Editar alertas</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
-					@csrf
-					<input name="_method" type="hidden" id="method">
-					<input name="alertas_id" id="alertas_id" class="form-control" type="hidden" value="<?php echo $alertas->first()['id'] ?? ""; ?>">
-					<input type="hidden" value="" name="accion" id="accion" />
-					<input type="hidden" value="" name="id" />
-					<div class="modal-body">
+				<div class="modal-body" style="padding-top:0px;">
+					<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">
+						@csrf
+						<input name="_method" type="hidden" id="method">
+						<input name="alertas_id" id="alertas_id" class="form-control" type="hidden" value="<?php echo $alertas->first()['id'] ?? ""; ?>">
+						<input type="hidden" value="" name="accion" id="accion" />
+						<input type="hidden" value="" name="id" />
 						<!-- Campos principales -->
 						<div class="form-group" style="margin-top:15px; margin-bottom:15px;">
 							<label for="nombre">Nombre</label>
@@ -492,29 +474,31 @@
 
 
 						<!-- Detalles de Alerta -->
-						 <div  style="margin-top:15px; margin-bottom:15px;">
+						<div  style="margin-top:15px; margin-bottom:15px;">
 							<h5>Detalles de la Alerta</h5>
 						</div>
-						<a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
-						<table class="table table-bordered" id="detalles_alertas" style="margin-top:15px; margin-bottom:15px;">
-							<thead>
-								<tr>
-									<th>Función</th>
-									<th>Fecha Desde</th>
-									<th>Fecha Hasta</th>
-									<th>Acciones</th>
-								</tr>
-							</thead>
-							<tbody>
-								<!-- Filas dinámicas se añadirán aquí -->
-							</tbody>
-						</table>
-					</div>
-					<div class="modal-footer">
-						<a onclick="if (validarFormulario()) guardar_datos();" class="btn btn-primary">Guardar</a>
-						<a id="eliminar_filas" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</a>
-					</div>
-				</form>
+						<div class="form-group">
+							<a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
+							<table class="table table-bordered" id="detalles_alertas" style="margin-top:15px; margin-bottom:15px;">
+								<thead>
+									<tr>
+										<th>Función</th>
+										<th>Fecha Desde</th>
+										<th>Fecha Hasta</th>
+										<th>Acciones</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!-- Filas dinámicas se añadirán aquí -->
+								</tbody>
+							</table>
+						</div>
+						<div class="modal-footer">
+							<a onclick="if (validarFormulario()) guardar_datos();" class="btn btn-primary">Guardar</a>
+							<a id="eliminar_filas" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</a>
+						</div>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>

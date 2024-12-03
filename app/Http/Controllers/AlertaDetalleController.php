@@ -138,7 +138,7 @@ class AlertaDetalleController extends Controller
 			'tipo.required' => 'Debe seleccionar un Tipo de Alerta.',
 			'tipo.exists' => 'El Tipo de Alerta seleccionado no es válido.',
 		]);
-		dd($validatedData);
+		#dd($validatedData);
 		Alerta::create($validatedData);
 		
 		$clientIP = \Request::ip();
