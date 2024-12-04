@@ -155,7 +155,7 @@
 			$('.help-block').empty();
 			$('#modal_form_alerta_tipo').modal('show');
 			//$('#modal_form').modal('show');
-			$('.modal-title').text('Agregar Tipo de Alerta');
+			$('.modal-title').text('Agregar Tipo de Tratamiento');
 			$('#accion').val('add');
 			$('#form').attr('action', "{{ url('alertas_tipos') }}");
 			$('#method').val('POST');
@@ -179,7 +179,7 @@
 					$('#form [name="id"]').val(data.id);
 					$('#form [name="nombre"]').val(data.nombre);
 					$('#modal_form_alerta_tipo').modal('show');
-					$('.modal-title').text('Editar Tipo de Alerta');
+					$('.modal-title').text('Editar Tipo de Tratamiento');
 					$('#form').attr('action', "{{ url('alertas_tipos_tratamientos') }}" + "/" + id);
 					$('#method').val('PUT');
 				},
@@ -271,7 +271,7 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title">Formulario Tipos de Alerta</h5>
+					<h5 class="modal-title">Formulario Tipos de Tratamiento</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<form id="form" method="POST" enctype="multipart/form-data" class="form-horizontal" action="">

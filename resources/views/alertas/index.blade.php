@@ -17,70 +17,62 @@
 	#dd($response);
 	?>
 	<script type="text/javascript">
-		var table;
-		var save_method;
-		jQuery(document).ready(function($) {
-			/*******************************************************************************************************************************
-			 *******************************************************************************************************************************/
-			//tipo_transaccion_id = <?php #echo $id; ?>;
-			table = $('#alertas_table').DataTable({
-				"ajax": {
-					url: "{{ url('alertas/ajax_listado') }}",
-					type: 'GET',
-/* 					data: function(d) { // Agrega parámetros adicionales a la solicitud
-						d.tipo_transaccion_id = tipo_transaccion_id;
-        			}
- */				},
-				language: traduccion_datatable,
-				//dom: 'Bfrtip',
-				columnDefs: [{
-					"targets": 'no-sort',
-					"orderable": true
-				}],
-				layout: {
-					topStart: {
-						buttons: [{
-								"extend": 'pdf',
-								"text": 'Export',
-								"className": 'btn btn-danger',
-								"orientation": 'landscape',
-								title: 'Alertas'
-							},
-							{
-								"extend": 'copy',
-								"text": 'Export',
-								"className": 'btn btn-primary',
-								title: 'Alertas'
-							},
-							{
-								"extend": 'excel',
-								"text": 'Export',
-								"className": 'btn btn-success',
-								title: 'Alertas'
-							},
-							{
-								"extend": 'print',
-								"text": 'Export',
-								"className": 'btn btn-secondary',
-								title: 'Alertas'
-							}
-						]
-					},
-					bottomEnd: {
-						paging: {
-							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
-						}
-					}
-				},
-				initComplete: function() {
-					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
-					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
-					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
-					$('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
-				},
-				"order": [[2, 'asc']]
-			});
-		});
+var table;
+var save_method;
+jQuery(document).ready(function($) {
+    table = $('#alertas_table').DataTable({
+        "ajax": {
+            url: "{{ url('alertas/ajax_listado') }}",
+            type: 'GET',
+        },
+        language: traduccion_datatable,
+        columnDefs: [{
+            "targets": 'no-sort',
+            "orderable": true
+        }],
+        dom: 'Bfrtip', // Habilitar los botones de exportación
+        buttons: [
+            {
+                "extend": 'pdf',
+                "text": '<i class="fas fa-file-pdf"></i> PDF',
+                "className": 'btn btn-danger',
+                "orientation": 'landscape',
+                title: 'Alertas',
+                exportOptions: {
+                    columns: [0, 1, 2, 3] // Índices de las columnas que deseas incluir en la exportación
+                }
+            },
+            {
+                "extend": 'copy',
+                "text": '<i class="fas fa-copy"></i> Copiar',
+                "className": 'btn btn-primary',
+                title: 'Alertas',
+                exportOptions: {
+                    columns: ':visible' // Solo las columnas visibles
+                }
+            },
+            {
+                "extend": 'excel',
+                "text": '<i class="fas fa-file-excel"></i> Excel',
+                "className": 'btn btn-success',
+                title: 'Alertas',
+                exportOptions: {
+                    columns: [0, 1, 2, 3] // Índices de las columnas específicas
+                }
+            },
+            {
+                "extend": 'print',
+                "text": '<i class="bi bi-printer"></i> Imprimir',
+                "className": 'btn btn-secondary',
+                title: 'Alertas',
+                exportOptions: {
+                    columns: ':visible' // Exportar solo las columnas visibles
+                }
+            }
+        ],
+        "order": [[2, 'asc']]
+    });
+});
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
@@ -97,7 +89,7 @@
 			$('.help-block').empty();
 			$('#modal_form_alertas').modal('show');
 			//$('#modal_form').modal('show');
-			$('.modal-title').text('Agregar alerta');
+			$('.modal-title').text('Agregar Alerta');
 			$('#accion').val('add');
 			$('#form').attr('action', "{{ url('alertas') }}");
 			$('#method').val('POST');
@@ -186,80 +178,51 @@
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		function validarFormulario() 
-		{
+		function validarFormulario() {
 			let errores = [];
 			let nombre = document.querySelector('input[name="nombre"]').value.trim();
 			let descripcion = document.querySelector('input[name="descripcion"]').value.trim();
 			let tiposAlertasId = document.querySelector('select[name="tipos_alertas_id"]').value;
+			let tiposTratamientosId = document.querySelector('select[name="tipos_tratamientos_id"]').value;
 			let funcionesId = document.querySelectorAll('select[name="funciones_id[]"]');
 			let fechasDesde = document.querySelectorAll('input[name="fecha_desde[]"]');
 			let fechasHasta = document.querySelectorAll('input[name="fecha_hasta[]"]');
 			let hoy = new Date();
 			hoy.setHours(0, 0, 0, 0);
 
-			// Verificar si el tbody de la tabla tiene al menos un hijo
-			let tbody = document.querySelector('#detalles_alertas tbody');
-			if (!tbody || tbody.children.length === 0) {
-				errores.push("La tabla 'Detalles de la Alerta' debe tener al menos una fila de datos.");
-			}
+			// Limpiar errores previos
+			document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+			document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
 
-			if (!nombre) errores.push("El campo 'Nombre' es obligatorio.");
-			if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
-			if (!tiposAlertasId || tiposAlertasId === "0") errores.push("Seleccione un 'Tipo de Alerta'.");
-			if (!nombre) errores.push("El campo 'Nombre' es obligatorio.");
-			if (!descripcion) errores.push("El campo 'Descripción' es obligatorio.");
-			if (!tiposAlertasId || tiposAlertasId === "0") errores.push("Seleccione un 'Tipo de Alerta'.");
+			if (!nombre) errores.push({ campo: 'nombre', mensaje: "El campo 'Nombre' es obligatorio." });
+			if (!descripcion) errores.push({ campo: 'descripcion', mensaje: "El campo 'Descripción' es obligatorio." });
+			if (!tiposAlertasId || tiposAlertasId === "0") errores.push({ campo: 'tipos_alertas_id', mensaje: "Seleccione un 'Tipo de Alerta'." });
+			if (!tiposTratamientosId || tiposTratamientosId === "0") errores.push({ campo: 'tipos_tratamientos_id', mensaje: "Seleccione un 'Tipo de Tratamiento'." });
 
-			// Bandera para errores en la fila
-			let filaError = false;
-
-			// Validar duplicados en funciones_id
-			let funcionesIdsVistos = new Set();
+			// Validar filas de la tabla
+			let filaErrores = [];
 			funcionesId.forEach((funcion, index) => {
-				let valor = funcion.value;
-				if (!valor || valor === "0") {
-					filaError = true;
-				} else if (funcionesIdsVistos.has(valor)) {
-					errores.push(`El valor de 'Función' en la fila ${index + 1} está duplicado.`);
-				} else {
-					funcionesIdsVistos.add(valor);
+				let erroresFila = {};
+				if (!funcion.value || funcion.value === "0") {
+					erroresFila['funciones_id'] = ["Debe seleccionar una función válida."];
+				}
+				if (fechasDesde[index] && !fechasDesde[index].value) {
+					erroresFila['fecha_desde'] = ["La 'Fecha Desde' es obligatoria."];
+				}
+				if (fechasHasta[index] && !fechasHasta[index].value) {
+					erroresFila['fecha_hasta'] = ["La 'Fecha Hasta' es obligatoria."];
+				} else if (new Date(fechasDesde[index].value) > new Date(fechasHasta[index].value)) {
+					erroresFila['fecha_hasta'] = ["La 'Fecha Hasta' debe ser mayor o igual a 'Fecha Desde'."];
+				}
+
+				if (Object.keys(erroresFila).length > 0) {
+					filaErrores[index] = erroresFila;
 				}
 			});
 
-
-			fechasDesde.forEach((fecha, index) => {
-				if (!fecha.value) {
-					filaError = true;
-				} else {
-					let fechaDesde = new Date(fecha.value);
-					if (fechaDesde < hoy) {
-						errores.push(`En la fila ${index + 1}, 'Fecha Desde' no puede ser anterior al día de hoy.`);
-					}
-				}
-			});
-
-			fechasHasta.forEach((fecha, index) => {
-				if (!fecha.value) {
-					filaError = true;
-				} else if (new Date(fechasDesde[index].value) > new Date(fecha.value)) {
-					errores.push(`En la fila ${index + 1}, 'Fecha Hasta' debe ser mayor o igual a 'Fecha Desde'.`);
-				}
-			});
-			fechasHasta.forEach((fecha, index) => {
-				if (!fecha.value) {
-					filaError = true;
-				} else if (new Date(fechasDesde[index].value) > new Date(fecha.value)) {
-					errores.push(`En la fila ${index + 1}, 'Fecha Hasta' debe ser mayor o igual a 'Fecha Desde'.`);
-				}
-			});
-
-			if (filaError) {
-				errores.push("Debe completar todas las filas de la tabla correctamente.");
-			}
-
-			if (errores.length > 0) {
-				swal.fire("Aviso", errores.join("\n"), "warning");
+			if (filaErrores.length > 0 || errores.length > 0) {
+				mostrarErroresPorFila(filaErrores);
+				errores.forEach(err => mostrarErrorGeneral(err.campo, err.mensaje));
 				return false;
 			}
 
@@ -269,36 +232,43 @@
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function mostrarErroresPorFila(errores) {
-			// Iterar sobre las filas que tienen errores
 			for (let filaIndex in errores) {
-				let erroresFila = errores[filaIndex];
-
-				// Seleccionar la fila correspondiente en la tabla
+				let filaErrores = errores[filaIndex];
 				let fila = document.querySelector(`#detalles_alertas tbody tr:nth-child(${parseInt(filaIndex) + 1})`);
-
 				if (fila) {
-					// Iterar sobre los campos con errores en esa fila
-					for (let campo in erroresFila) {
-						let mensajes = erroresFila[campo];
-
-						// Buscar el input o select correspondiente dentro de la fila
+					for (let campo in filaErrores) {
+						let mensajes = filaErrores[campo];
 						let input = fila.querySelector(`[name="${campo}[]"]`);
 						if (input) {
-							// Mostrar el error como un tooltip o al lado del campo
 							input.classList.add('is-invalid');
-
-							// Crear un span para mostrar el mensaje de error (si no existe)
 							let errorSpan = input.parentNode.querySelector('.invalid-feedback');
 							if (!errorSpan) {
 								errorSpan = document.createElement('span');
 								errorSpan.classList.add('invalid-feedback');
-								errorSpan.style.display = 'block'; // Asegurar que sea visible
+								errorSpan.style.display = 'block';
 								input.parentNode.appendChild(errorSpan);
 							}
-							errorSpan.innerHTML = mensajes.join(', ');
+							errorSpan.innerHTML = mensajes.join('<br>');
 						}
 					}
 				}
+			}
+		}
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function mostrarErrorGeneral(campo, mensaje) {
+			let input = document.querySelector(`[name="${campo}"]`);
+			if (input) {
+				input.classList.add('is-invalid');
+				let errorSpan = input.parentNode.querySelector('.invalid-feedback');
+				if (!errorSpan) {
+					errorSpan = document.createElement('span');
+					errorSpan.classList.add('invalid-feedback');
+					errorSpan.style.display = 'block';
+					input.parentNode.appendChild(errorSpan);
+				}
+				errorSpan.innerHTML = mensaje;
 			}
 		}
 
@@ -415,7 +385,7 @@
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title">Editar alertas</h5>
+					<h5 class="modal-title">Editar Alertas</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body" style="padding-top:0px;">
@@ -534,21 +504,24 @@
 					// Asignar los datos de detalles_alertas
 					if (response.alertas_detalles.length > 0) {
 						response.alertas_detalles.forEach(function(detalle) {
-							// Dividir el campo 'funciones_id' en un arreglo de IDs
 							const funcionesIds = detalle.funciones_id.split(',');
-							// Dividir las fechas 'fecha_desde' y 'fecha_hasta' en arreglos
 							const fechasDesde = detalle.fecha_desde.split(',');
 							const fechasHasta = detalle.fecha_hasta.split(',');
 
-							// Iterar sobre los arrays de funciones y fechas
 							for (let i = 0; i < funcionesIds.length; i++) {
+								// Convertir las fechas a formato yyyy-MM-dd
+								const fechaDesdeParts = fechasDesde[i].split('-');
+								const fechaDesdeFormatted = `${fechaDesdeParts[2]}-${fechaDesdeParts[1]}-${fechaDesdeParts[0]}`;
+
+								const fechaHastaParts = fechasHasta[i].split('-');
+								const fechaHastaFormatted = `${fechaHastaParts[2]}-${fechaHastaParts[1]}-${fechaHastaParts[0]}`;
+
 								let opcionesFunciones = '';
 								response.funciones.forEach(function(funcion) {
 									const selected = funcion.id == funcionesIds[i] ? 'selected' : '';
 									opcionesFunciones += `<option value="${funcion.id}" ${selected}>${funcion.nombre}</option>`;
 								});
 
-								// Crear la fila con los datos correspondientes
 								const row = `
 									<tr>
 										<input type="hidden" name="detalles_id[]" value="${detalle.id}">
@@ -559,10 +532,10 @@
 											</select>
 										</td>
 										<td>
-											<input type="date" class="form-control" name="fecha_desde[]" value="${fechasDesde[i]}">
+											<input type="date" class="form-control" name="fecha_desde[]" value="${fechaDesdeFormatted}">
 										</td>
 										<td>
-											<input type="date" class="form-control" name="fecha_hasta[]" value="${fechasHasta[i]}">
+											<input type="date" class="form-control" name="fecha_hasta[]" value="${fechaHastaFormatted}">
 										</td>
 										<td>
 											<button type="button" class="btn btn-danger btn-sm" onclick="remove_row(this)">

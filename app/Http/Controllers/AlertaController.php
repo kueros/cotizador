@@ -153,7 +153,7 @@ class AlertaController extends Controller
 		$clientIP_sc = str_replace('"', '', $clientIP);
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
-		$message = "creó una alerta: $validated[nombre]";
+		$message = "Creó el alerta: $validated[nombre]";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 		#dd($clientIP_sc);
 		$response = [
@@ -235,7 +235,7 @@ class AlertaController extends Controller
 	
 		$mensajeCambios = implode(', ', $cambios);
 		$username = Auth::user()->username;
-		$message = "El usuario $username modificó el alerta \"{$alertaExistente->nombre}\" $mensajeCambios.";
+		$message = "Actualizó el alerta \"{$alertaExistente->nombre}\" $mensajeCambios.";
 	
 		// Actualizar los datos
 		$alertaExistente->update($validated);
@@ -278,7 +278,7 @@ class AlertaController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " borró el alerta " . $alerta->nombre;
+		$message = "Eliminó el alerta " . $alerta->nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$alertas_detalles->delete();
