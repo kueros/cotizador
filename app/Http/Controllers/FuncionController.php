@@ -10,6 +10,8 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MyController;
+use App\Models\TipoTransaccionCampoAdicional;
+use App\Models\TipoTransaccion;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Collection;
@@ -45,11 +47,11 @@ class FuncionController extends Controller
 
 			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_funcion('."'".$r->id.
 					"'".')"><i class="bi bi-trash"></i></a>';
-			$r->formula = str_replace(",", "", $r->formula);
+			$r->formula = str_replace(",", " ", $r->formula);
 
 			$data[] = array(
                 $r->nombre,
-                $r->formula,
+                " = ".$r->formula,
                 $accion
             );
         }
@@ -207,6 +209,93 @@ class FuncionController extends Controller
 		$funcion->delete();
 		return response()->json(["status"=>true]);
     }
+
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+	#Route::post('/funciones/campos-transacciones', [TransaccionController::class, 'getCamposTransacciones']);
+
+	public function obtenerCamposTransacciones(Request $request) {
+		$tipoTransaccion = $request->input('tipo_transaccion');
+		// Validar el dato recibido
+		if (!$tipoTransaccion) {
+			return response()->json(['error' => 'Tipo de transacción no especificado.'], 400);
+		}
+	
+		$tipoTransaccionId = TipoTransaccion::where('nombre', $tipoTransaccion)->first()['id'];
+	
+		// Obtener los campos relacionados
+		$campos = TipoTransaccionCampoAdicional::where('tipo_transaccion_id', $tipoTransaccionId)->get(['nombre_campo']);
+	
+		if ($campos->isEmpty()) {
+			return response()->json(['error' => 'No se encontraron campos para el tipo seleccionado.'], 404);
+		}
+	
+		// Transformar los datos al formato requerido
+		$nombresCampos = $campos->pluck('nombre_campo')->map(function($campo) {
+			// Convertir a formato con primera letra en mayúscula
+			return ucfirst(strtolower(str_replace('campo ', '', $campo)));
+		});
+	
+		return response()->json($nombresCampos);
+	}
+	
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+	public function obtenerTiposTransacciones()
+	{
+		$campos = DB::table('tipos_transacciones')->pluck('nombre');
+		return response()->json($campos);
+	}
+
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+	public function contarTransacciones(Request $request)
+	{
+		#dd($request->input('nombre_mostrar'));
+		$nombre_mostrar = $request->input('nombre_mostrar');
+		$tipoTransaccionId = DB::table('tipos_transacciones_campos_adicionales')
+			->where('nombre_mostrar', $nombre_mostrar)->value('tipo_transaccion_id');
+		#dd($tipoTransaccionId);
+
+		if (!$tipoTransaccionId) {
+			return response()->json(['error' => 'ID de tipo de transacción no proporcionado'], 400);
+		}
+
+		$contador = DB::table('transacciones')
+			->where('tipo_transaccion_id', $tipoTransaccionId)
+			->count();
+
+		return response()->json(['contador' => $contador]);
+	}
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+	public function acumularTransacciones(Request $request)
+	{
+		#dd($request->input('nombre_mostrar'));
+		$nombre_mostrar = $request->input('nombre_mostrar');
+		$tipoTransaccionId = DB::table('tipos_transacciones_campos_adicionales')
+			->where('nombre_mostrar', $nombre_mostrar)->value('tipo_transaccion_id');
+		#dd($tipoTransaccionId);
+
+		if (!$tipoTransaccionId) {
+			return response()->json(['error' => 'ID de tipo de transacción no proporcionado'], 400);
+		}
+
+		$acumulador = DB::table('transacciones')
+			->where('tipo_transaccion_id', $tipoTransaccionId)
+			->sum('monto'); 
+
+		return response()->json(['acumulador' => $acumulador]);
+	}
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+	public function listado(Request $request)
+	{
+		$funciones = Funcion::select('id', 'nombre')->get();
+	
+		// Devuelve el arreglo de objetos JSON directamente
+		return response()->json($funciones);
+	}
 
 
 

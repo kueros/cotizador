@@ -29,11 +29,11 @@ Route::get('/', function () {
 });
 
 Route::get('/session/check', function () {
-    if (Auth::check()) {
-        return response()->json(['session' => 'active'], 200);
-    } else {
-        return response()->json(['session' => 'expired'], 401);
-    }
+	if (Auth::check()) {
+		return response()->json(['session' => 'active'], 200);
+	} else {
+		return response()->json(['session' => 'expired'], 401);
+	}
 });
 /* 
 Route::get('/dashboard/{imagenHome}', function () {
@@ -44,7 +44,7 @@ Route::get('/dashboard/{imagenHome}', function () {
 Route::get('/dashboard', function () {
 	$copa_background_home_custom = Variable::where('nombre', '=', 'copa_background_home_custom')->first();
 	$background_home_custom_path = Variable::where('nombre', '=', 'background_home_custom_path')->first();
-	if( !is_null($copa_background_home_custom) ){
+	if (!is_null($copa_background_home_custom)) {
 		$copa_background_home_custom = $copa_background_home_custom->valor;
 		$background_home_custom_path = is_null($background_home_custom_path) ? "" : $background_home_custom_path->valor;
 	}
@@ -55,19 +55,19 @@ Route::get('/dashboard', function () {
 
 // Ruta para mostrar un mensaje después del registro para que el usuario verifique su correo
 Route::get('/email/verify', function () {
-    return view('auth.verify-email');
+	return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
 // Ruta para verificar el correo cuando el usuario hace clic en el enlace
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('/home'); // Cambia esta ruta según tu aplicación
+	$request->fulfill();
+	return redirect('/home'); // Cambia esta ruta según tu aplicación
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 // Ruta para reenviar el correo de verificación
 Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    return back()->with('message', 'Verification link sent!');
+	$request->user()->sendEmailVerificationNotification();
+	return back()->with('message', 'Verification link sent!');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::middleware('auth')->group(function () {
@@ -107,7 +107,7 @@ Route::middleware('auth')->group(function () {
 	Route::delete('/permisos/{permiso}', 						[PermisoController::class, 'destroy'])->name('permisos.destroy');
 	Route::post('/permisos/options', 							[PermisoController::class, 'options'])->name('permisos.options');
 	Route::get('/permisos/fields', 								[PermisoController::class, 'fields'])->name('permisos.fields');
-    Route::post('/permisos/update-order', 						[PermisoController::class, 'updateOrder'])->name('permisos.updateOrder');
+	Route::post('/permisos/update-order', 						[PermisoController::class, 'updateOrder'])->name('permisos.updateOrder');
 
 	#Route::get('/permisos', [PermisoController::class, 'index'])->name('permisos.index');
 	Route::post('/permisos/reordenar', 							[PermisoController::class, 'reordenar'])->name('permisos.reordenar');
@@ -161,7 +161,6 @@ Route::middleware('auth')->group(
 		Route::post('/configuracion/ajax_delete_parametro_email', [ConfiguracionController::class, 'ajax_delete_parametro_email'])->name('configuracion.ajax_delete_parametro_email');
 		Route::post('/guardar_imagen_home', 					[ConfiguracionController::class, 'guardarImagenHome'])->name('configuracion.guardar_imagen_home');
 		Route::post('/guardar_imagen_login', 					[ConfiguracionController::class, 'guardarImagenLogin'])->name('configuracion.guardar_imagen_login');
-
 	}
 );
 
@@ -196,9 +195,9 @@ Route::middleware('auth')->group(
 		Route::post('/tipos_transacciones_campos_adicionales', 						[TipoTransaccionCampoAdicionalController::class, 'store'])->name('tipos_transacciones_campos_adicionales.store');
 		Route::put('/tipos_transacciones_campos_adicionales/{id}', 					[TipoTransaccionCampoAdicionalController::class, 'update'])->name('tipos_transacciones_campos_adicionales.update');
 		Route::delete('/tipos_transacciones_campos_adicionales/{id}', 				[TipoTransaccionCampoAdicionalController::class, 'destroy'])->name('tipos_transacciones_campos_adicionales.destroy');
-		Route::get('/tipos_transacciones_campos_adicionales/ajax_edit/{id}', 		[TipoTransaccionCampoAdicionalController::class, 'ajax_edit'])->name('tipos_transacciones_campos_adicionales.ajax_edit');		
+		Route::get('/tipos_transacciones_campos_adicionales/ajax_edit/{id}', 		[TipoTransaccionCampoAdicionalController::class, 'ajax_edit'])->name('tipos_transacciones_campos_adicionales.ajax_edit');
 		Route::post('/tipos_transacciones_campos_adicionales/ajax_delete/{id}', 	[TipoTransaccionCampoAdicionalController::class, 'ajax_delete'])->name('tipos_transacciones_campos_adicionales.ajax_delete');
-		Route::post('/tipos_transacciones_campos_adicionales/ajax_store/',[TipoTransaccionCampoAdicionalController::class, 'ajax_store'])->name('tipos_transacciones_campos_adicionales.ajax_store');
+		Route::post('/tipos_transacciones_campos_adicionales/ajax_store/', [TipoTransaccionCampoAdicionalController::class, 'ajax_store'])->name('tipos_transacciones_campos_adicionales.ajax_store');
 	}
 );
 
@@ -210,6 +209,11 @@ Route::middleware('auth')->group(
 		Route::get('/funciones/ajax_listado', 					[FuncionController::class, 'ajax_listado'])->name('funciones.ajax_listado');
 		Route::get('/funciones/ajax_edit/{id}', 				[FuncionController::class, 'ajax_edit'])->name('funciones.ajax_edit');
 		Route::post('/funciones/ajax_delete/{id}', 				[FuncionController::class, 'ajax_delete'])->name('funciones.ajax_delete');
+		Route::get('/funciones/tipos_transacciones', 			[FuncionController::class, 'obtenerTiposTransacciones']);
+		Route::post('/funciones/campos-transacciones', 			[FuncionController::class, 'obtenerCamposTransacciones']);
+		Route::post('/funciones/contar-transacciones', 			[FuncionController::class, 'contarTransacciones']);
+		Route::post('/funciones/acumular-transacciones', 		[FuncionController::class, 'acumularTransacciones']);
+		Route::get('/funciones/listado', 						[FuncionController::class, 'listado']);
 	}
 );
 
@@ -262,4 +266,3 @@ Route::middleware('auth')->group(
 
 
 require __DIR__ . '/auth.php';
-
