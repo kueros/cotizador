@@ -104,7 +104,7 @@ class AlertaTipoController extends Controller
 		$clientIP = $request->ip();
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
-		$message = "$username creó un nuevo tipo de alerta: {$alerta->nombre}";
+		$message = "Creó el tipo de alerta \"$alerta->nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 	
 		// Respuesta exitosa
@@ -170,7 +170,7 @@ class AlertaTipoController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " actualizó el tipo de alerta " . $alertas_tipos_nombre_viejo . ' a ' . $request->nombre;
+		$message = "Actualizó el tipo de alerta \"$alertas_tipos_nombre_viejo\" a \"$request->nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		// Respuesta exitosa
@@ -202,7 +202,7 @@ class AlertaTipoController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " borró el tipo de alerta " . $nombre;
+		$message = "Eliminó el tipo de alerta \"$nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 	
 		// Eliminar el tipo de alerta

@@ -284,7 +284,7 @@
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Nombre') }}</label>
 								<div class="col-md-9">
-									<input name="nombre" minlength="3" maxlength="255" placeholder="Nombre del Tipo de Alerta"
+									<input name="nombre" minlength="3" maxlength="255" placeholder="Nombre del Tipo de Tratamiento"
 										id="nombre" class="form-control" type="text" required>
 									<span class="help-block"></span>
 								</div>

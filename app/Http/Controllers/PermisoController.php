@@ -79,83 +79,83 @@ class PermisoController extends Controller
 		return view('permiso.create', compact('permisos', 'secciones', 'permisoUltimoId'));
 	}
 
-public function store(Request $request, MyController $myController): RedirectResponse
-{
-    // Validar los datos del permiso
-    $messages = [
-        'id' => 'Ese ID ya está utilizado en otro permiso',
-        'nombre' => 'Ese nombre de permiso ya está utilizado',
-        'descripcion' => 'Esa descripción de permiso ya está utilizada',
-        'orden' => 'Ese orden de permiso ya está utilizado',
-    ];
+	public function store(Request $request, MyController $myController): RedirectResponse
+	{
+		// Validar los datos del permiso
+		$messages = [
+			'id' => 'Ese ID ya está utilizado en otro permiso',
+			'nombre' => 'Ese nombre de permiso ya está utilizado',
+			'descripcion' => 'Esa descripción de permiso ya está utilizada',
+			'orden' => 'Ese orden de permiso ya está utilizado',
+		];
 
-    $validatedData = $request->validate([
-        'id' => 'required|int|unique:permisos,id',
-        'nombre' => 'required|string|max:255|unique:permisos,nombre',
-        'descripcion' => 'required|string|max:255',
-        'orden' => 'required|int',
-        'seccion_id' => 'required|int',
-    ], $messages);
+		$validatedData = $request->validate([
+			'id' => 'required|int|unique:permisos,id',
+			'nombre' => 'required|string|max:255|unique:permisos,nombre',
+			'descripcion' => 'required|string|max:255',
+			'orden' => 'required|int',
+			'seccion_id' => 'required|int',
+		], $messages);
 
-    // Crear el permiso en la base de datos
-    $permiso = Permiso::create($validatedData);
+		// Crear el permiso en la base de datos
+		$permiso = Permiso::create($validatedData);
 
-    // Lógica para actualizar el archivo PermisosSeeder.php
-    $this->updatePermisosSeeder();
+		// Lógica para actualizar el archivo PermisosSeeder.php
+		$this->updatePermisosSeeder();
 
-    // Enviar correo y otros procesos adicionales
-    $clientIP = \Request::ip();
-    $userAgent = \Request::userAgent();
-    $username = Auth::user()->username;
-    $action = "permisos.store";
-    $message = $username . " creó el permiso " . $_POST['nombre'];
-    $subject = "Creación de permiso";
-    $body = "Permiso " . $_POST['nombre'] . " creado correctamente por " . Auth::user()->username;
-    $to = Auth::user()->email;
-    $myController->enviar_email($to, $body, $subject);
-    Log::info('Correo enviado exitosamente a ' . $to);
+		// Enviar correo y otros procesos adicionales
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		$username = Auth::user()->username;
+		$action = "permisos.store";
+		$message = $username . " creó el permiso " . $_POST['nombre'];
+		$subject = "Creación de permiso";
+		$body = "Permiso " . $_POST['nombre'] . " creado correctamente por " . Auth::user()->username;
+		$to = Auth::user()->email;
+		$myController->enviar_email($to, $body, $subject);
+		Log::info('Correo enviado exitosamente a ' . $to);
 
-    return Redirect::route('permisos.index')
-        ->with('success', 'Permiso created successfully.');
-}
+		return Redirect::route('permisos.index')
+			->with('success', 'Permiso created successfully.');
+	}
 
-private function updatePermisosSeeder()
-{
-    // Obtener todos los permisos actuales
-    $permisos = Permiso::all();
+	private function updatePermisosSeeder()
+	{
+		// Obtener todos los permisos actuales
+		$permisos = Permiso::all();
 
-    // Generar el contenido del archivo de seed
-    $seedContent = "<?php\n\n";
-    $seedContent .= "namespace Database\\Seeders;\n\n";
-    $seedContent .= "use Illuminate\\Database\\Seeder;\n";
-    $seedContent .= "use Illuminate\\Support\\Facades\\DB;\n\n";
-    $seedContent .= "class PermisosSeeder extends Seeder\n";
-    $seedContent .= "{\n";
-    $seedContent .= "    public function run()\n";
-    $seedContent .= "    {\n";
-    $seedContent .= "        DB::table('permisos')->truncate();\n\n";
-    $seedContent .= "        DB::table('permisos')->insert([\n";
+		// Generar el contenido del archivo de seed
+		$seedContent = "<?php\n\n";
+		$seedContent .= "namespace Database\\Seeders;\n\n";
+		$seedContent .= "use Illuminate\\Database\\Seeder;\n";
+		$seedContent .= "use Illuminate\\Support\\Facades\\DB;\n\n";
+		$seedContent .= "class PermisosSeeder extends Seeder\n";
+		$seedContent .= "{\n";
+		$seedContent .= "    public function run()\n";
+		$seedContent .= "    {\n";
+		$seedContent .= "        DB::table('permisos')->truncate();\n\n";
+		$seedContent .= "        DB::table('permisos')->insert([\n";
 
-    foreach ($permisos as $permiso) {
-        $seedContent .= "            [\n";
-        $seedContent .= "                'id' => {$permiso->id},\n";
-        $seedContent .= "                'nombre' => '{$permiso->nombre}',\n";
-        $seedContent .= "                'descripcion' => '{$permiso->descripcion}',\n";
-        $seedContent .= "                'orden' => {$permiso->orden},\n";
-        $seedContent .= "                'seccion_id' => {$permiso->seccion_id},\n";
-        $seedContent .= "                'created_at' => '{$permiso->created_at}',\n";
-        $seedContent .= "                'updated_at' => '{$permiso->updated_at}',\n";
-        $seedContent .= "            ],\n";
-    }
+		foreach ($permisos as $permiso) {
+			$seedContent .= "            [\n";
+			$seedContent .= "                'id' => {$permiso->id},\n";
+			$seedContent .= "                'nombre' => '{$permiso->nombre}',\n";
+			$seedContent .= "                'descripcion' => '{$permiso->descripcion}',\n";
+			$seedContent .= "                'orden' => {$permiso->orden},\n";
+			$seedContent .= "                'seccion_id' => {$permiso->seccion_id},\n";
+			$seedContent .= "                'created_at' => '{$permiso->created_at}',\n";
+			$seedContent .= "                'updated_at' => '{$permiso->updated_at}',\n";
+			$seedContent .= "            ],\n";
+		}
 
-    $seedContent .= "        ]);\n";
-    $seedContent .= "    }\n";
-    $seedContent .= "}\n";
+		$seedContent .= "        ]);\n";
+		$seedContent .= "    }\n";
+		$seedContent .= "}\n";
 
-    // Guardar el contenido en PermisosSeeder.php
-    $filePath = database_path('seeders/PermisosSeeder.php');
-    file_put_contents($filePath, $seedContent);
-}
+		// Guardar el contenido en PermisosSeeder.php
+		$filePath = database_path('seeders/PermisosSeeder.php');
+		file_put_contents($filePath, $seedContent);
+	}
 	/**
 	 * Display the specified resource.
 	 */
@@ -180,7 +180,7 @@ private function updatePermisosSeeder()
 	public function update(Request $request, Permiso $permiso, MyController $myController): RedirectResponse
 	{
 		#dd($request);
- 		$messages = [
+		$messages = [
 			'id' => 'Ese ID ya está utilizado en otro permiso',
 			'nombre' => 'Ese nombre de permiso ya está utilizado',
 			'descripcion' => 'Ese nombre de permiso ya está utilizado',
@@ -217,7 +217,7 @@ private function updatePermisosSeeder()
 		$nombre = $permiso->nombre;
 		// Elimina el permiso
 		$permiso->delete();
-		$message = Auth::user()->username . " borró el permiso " . $nombre;
+		$message = Auth::user()->username . " Eliminó el permiso " . $nombre;
 		Log::info($message);
 		$subject = "Borrado de permiso";
 		$body = "Permiso " . $nombre . " borrado correctamente por " . Auth::user()->username;
@@ -228,5 +228,4 @@ private function updatePermisosSeeder()
 		return Redirect::route('permisos.index')
 			->with('success', 'Permiso deleted successfully');
 	}
-
 }

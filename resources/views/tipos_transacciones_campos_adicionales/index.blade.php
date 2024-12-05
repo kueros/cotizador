@@ -256,7 +256,7 @@
 		 *******************************************************************************************************************************/
 		function guardar_datos() {
 			let form_data = $('#form_campo_adicional').serializeArray();
-			let url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales/ajax_guardar_columna') }}";
+			let url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales/ajax_store') }}";
 			let type_guarda_datos = "POST";
 
 			if(!validar_campos_requeridos('form_campo_adicional')){

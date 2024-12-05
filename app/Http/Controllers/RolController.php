@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 class RolController extends Controller
 {
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
+	 *******************************************************************************************************************************/
 	public function index(Request $request, MyController $myController): View
 	{
 		$permiso_listar_roles = $myController->tiene_permiso('list_roles');
@@ -30,65 +30,66 @@ class RolController extends Controller
 	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
+	 *******************************************************************************************************************************/
 	public function ajax_listado(Request $request)
 	{
 		$roles = Rol::all();
 		$data = array();
-        foreach($roles as $r) {
-            $accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol('."'".$r->rol_id.
-				"'".')"><i class="bi bi-pencil-fill"></i></a>';
+		foreach ($roles as $r) {
+			$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_rol(' . "'" . $r->rol_id .
+				"'" . ')"><i class="bi bi-pencil-fill"></i></a>';
 
-            if($r->id != 1){
-                $accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_rol('."'".$r->rol_id.
-					"'".')"><i class="bi bi-trash"></i></a>';
-            }
+			if ($r->id != 1) {
+				$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_rol(' . "'" . $r->rol_id .
+					"'" . ')"><i class="bi bi-trash"></i></a>';
+			}
 
-            $data[] = array(
-                $r->nombre,
-                $accion
-            );
-        }
-        $output = array(
-            "recordsTotal" => $roles->count(),
-            "recordsFiltered" => $roles->count(),
-            "data" => $data
-        );
+			$data[] = array(
+				$r->nombre,
+				$accion
+			);
+		}
+		$output = array(
+			"recordsTotal" => $roles->count(),
+			"recordsFiltered" => $roles->count(),
+			"data" => $data
+		);
 
 		return response()->json($output);
-
 	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
-	public function ajax_edit($id){
+	 *******************************************************************************************************************************/
+	public function ajax_edit($id)
+	{
 
-        $data = Rol::find($id);
+		$data = Rol::find($id);
 		return response()->json($data);
-    }
+	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
-	public function ajax_delete($id, MyController $myController){
-        $permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
+	 *******************************************************************************************************************************/
+	public function ajax_delete($id, MyController $myController)
+	{
+		$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
 		if (!$permiso_eliminar_roles) {
-			return response()->json(["error"=>"No tienes permiso para realizar esta acción, contáctese con un administrador."], "405");
+			return response()->json(["error" => "No tienes permiso para realizar esta acción, contáctese con un administrador."], "405");
 		}
 		$rol = Rol::find($id);
 		$nombre = $rol->nombre;
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " borró el rol " . $nombre;
+		$message = $username . " Eliminó el rol " . $nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$rol->delete();
-		return response()->json(["status"=>true]);
-    }
+		return response()->json(["status" => true]);
+	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
-	public function create( MyController $myController): View
+	 *******************************************************************************************************************************/
+	public function create(MyController $myController): View
 	{
 		$permiso_agregar_roles = $myController->tiene_permiso('add_rol');
 		if (!$permiso_agregar_roles) {
@@ -100,51 +101,51 @@ class RolController extends Controller
 	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
+	 *******************************************************************************************************************************/
 	public function store(Request $request, MyController $myController): RedirectResponse
-{
-	#dd($request->input('nombre'));
-    $permiso_agregar_roles = $myController->tiene_permiso('add_rol');
-    if (!$permiso_agregar_roles) {
-        abort(403, '.');
-        return false;
-    }
+	{
+		#dd($request->input('nombre'));
+		$permiso_agregar_roles = $myController->tiene_permiso('add_rol');
+		if (!$permiso_agregar_roles) {
+			abort(403, '.');
+			return false;
+		}
 
-	$request->merge([
-        'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
-    ]);
-    // Validar los datos del usuario
-	$validatedData = $request->validate([
-		'nombre' => [
-			'required',
-			'string',
-			'max:255',
-			'min:3',
-			'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-			Rule::unique('roles'),
-		],
-	], [
-		'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-		'nombre.unique' => 'Este nombre de rol ya está en uso.',
-	]);
+		$request->merge([
+			'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
+		]);
+		// Validar los datos del usuario
+		$validatedData = $request->validate([
+			'nombre' => [
+				'required',
+				'string',
+				'max:255',
+				'min:3',
+				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				Rule::unique('roles'),
+			],
+		], [
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+			'nombre.unique' => 'Este nombre de rol ya está en uso.',
+		]);
 
-	$rolExistente = Rol::where('nombre', $request->input('nombre'))->first();
-	if ($rolExistente) {
-		return redirect()->back()->withErrors(['nombre' => 'Este nombre de rol ya está en uso.'])->withInput();
+		$rolExistente = Rol::where('nombre', $request->input('nombre'))->first();
+		if ($rolExistente) {
+			return redirect()->back()->withErrors(['nombre' => 'Este nombre de rol ya está en uso.'])->withInput();
+		}
+
+		Rol::create($validatedData);
+
+		$clientIP = \Request::ip();
+		$userAgent = \Request::userAgent();
+		$username = Auth::user()->username;
+		$message = $username . " creó el rol " . $request->input('nombre');
+		$myController->loguear($clientIP, $userAgent, $username, $message);
+
+		return Redirect::route('roles.index')->with('success', 'Rol creado exitosamente.');
 	}
-
-    Rol::create($validatedData);
-
-    $clientIP = \Request::ip();
-    $userAgent = \Request::userAgent();
-    $username = Auth::user()->username;
-    $message = $username . " creó el rol " . $request->input('nombre');
-    $myController->loguear($clientIP, $userAgent, $username, $message);
-
-    return Redirect::route('roles.index')->with('success', 'Rol creado exitosamente.');
-}
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
+	 *******************************************************************************************************************************/
 	public function show($id): View
 	{
 		$rol = Rol::find($id);
@@ -152,7 +153,7 @@ class RolController extends Controller
 	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
+	 *******************************************************************************************************************************/
 	public function edit($id, MyController $myController): View
 	{
 		#dd($id);
@@ -167,7 +168,7 @@ class RolController extends Controller
 	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
+	 *******************************************************************************************************************************/
 	public function update(Request $request, Rol $rol, MyController $myController): RedirectResponse
 	{
 		#dd($request);
@@ -199,7 +200,7 @@ class RolController extends Controller
 	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
+	 *******************************************************************************************************************************/
 	public function destroy($id, MyController $myController): RedirectResponse
 	{
 		$permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
@@ -212,10 +213,9 @@ class RolController extends Controller
 		$nombre = $rol->nombre;
 		// Elimina el rol
 		$rol->delete();
-		$message = Auth::user()->username . " borró el rol " . $nombre;
+		$message = Auth::user()->username . " Eliminó el rol " . $nombre;
 		Log::info($message);
 		return Redirect::route('roles.index')
 			->with('success', 'Rol deleted successfully');
 	}
-
 }

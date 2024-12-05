@@ -144,7 +144,7 @@ class AlertaDetalleController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " creó el alerta " . $request->input('nombre');
+		$message = $username . "Creó el detalle de alerta \"$request->input('nombre')\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		return Redirect::route('alertas.index')->with('success', 'alerta creada exitosamente.');
@@ -182,7 +182,7 @@ class AlertaDetalleController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " actualizó el detalle de alerta ";// . $alerta_nombre;
+		$message = "Actualizó el detalle de alerta \"$alerta_nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		return redirect()->route('alertas_detalles', ['id' => $alertas_id])
@@ -203,7 +203,7 @@ class AlertaDetalleController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " borró el alerta " . $nombre;
+		$message = "Eliminó el alerta \"$nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$alerta->delete();

@@ -104,7 +104,7 @@ class AlertaTipoTratamientoController extends Controller
 		$clientIP = $request->ip();
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
-		$message = "$username creó un nuevo tipo de tratamiento: {$tipo_tratamiento->nombre}";
+		$message = "Creó el tipo de tratamiento \"$tipo_tratamiento->nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 	
 		// Respuesta exitosa
@@ -170,7 +170,7 @@ class AlertaTipoTratamientoController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " actualizó el tipo de tratamiento " . $alertas_tipos_tratamientos_viejo . ' a ' . $request->nombre;
+		$message = "Actualizó el tipo de tratamiento \"$alertas_tipos_tratamientos_viejo\" a \"$request->nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		// Respuesta exitosa
@@ -202,7 +202,7 @@ class AlertaTipoTratamientoController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " borró el tipo de tratamiento " . $nombre;
+		$message = "Eliminó el tipo de tratamiento \"$nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 	
 		// Eliminar el tipo de tratamiento

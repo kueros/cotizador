@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,8 +28,8 @@ class UserController extends Controller
 {
 
 	/**************************************************************************
-	*
-	**************************************************************************/
+	 *
+	 **************************************************************************/
 	/**
 	 * Display a listing of the resource.
 	 */
@@ -47,21 +48,28 @@ class UserController extends Controller
 			->first()['valor'];
 		$configurar_claves = Variable::where('nombre', 'configurar_claves')
 			->first()['valor'];
-			#dd($variables);
+		#dd($variables);
 		$users = User::withoutTrashed()
 			->leftJoin('roles', 'users.rol_id', '=', 'roles.rol_id')
 			->select('users.*', 'roles.nombre as nombre_rol')
 			->paginate(100);
 		$roles = Rol::all();
-		return view('user.index', compact('users', 'permiso_agregar_usuario', 
-			'permiso_editar_usuario', 'permiso_eliminar_usuario', 'permiso_deshabilitar_usuario', 
-			'reset_password_30_dias', 'configurar_claves', 'roles'))
+		return view('user.index', compact(
+			'users',
+			'permiso_agregar_usuario',
+			'permiso_editar_usuario',
+			'permiso_eliminar_usuario',
+			'permiso_deshabilitar_usuario',
+			'reset_password_30_dias',
+			'configurar_claves',
+			'roles'
+		))
 			->with('i', ($request->input('page', 1) - 1) * $users->perPage());
 	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
+	 *
+	 **************************************************************************/
 	/**
 	 * Show the form for creating a new resource.
 	 */
@@ -79,8 +87,8 @@ class UserController extends Controller
 
 
 	/**************************************************************************
-	*
-	**************************************************************************/
+	 *
+	 **************************************************************************/
 	/**
 	 * Store a newly created resource in storage.
 	 */
@@ -102,45 +110,45 @@ class UserController extends Controller
 				return false;
 			}
 			//$validatedData = $request->validate([
-				$validatedData = Validator::make($formData, [
-					'username' => [
-						'required',
-						'string',
-						'max:255',
-						'regex:/^[a-zA-Z0-9._-]+$/', // Permitir solo letras, números, puntos, guiones y guiones bajos
-						Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
-					],
-					'nombre' => [
-						'required',
-						'string',
-						'max:255',
-						'min:3',
-						'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-					],
-					'apellido' => [
-						'required',
-						'string',
-						'max:255',
-						'min:3',
-						'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
-					],
-					'email' => [
-						'required',
-						'string',
-						'email',
-						'max:255',
-						'regex:/^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', // Validar formato de email
-						Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
-					],
-					'rol_id' => 'required|exists:roles,rol_id',
-					'habilitado' => 'required|boolean',
-				], [
-					'username.regex' => 'El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos.',
-					'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-					'apellido.regex' => 'El apellido solo puede contener letras y espacios.',
-					'rol_id.required' => 'Debe seleccionar un rol para el usuario que va a crear.',
-					'email.regex' => 'El correo electrónico debe tener un nombre de al menos 3 caracteres y un dominio válido.',
-				]);
+			$validatedData = Validator::make($formData, [
+				'username' => [
+					'required',
+					'string',
+					'max:255',
+					'regex:/^[a-zA-Z0-9._-]+$/', // Permitir solo letras, números, puntos, guiones y guiones bajos
+					Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
+				],
+				'nombre' => [
+					'required',
+					'string',
+					'max:255',
+					'min:3',
+					'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				],
+				'apellido' => [
+					'required',
+					'string',
+					'max:255',
+					'min:3',
+					'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				],
+				'email' => [
+					'required',
+					'string',
+					'email',
+					'max:255',
+					'regex:/^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', // Validar formato de email
+					Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
+				],
+				'rol_id' => 'required|exists:roles,rol_id',
+				'habilitado' => 'required|boolean',
+			], [
+				'username.regex' => 'El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos.',
+				'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+				'apellido.regex' => 'El apellido solo puede contener letras y espacios.',
+				'rol_id.required' => 'Debe seleccionar un rol para el usuario que va a crear.',
+				'email.regex' => 'El correo electrónico debe tener un nombre de al menos 3 caracteres y un dominio válido.',
+			]);
 			// Verifica si la validación falla
 			if ($validatedData->fails()) {
 				$response["message"] = 'Error en la validación de los datos.';
@@ -165,7 +173,7 @@ class UserController extends Controller
 				$existingUser->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
 				$existingUser->save();
 
-				$existingUser->update($validatedData); 	
+				$existingUser->update($validatedData);
 
 				$clientIP = \Request::ip();
 				$userAgent = \Request::userAgent();
@@ -174,7 +182,7 @@ class UserController extends Controller
 				$myController->loguear($clientIP, $userAgent, $username, $message);
 
 				$subject = "Restauración de usuario";
-				$body = "Usuario ". $existingUser->username . " restaurado correctamente por ". Auth::user()->username;
+				$body = "Usuario " . $existingUser->username . " restaurado correctamente por " . Auth::user()->username;
 				$to = Auth::user()->email;
 				$emailEnviado = $myController->enviar_email($to, $body, $subject);
 
@@ -193,45 +201,45 @@ class UserController extends Controller
 				return response()->json($response);
 			} else {
 
-			// Si no existe un usuario soft deleted, crear uno nuevo
-			#$validatedData['ultima_fecha_restablecimiento'] = Carbon::now(); // Añadir fecha actual
-			#dd($validatedData);
-			$user = User::create($validatedData);
-			$user->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
-			$user->save();
+				// Si no existe un usuario soft deleted, crear uno nuevo
+				#$validatedData['ultima_fecha_restablecimiento'] = Carbon::now(); // Añadir fecha actual
+				#dd($validatedData);
+				$user = User::create($validatedData);
+				$user->ultima_fecha_restablecimiento = now(); // Establecer fecha actual
+				$user->save();
 
 				#Envío de mail al administrador que creó de la cuenta del usuario
 				$subject = "Creación de usuario";
-				$body = "Usuario ". $validatedData['username'] . " creado correctamente por ". Auth::user()->username;
+				$body = "Usuario " . $validatedData['username'] . " creado correctamente por " . Auth::user()->username;
 				$to = Auth::user()->email;
 				$myController->enviar_email($to, $body, $subject);
 				$user = User::where('email', $validatedData['email'])
-							->first();
+					->first();
 				//Genero email por la creacion de usuario
 				$email = $user->email;
 				$username = $user->username;
 				#dd($username);
-			$nombre = $user->nombre;
+				$nombre = $user->nombre;
 				$token = Str::random(60);
 				$link = route('create_pass_form', ['token' => $token, 'email' => $email]);
 				$subject = "Aviso de creación de cuenta y cambio de contraseña";
-				$body = '<p>Hola '.$nombre.',</p>Se ha registrado una nueva cuenta en el sistema de gestión Aleph Manager con su email, su nombre de usuario es "'.$username.'" para continuar la verificación y cambiar la contraseña siga el siguiente link a continuacion:<br><a href="'.$link.'">Haz clic aquí</a>';
+				$body = '<p>Hola ' . $nombre . ',</p>Se ha registrado una nueva cuenta en el sistema de gestión Aleph Manager con su email, su nombre de usuario es "' . $username . '" para continuar la verificación y cambiar la contraseña siga el siguiente link a continuacion:<br><a href="' . $link . '">Haz clic aquí</a>';
 				$to = $email;
 				$emailEnviado = $myController->enviar_email($to, $body, $subject);
 
-			$clientIP = $_SERVER['REMOTE_ADDR'];
-			$userAgent = \Request::userAgent();
-			$email = $user->email;
-			$detalle = "Aviso de creación de cuenta y cambio de contraseña";
-			$enviado = $emailEnviado ? "Si" : "No";
-			#dd($clientIP);
-			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
+				$clientIP = $_SERVER['REMOTE_ADDR'];
+				$userAgent = \Request::userAgent();
+				$email = $user->email;
+				$detalle = "Aviso de creación de cuenta y cambio de contraseña";
+				$enviado = $emailEnviado ? "Si" : "No";
+				#dd($clientIP);
+				$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 
-			$clientIP = $_SERVER['REMOTE_ADDR'];
-			$userAgent = \Request::userAgent();
-			$username = $user->username;
-			$message = "Aviso de creación de cuenta y cambio de contraseña";
-			$myController->loguearAdministracion($clientIP, $userAgent, $username, $message);
+				$clientIP = $_SERVER['REMOTE_ADDR'];
+				$userAgent = \Request::userAgent();
+				$username = $user->username;
+				$message = "Aviso de creación de cuenta y cambio de contraseña";
+				$myController->loguearAdministracion($clientIP, $userAgent, $username, $message);
 
 				Log::info('Correo enviado exitosamente a ' . $to);
 				$response = [
@@ -246,8 +254,8 @@ class UserController extends Controller
 	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
+	 *
+	 **************************************************************************/
 
 	/**
 	 * Display the specified resource.
@@ -255,12 +263,12 @@ class UserController extends Controller
 	public function show($id): View
 	{
 		$user = User::find($id);
-	return view('user.show', compact('user'));
+		return view('user.show', compact('user'));
 	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
+	 *
+	 **************************************************************************/
 
 	/**
 	 * Show the form for editing the specified resource.
@@ -278,8 +286,8 @@ class UserController extends Controller
 	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
+	 *
+	 **************************************************************************/
 
 	/**
 	 * Update the specified resource in storage.
@@ -341,19 +349,19 @@ class UserController extends Controller
 			Log::info($message);
 
 			$subject = "Actualización de usuario";
-			$body = "El usuario " . $username . " correspondiente a ". $user->nombre ." ". $user->apellido ." fue actualizado por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+			$body = "El usuario " . $username . " correspondiente a " . $user->nombre . " " . $user->apellido . " fue actualizado por " . Auth::user()->nombre . " " . Auth::user()->apellido;
 
 			#dd($user->email." - ".$validatedData['email']);
 			if ($user->email != $validatedData['email']) {
-				$to = $user->email.",".$validatedData['email'];
-				$body = "El email del usuario ". $user->nombre ." ". $user->apellido ." fue actualizado de ".$user->email." a ".$validatedData['email']." por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+				$to = $user->email . "," . $validatedData['email'];
+				$body = "El email del usuario " . $user->nombre . " " . $user->apellido . " fue actualizado de " . $user->email . " a " . $validatedData['email'] . " por " . Auth::user()->nombre . " " . Auth::user()->apellido;
 			} else {
 				$to = $user->email;
 			}
 
 			if ($user->username != $validatedData['username']) {
 				$to = $validatedData['email'];
-				$body = "El username del usuario ". $user->nombre ." ". $user->apellido ." fue actualizado de ".$user->username." a ".$validatedData['username']." por " . Auth::user()->nombre . " " . Auth::user()->apellido;
+				$body = "El username del usuario " . $user->nombre . " " . $user->apellido . " fue actualizado de " . $user->username . " a " . $validatedData['username'] . " por " . Auth::user()->nombre . " " . Auth::user()->apellido;
 			} else {
 				$to = $user->email;
 			}
@@ -367,7 +375,7 @@ class UserController extends Controller
 			$enviado = $emailEnviado ? "Si" : "No";
 			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 			Log::info('Correo enviado exitosamente a ' . $to);
-			
+
 			// Actualizar el usuario con los datos validados
 			$user->update($validatedData);
 
@@ -384,7 +392,7 @@ class UserController extends Controller
 			$response['message'] = 'Tu sesión ha expirado. Inicia sesión nuevamente.';
 			return response()->json($response);
 		} catch (\Exception $e) {
-			Log::error('Error en la actualización del usuario: '.$e->getMessage());
+			Log::error('Error en la actualización del usuario: ' . $e->getMessage());
 			#dd('Error: '.$e->getMessage());  // Muestra el mensaje exacto del error
 			$response['message'] = 'Ocurrió un error inesperado.';
 			return response()->json($response);
@@ -392,8 +400,8 @@ class UserController extends Controller
 	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
+	 *
+	 **************************************************************************/
 
 	public function destroy($id, MyController $myController): RedirectResponse
 	{
@@ -402,15 +410,14 @@ class UserController extends Controller
 			abort(403, '.');
 			return false;
 		}
-		if(Auth::user()->user_id != $id) 
-		{
+		if (Auth::user()->user_id != $id) {
 			// Encuentra el usuario por su ID
 			$user = User::withTrashed()->find($id);
 			// Almacena el nombre de usuario antes de eliminarlo
 			$username = $user->username;
 			// Elimina el usuario
 			$user->delete();
-			$message = Auth::user()->username . " borró el usuario " . $username;
+			$message = Auth::user()->username . " Eliminó el usuario " . $username;
 			Log::info($message);
 			$subject = "Borrado de usuario";
 			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
@@ -427,18 +434,19 @@ class UserController extends Controller
 			$myController->loguearEmails($clientIP, $userAgent, $email, $detalle, $enviado);
 			Log::info('Correo enviado exitosamente a ' . $to);
 			return Redirect::route('users.index')
-			->with('success', 'Usuario eliminado correctamente.');
+				->with('success', 'Usuario eliminado correctamente.');
 		} else {
 			return Redirect::route('users.index')
-			->with('error', 'No se puede borrar tu propia cuenta.');
+				->with('error', 'No se puede borrar tu propia cuenta.');
 			#return response()->json('No se puede borrar tu propia cuenta', 403);
 		}
 	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
-	public function ajax_edit($id, MyController $myController){
+	 *
+	 **************************************************************************/
+	public function ajax_edit($id, MyController $myController)
+	{
 		$permiso_editar_usuario = $myController->tiene_permiso('edit_usr');
 		if (!$permiso_editar_usuario) {
 			abort(403, '.');
@@ -451,26 +459,26 @@ class UserController extends Controller
 			'user' => $user
 		];
 		return response()->json($data);
-    }
+	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
-	public function ajax_delete($id, MyController $myController){
-        $permiso_borrar_usuario = $myController->tiene_permiso('del_usr');
+	 *
+	 **************************************************************************/
+	public function ajax_delete($id, MyController $myController)
+	{
+		$permiso_borrar_usuario = $myController->tiene_permiso('del_usr');
 		if (!$permiso_borrar_usuario) {
 			abort(403, '.');
 			return false;
 		}
-		if(Auth::user()->user_id != $id) 
-		{
+		if (Auth::user()->user_id != $id) {
 			// Encuentra el usuario por su ID
 			$user = User::withTrashed()->find($id);
 			// Almacena el nombre de usuario antes de eliminarlo
 			$username = $user->username;
 			// Elimina el usuario
 			$user->delete();
-			$message = Auth::user()->username . " borró el usuario " . $username;
+			$message = Auth::user()->username . " Eliminó el usuario " . $username;
 			Log::info($message);
 			$subject = "Borrado de usuario";
 			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
@@ -492,39 +500,40 @@ class UserController extends Controller
 			return response()->json(['error' => 'No se puede borrar tu propia cuenta.']);
 			#return response()->json('No se puede borrar tu propia cuenta', 403);
 		}
-    }
+	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
+	 *
+	 **************************************************************************/
 
 	public function guardar_opciones(Request $request)
 	{
 		$reset_password_30_dias = $request->reset_password_30_dias ? 1 : 0;
 		$configurar_claves = $request->configurar_claves ? 1 : 0;
-			Variable::where('nombre', 'reset_password_30_dias')->update([
-				'valor' => $reset_password_30_dias
-			]);
-			Variable::where('nombre', 'configurar_claves')->update([
-				'valor' => $configurar_claves
-			]);
+		Variable::where('nombre', 'reset_password_30_dias')->update([
+			'valor' => $reset_password_30_dias
+		]);
+		Variable::where('nombre', 'configurar_claves')->update([
+			'valor' => $configurar_claves
+		]);
 		return redirect()->route('users.index')->with('success', 'Opciones guardadas correctamente.');
-	}				
+	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
+	 *
+	 **************************************************************************/
 
 	public function mostrar_opciones(Request $request)
 	{
-		echo($request);
-	}				
+		echo ($request);
+	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
-	public function deshabilitar_usuario(Request $request, $user_id, MyController $myController) {
-		if(Auth::user()->user_id != $user_id) {
+	 *
+	 **************************************************************************/
+	public function deshabilitar_usuario(Request $request, $user_id, MyController $myController)
+	{
+		if (Auth::user()->user_id != $user_id) {
 			$permiso_habilitar_usuario = $myController->tiene_permiso('del_usr');
 			if (!$permiso_habilitar_usuario) {
 				abort(403, '.');
@@ -532,7 +541,7 @@ class UserController extends Controller
 			}
 			try {
 				$user = User::findOrFail($user_id);
-				$user->habilitado = ( $user->habilitado != 1 ) ? 1 : 0;
+				$user->habilitado = ($user->habilitado != 1) ? 1 : 0;
 				$user->save(); // Guardar los cambios en la base de datos
 				return response()->json(['success' => true]);
 			} catch (\Exception $e) {
@@ -544,10 +553,11 @@ class UserController extends Controller
 	}
 
 	/**************************************************************************
-	*
-	**************************************************************************/
-	public function deshabilitar_usuario_temporal(Request $request, $user_id, MyController $myController) {
-		if(Auth::user()->user_id != $user_id) {
+	 *
+	 **************************************************************************/
+	public function deshabilitar_usuario_temporal(Request $request, $user_id, MyController $myController)
+	{
+		if (Auth::user()->user_id != $user_id) {
 			$permiso_habilitar_usuario = $myController->tiene_permiso('del_usr');
 			if (!$permiso_habilitar_usuario) {
 				abort(403, '.');
@@ -556,7 +566,7 @@ class UserController extends Controller
 			try {
 				$user = User::findOrFail($user_id);
 				#echo "hab ".$user->habilitado;
-				$user->habilitado = ( $user->habilitado != 2 ) ? 2 : 0;
+				$user->habilitado = ($user->habilitado != 2) ? 2 : 0;
 				$user->save(); // Guardar los cambios en la base de datos
 				return response()->json(['success' => true]);
 			} catch (\Exception $e) {
@@ -569,8 +579,8 @@ class UserController extends Controller
 
 
 	/**************************************************************************
-	*
-	**************************************************************************/
+	 *
+	 **************************************************************************/
 
 	public function unlockAccount(Request $request, $userId, MyController $myController)
 	{
@@ -596,14 +606,13 @@ class UserController extends Controller
 	}
 
 	/**************************************************************************
-	* Blanqueo de passwords.
-	*/
+	 * Blanqueo de passwords.
+	 */
 
 	public function blanquear_password($user_id, MyController $myController)
 	{
 		#echo "kdk1 ".$user_id;
-		if(Auth::user()->user_id != $user_id) 
-		{
+		if (Auth::user()->user_id != $user_id) {
 			// Actualiza la contraseña del usuario
 			$user = User::find($user_id);
 			if ($user) {
@@ -622,7 +631,7 @@ class UserController extends Controller
 				$resetUrl = route('blank_pass_form', ['token' => $token, 'email' => $email]);
 				// Enviar correo
 				$subject = "Aviso de blanqueo de contraseña";
-				$body = 'Se ha realizado un blanqueo de su contraseña en Aleph Manager, para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="'.$resetUrl.'">Haz clic aquí</a>';
+				$body = 'Se ha realizado un blanqueo de su contraseña en Aleph Manager, para continuar y cambiar la contraseña siga el siguiente enlace:<br><a href="' . $resetUrl . '">Haz clic aquí</a>';
 				$to = $user->email;
 				#echo "kdk2 ".$resetUrl;
 				$myController->enviar_email($to, $body, $subject);
@@ -634,8 +643,8 @@ class UserController extends Controller
 	}
 
 	/**************************************************************************
-	* Set password expiration.
-	*/
+	 * Set password expiration.
+	 */
 	public function setPasswordExpiration(User $user)
 	{
 		// Define el periodo de expiración, por ejemplo, 90 días
@@ -647,8 +656,8 @@ class UserController extends Controller
 
 
 	/**************************************************************************
-	* Set password expiration.
-	*/
+	 * Set password expiration.
+	 */
 	public function authenticate(Request $request)
 	{
 		// Realiza la autenticación habitual
@@ -662,8 +671,8 @@ class UserController extends Controller
 		// Continua con el flujo de autenticación
 	}
 	/**************************************************************************
-	* Display a listing of the resource.
-	*
+	 * Display a listing of the resource.
+	 *
 
 	public function showChangePasswordForm(Request $request)
 	{
@@ -719,8 +728,8 @@ class UserController extends Controller
 	}
 
 	/**************************************************************************
-	* Display a listing of the resource.
-	**************************************************************************
+	 * Display a listing of the resource.
+	 **************************************************************************
 
 	public function showResetForm(Request $request)
 	{
@@ -730,6 +739,5 @@ class UserController extends Controller
 		return view('auth.password_reset', ['token' => $token],['email' => $email]);
 	}
 
-*/
-
+	 */
 }

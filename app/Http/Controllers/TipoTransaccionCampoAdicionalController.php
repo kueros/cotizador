@@ -31,7 +31,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			return false;
 		}
 */
-#dd($id);
+		#dd($id);
 		$ultima_posicion = TipoTransaccionCampoAdicional::where('tipo_transaccion_id', $id)->max('orden_listado');
 		$ultima_posicion = $ultima_posicion ? $ultima_posicion + 1 : 1;
 		#dd($ultima_posicion);
@@ -55,7 +55,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			->where('tipo_transaccion_id', $tipo_transaccion_id)
 			->orderBy('orden_listado', 'asc')
 			->get();
-#dd($campos_adicionales);// ->toSql(), $campos_adicionales->getBindings());
+		#dd($campos_adicionales);// ->toSql(), $campos_adicionales->getBindings());
 
 		$data = array();
 		foreach ($campos_adicionales as $r) {
@@ -66,7 +66,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 				$r->nombre_campo,
 				$r->nombre_mostrar,
 				$r->orden_listado,
-				$r->requerido == 1 ? 'Sí' : 'No', 
+				$r->requerido == 1 ? 'Sí' : 'No',
 				$r->tipo_nombre,
 				$r->valores = json_decode($r->valores),
 				$accion
@@ -110,7 +110,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " borró el tipo de transacción " . $nombre;
+		$message = $username . " Eliminó el tipo de transacción " . $nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$campos_adicionales->delete();
@@ -168,7 +168,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		$inserted_id->orden_listado = $orden_listado;
 		$inserted_id->save();
 		// Si el tipo es "selector" (id = 4), verificar valores
-		if ($validated['tipo'] == 4 ) {
+		if ($validated['tipo'] == 4) {
 			if (empty($validated['tipo'])) {
 				return response()->json([
 					'errors' => ['valores' => 'Se deben agregar valores para el selector.']
@@ -179,7 +179,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 				$inserted_id->save();
 			}
 		}
-	 	$nombre_campo = $validated['nombre_campo'];
+		$nombre_campo = $validated['nombre_campo'];
 		$tipo = $validated['tipo'];
 
 		// Crear la columna en la tabla
@@ -197,22 +197,21 @@ class TipoTransaccionCampoAdicionalController extends Controller
 					$table->{$tipoDB}($nombre_campo)->nullable()->after('nombre');
 				});
 			}
-		
 		}
 
-	
+
 		// Loguear la acción
 		$clientIP = $request->ip();
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
 		$message = "$username creó el campo adicional para tipo de transacción $nombre_campo";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-	
-			/*$response = [
+
+		/*$response = [
 			'status' => 0,
 			'message' => $validatedData->errors()
 		];*/
-	// Respuesta exitosa
+		// Respuesta exitosa
 		$response = [
 			'status' => 1,
 			'message' => 'Campo adicional creado correctamente.'
@@ -318,16 +317,16 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	{
 		#dd($request);
 		// Validar los datos
-		
+
 		$formData = [];
 		foreach ($request->input('form_data') as $input) {
-			if( $input['name'] == "posicion" ){
+			if ($input['name'] == "posicion") {
 				$formData['orden_listado'] = $input['value'];
 			} else {
 				$formData[$input['name']] = $input['value'];
 			}
 		}
-		
+
 		$validatedData = Validator::make($formData, [
 			'nombre_campo' => 'required|string|max:255',
 			'nombre_mostrar' => 'required|string|max:255',
@@ -375,13 +374,12 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			return false;
 		}
 */
-/* 		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::find($id);
+		/* 		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::find($id);
 		#dd($roles);
 		return view('tipos_transacciones_campos_adicionales.edit', compact('tipos_transacciones_campos_adicionales'));
 */
 		$tipos_campos = TipoCampo::all();
-		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::
-			where('tipos_transacciones_campos_adicionales.id', $id)
+		$tipos_transacciones_campos_adicionales = TipoTransaccionCampoAdicional::where('tipos_transacciones_campos_adicionales.id', $id)
 			->leftJoin('tipos_campos', 'tipos_transacciones_campos_adicionales.tipo', '=', 'tipos_campos.id')
 			->select('tipos_campos.nombre as tipo_nombre', 'tipos_transacciones_campos_adicionales.*')
 			->first();
@@ -404,11 +402,9 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		$nombre = $tipos_transacciones_campos_adicionales->nombre_campo;
 		// Elimina el rol
 		$tipos_transacciones_campos_adicionales->delete();
-		$message = Auth::user()->username . " borró el campo adicional de tipo de transacción " . $nombre;
+		$message = Auth::user()->username . " Eliminó el campo adicional de tipo de transacción " . $nombre;
 		Log::info($message);
 		return Redirect::route('tipos_transacciones_campos_adicionales')
 			->with('success', 'Campo adicional de tipo de transacción exitosamente borrado');
 	}
-
-
 }

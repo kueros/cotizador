@@ -18,7 +18,7 @@ class ConfiguracionController extends Controller
 {
 	/*****************************************************************************************************************
 	 *****************************************************************************************************************/
-	public function index( MyController $myController): View
+	public function index(MyController $myController): View
 	{
 		$permiso_configuraciones_software = $myController->tiene_permiso('setup_soft');
 		if (!$permiso_configuraciones_software) {
@@ -38,7 +38,7 @@ class ConfiguracionController extends Controller
 
 	/*****************************************************************************************************************
 	 *****************************************************************************************************************/
-	public function variables( MyController $myController)
+	public function variables(MyController $myController)
 	{
 		$permiso_configuraciones_software = $myController->tiene_permiso('setup_soft');
 		if (!$permiso_configuraciones_software) {
@@ -107,12 +107,12 @@ class ConfiguracionController extends Controller
 	/*****************************************************************************************************************
 	 *****************************************************************************************************************/
 
-    public function guardarImagenHome(Request $request)
-    {
-		try{
+	public function guardarImagenHome(Request $request)
+	{
+		try {
 			// Validar que el archivo es una imagen
 			$request->validate([
-				'copa_path' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', 
+				'copa_path' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
 			], [
 				'copa_path.required' => 'Debes seleccionar una imagen.',
 				'copa_path.mimes' => 'La imagen debe ser de tipo: jpeg, jpg, png, gif o webp.',
@@ -121,36 +121,36 @@ class ConfiguracionController extends Controller
 
 			$file = $request->file('copa_path');
 			$time = date('Ymd_His');
-			$filename = "background_home_".$time.".jpg";
-			$path_filename = 'images/'.$filename;
+			$filename = "background_home_" . $time . ".jpg";
+			$path_filename = 'images/' . $filename;
 			$variable = Variable::where('nombre', '=', 'background_home_custom_path')->first();
-			if( is_null($variable) ) {
+			if (is_null($variable)) {
 				return redirect()->back()->with('error', 'La variable no existe.');
 			}
 			$path_oldfilename = public_path($variable->valor);
 			if (file_exists($path_oldfilename)) {
 				unlink($path_oldfilename);
 			}
-			
+
 			$path = $file->move(public_path('images'), $filename);
 			$variable->valor = $path_filename;
 			$variable->save();
 
 			return redirect()->back()->with('success', 'Imagen guardada correctamente.');
-		}catch(\Exception $ex){
+		} catch (\Exception $ex) {
 			return redirect()->back()->with('error', 'La imagen no se pudo cargar.');
 		}
-    }
+	}
 
 	/*****************************************************************************************************************
 	 *****************************************************************************************************************/
 
-    public function guardarImagenLogin(Request $request)
-    {
-		try{
+	public function guardarImagenLogin(Request $request)
+	{
+		try {
 			// Validar que el archivo es una imagen
 			$request->validate([
-				'copa_path' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', 
+				'copa_path' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
 			], [
 				'copa_path.required' => 'Debes seleccionar una imagen.',
 				'copa_path.mimes' => 'La imagen debe ser de tipo: jpeg, jpg, png, gif o webp.',
@@ -159,10 +159,10 @@ class ConfiguracionController extends Controller
 			// Obtener el archivo de la solicitud
 			$file = $request->file('copa_path');
 			$time = date('Ymd_His');
-			$filename = "background_login_".$time.".jpg";
-			$path_filename = 'images/'.$filename;
+			$filename = "background_login_" . $time . ".jpg";
+			$path_filename = 'images/' . $filename;
 			$variable = Variable::where('nombre', '=', 'background_login_custom_path')->first();
-			if( is_null($variable) ) {
+			if (is_null($variable)) {
 				return redirect()->back()->with('error', 'La variable no existe.');
 			}
 			$path_oldfilename = public_path($variable->valor);
@@ -175,10 +175,10 @@ class ConfiguracionController extends Controller
 			$variable->save();
 
 			return redirect()->back()->with('success', 'Imagen guardada correctamente.');
-		}catch(\Exception $ex){
+		} catch (\Exception $ex) {
 			return redirect()->back()->with('error', 'La imagen no se pudo cargar.');
 		}
-    }
+	}
 
 	/*****************************************************************************************************************
 	 *****************************************************************************************************************/
@@ -193,7 +193,7 @@ class ConfiguracionController extends Controller
 		$from = trim($_POST['from']);
 		$from_name = trim($_POST['from_name']);
 		$users = User::find(Auth::user()->user_id);
-		$message = "Se modificó el remitente guardado a: Email = " . $from . " Nombre = " . $from_name . " por " . $users->apellido . ", " . $users->nombre;		
+		$message = "Se modificó el remitente guardado a: Email = " . $from . " Nombre = " . $from_name . " por " . $users->apellido . ", " . $users->nombre;
 		Log::info($message);
 		$log = LogAdministracion::create([
 			'username' => Auth::user()->username,
@@ -231,7 +231,7 @@ class ConfiguracionController extends Controller
 		if ($parametro != '' && $valor != '') {
 			$notificaciones_email_config = Variable::where('nombre', '_notificaciones_email_config')->first();
 			$configs = json_decode($notificaciones_email_config->valor);
-			
+
 			$mail_config = array();
 			if ($configs != '') {
 				foreach ($configs as $key => $config) {
@@ -245,7 +245,7 @@ class ConfiguracionController extends Controller
 				Variable::where('nombre', '_notificaciones_email_config')->update(['valor' => json_encode($mail_config)]);
 
 				$users = User::find(Auth::user()->user_id);
-				$message = "Se agregó el parámetro " . $valor . " al email por " . $users->apellido . ", " . $users->nombre;		
+				$message = "Se agregó el parámetro " . $valor . " al email por " . $users->apellido . ", " . $users->nombre;
 				Log::info($message);
 				$log = LogAdministracion::create([
 					'username' => Auth::user()->username,
@@ -289,7 +289,7 @@ class ConfiguracionController extends Controller
 			}
 			if (isset($mail_config[$parametro])) {
 				$users = User::find(Auth::user()->user_id);
-				$message = "Se borró el parámetro " . $mail_config[$parametro] . " del email por " . $users->apellido . ", " . $users->nombre;		
+				$message = "Se eliminó el parámetro " . $mail_config[$parametro] . " del email por " . $users->apellido . ", " . $users->nombre;
 				Log::info($message);
 				$log = LogAdministracion::create([
 					'username' => Auth::user()->username,
@@ -301,7 +301,7 @@ class ConfiguracionController extends Controller
 				$log->save();
 				unset($mail_config[$parametro]);
 			}
-			session()->flash('success', 'Se borró el parámetro.');
+			session()->flash('success', 'Se eliminó el parámetro.');
 			Variable::where('nombre', '_notificaciones_email_config')->update(['valor' => json_encode($mail_config)]);
 
 			return true;

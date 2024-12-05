@@ -153,7 +153,7 @@ class AlertaController extends Controller
 		$clientIP_sc = str_replace('"', '', $clientIP);
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
-		$message = "Creó el alerta: $validated[nombre]";
+		$message = "Creó el alerta: \"$validated[nombre]\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 		#dd($clientIP_sc);
 		$response = [
@@ -278,7 +278,7 @@ class AlertaController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = "Eliminó el alerta " . $alerta->nombre;
+		$message = "Eliminó el alerta \"$alerta->nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$alertas_detalles->delete();
