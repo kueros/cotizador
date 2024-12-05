@@ -22,71 +22,63 @@ use Illuminate\Support\Facades\DB;
 class AlertaController extends Controller
 {
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
+	 *******************************************************************************************************************************/
 	public function alertasIndex(Request $request, MyController $myController): View
 	{
-/* 		$permiso_listar_funciones = $myController->tiene_permiso('list_funciones');
+		/* 		$permiso_listar_funciones = $myController->tiene_permiso('list_funciones');
 		if (!$permiso_listar_funciones) {
 			abort(403, '.');
 			return false;
 		}
- */		
+ */
 		$funciones = Funcion::all();
-        $tipos_alertas = TipoAlerta::all();
-        $alertas_tipos_tratamientos = AlertaTipoTratamiento::all();
-		
-        $alertas = 
-            Alerta::
-					leftJoin('tipos_alertas', 'alertas.tipos_alertas_id', '=', 'tipos_alertas.id')->
-					leftJoin('alertas_tipos_tratamientos', 'alertas.tipos_tratamientos_id', '=', 'alertas_tipos_tratamientos.id')->
-					select( 'tipos_alertas.nombre', 'alertas_tipos_tratamientos.nombre', 'alertas.*')->
-                #where('tipo_transaccion_id', $tipo_transaccion_id)->
-                #orderBy('nombre', 'asc')->
-                paginate();
-        return view('alertas.index', compact('alertas', 'tipos_alertas', 'alertas_tipos_tratamientos', 'funciones'))
+		$tipos_alertas = TipoAlerta::all();
+		$alertas_tipos_tratamientos = AlertaTipoTratamiento::all();
+
+		$alertas =
+			Alerta::leftJoin('tipos_alertas', 'alertas.tipos_alertas_id', '=', 'tipos_alertas.id')->leftJoin('alertas_tipos_tratamientos', 'alertas.tipos_tratamientos_id', '=', 'alertas_tipos_tratamientos.id')->select('tipos_alertas.nombre', 'alertas_tipos_tratamientos.nombre', 'alertas.*')->
+			#where('tipo_transaccion_id', $tipo_transaccion_id)->
+			#orderBy('nombre', 'asc')->
+			paginate();
+		return view('alertas.index', compact('alertas', 'tipos_alertas', 'alertas_tipos_tratamientos', 'funciones'))
 			->with('i', ($request->input('page', 1) - 1) * $alertas->perPage());
 	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
+	 *******************************************************************************************************************************/
 	public function ajax_listado(Request $request)
 	{
-		$alertas = 
-			Alerta::
-					leftJoin('tipos_alertas', 'alertas.tipos_alertas_id', '=', 'tipos_alertas.id')->
-					leftJoin('alertas_tipos_tratamientos', 'alertas.tipos_tratamientos_id', '=', 'alertas_tipos_tratamientos.id')->
-					select( 'tipos_alertas.nombre as tipo_alerta', 'alertas_tipos_tratamientos.nombre as tipo_tratamiento', 'alertas.*')->
-					orderBy('nombre', 'asc')->
-			        get();
+		$alertas =
+			Alerta::leftJoin('tipos_alertas', 'alertas.tipos_alertas_id', '=', 'tipos_alertas.id')->leftJoin('alertas_tipos_tratamientos', 'alertas.tipos_tratamientos_id', '=', 'alertas_tipos_tratamientos.id')->select('tipos_alertas.nombre as tipo_alerta', 'alertas_tipos_tratamientos.nombre as tipo_tratamiento', 'alertas.*')->orderBy('nombre', 'asc')->get();
 		$data = array();
 		#dd($alertas);
-        foreach($alertas as $r) {
-			$detalleAlerta = route('alertas_detalles', ['id' => $r->id]); 
+		foreach ($alertas as $r) {
+			$detalleAlerta = route('alertas_detalles', ['id' => $r->id]);
 			$accion = '<a class="btn btn-sm btn-info" href="' . $detalleAlerta . '" title="Detalle Alerta">Detalle Alerta</a>';
 
-            $accion .= '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_alertas('."'".$r->id.
-					"'".')"><i class="bi bi-pencil-fill"></i></a>';
+			$accion .= '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_alertas(' . "'" . $r->id .
+				"'" . ')"><i class="bi bi-pencil-fill"></i></a>';
 
-			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_alerta('."'".$r->id.
-					"'".')"><i class="bi bi-trash"></i></a>';
+			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_alerta(' . "'" . $r->id .
+				"'" . ')"><i class="bi bi-trash"></i></a>';
 
-            $data[] = array(
-                $r->nombre,
-                $r->descripcion,
-                $r->tipo_alerta,
+			$data[] = array(
+				$r->nombre,
+				$r->descripcion,
+				$r->tipo_alerta,
 				$r->tipo_tratamiento,
-                $accion
-            );
-        }
+				$accion
+			);
+		}
 		#dd($data);
-        $output = array(
-            "recordsTotal" => $alertas->count(),
-            "recordsFiltered" => $alertas->count(),
-            "data" => $data
-        );
- 
+		$output = array(
+			"recordsTotal" => $alertas->count(),
+			"recordsFiltered" => $alertas->count(),
+			"data" => $data
+		);
+
 		return response()->json($output);
-    }
+	}
 
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
@@ -117,6 +109,7 @@ class AlertaController extends Controller
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
 			'tipos_tratamientos_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_tratamientos_id.exists' => 'El tipo de campo seleccionado no es válido.',
+			'funciones_id.required' => '"Detalles de la Alerta" no puede quedar vacío.',
 		]);
 		// Si la validación falla
 		if ($validatedData->fails()) {
@@ -126,7 +119,7 @@ class AlertaController extends Controller
 				'errors' => $validatedData->errors()
 			]);
 		}
-		
+
 		$validated = $validatedData->validated(); // Obtiene los datos validados como array
 		#$inserted_id = Alerta::create($validated);
 
@@ -136,31 +129,31 @@ class AlertaController extends Controller
 			'tipos_alertas_id' => $validated['tipos_alertas_id'],
 			'tipos_tratamientos_id' => $validated['tipos_tratamientos_id'],
 		]);
-	#dd($alerta->id);
-	AlertaDetalle::create([
-		'alertas_id' => $alerta->id,
-		'funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
-		'fecha_desde' => implode(',', array_map(function ($fecha) {
-			return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
-		}, $request['fecha_desde'])),
-		'fecha_hasta' => implode(',', array_map(function ($fecha) {
-			return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
-		}, $request['fecha_hasta'])),
-	]);
+		#dd($alerta->id);
+		AlertaDetalle::create([
+			'alertas_id' => $alerta->id,
+			'funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
+			'fecha_desde' => implode(',', array_map(function ($fecha) {
+				return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
+			}, $request['fecha_desde'])),
+			'fecha_hasta' => implode(',', array_map(function ($fecha) {
+				return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
+			}, $request['fecha_hasta'])),
+		]);
 
 		// Loguear la acción
 		$clientIP = \Request::ip();
 		$clientIP_sc = str_replace('"', '', $clientIP);
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
-		$message = "Creó el alerta \"$validated[nombre]\"";
+		$message = "Creó la alerta \"$validated[nombre]\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 		#dd($clientIP_sc);
 		$response = [
-		'status' => 0,
-		'message' => $validatedData->errors()
+			'status' => 0,
+			'message' => $validatedData->errors()
 		];
-	// Respuesta exitosa
+		// Respuesta exitosa
 		$response = [
 			'status' => 1,
 			'message' => 'Alerta creada correctamente.'
@@ -170,9 +163,10 @@ class AlertaController extends Controller
 	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
-	public function ajax_edit($id){
-        $alerta = Alerta::where('id', $id)->first();
+	 *******************************************************************************************************************************/
+	public function ajax_edit($id)
+	{
+		$alerta = Alerta::where('id', $id)->first();
 		$alertasDetalles = AlertaDetalle::where('alertas_id', $id)->get();
 		$response = response()->json([
 			'alertas' => $alerta,
@@ -184,8 +178,8 @@ class AlertaController extends Controller
 	}
 
 
-    /*******************************************************************************************************************************
-	*******************************************************************************************************************************/
+	/*******************************************************************************************************************************
+	 *******************************************************************************************************************************/
 	public function alertasUpdate(Request $request, Alerta $alerta, MyController $myController)
 	{
 		// Validación de los datos
@@ -205,7 +199,7 @@ class AlertaController extends Controller
 			'tipos_tratamientos_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_tratamientos_id.exists' => 'El tipo de campo seleccionado no es válido.',
 		]);
-	
+
 		if ($validatedData->fails()) {
 			return response()->json([
 				'status' => 0,
@@ -213,9 +207,9 @@ class AlertaController extends Controller
 				'errors' => $validatedData->errors()
 			]);
 		}
-	
+
 		$validated = $validatedData->validated();
-	
+
 		// Obtener el registro existente (usando findOrFail para garantizar un modelo único)
 		$alertaExistente = Alerta::where('id', $request->alertas_id)->first();
 		if (!$alertaExistente) {
@@ -224,7 +218,7 @@ class AlertaController extends Controller
 				'message' => 'Alerta no encontrada.'
 			]);
 		}
-	
+
 		// Construir el mensaje de cambios
 		$cambios = [];
 		foreach (['nombre', 'descripcion', 'tipos_alertas_id', 'tipos_tratamientos_id'] as $campo) {
@@ -232,14 +226,14 @@ class AlertaController extends Controller
 				$cambios[] = "cambiando $campo de \"{$alertaExistente->$campo}\" a \"{$validated[$campo]}\"";
 			}
 		}
-	
+
 		$mensajeCambios = implode(', ', $cambios);
 		$username = Auth::user()->username;
-		$message = "Actualizó el alerta \"{$alertaExistente->nombre}\" $mensajeCambios.";
-	
+		$message = "Actualizó la alerta \"{$alertaExistente->nombre}\" $mensajeCambios.";
+
 		// Actualizar los datos
 		$alertaExistente->update($validated);
-	
+
 		DB::table('detalles_alertas')
 			->updateOrInsert(
 				['alertas_id' => $alertaExistente->id],
@@ -253,12 +247,12 @@ class AlertaController extends Controller
 					}, $request['fecha_hasta'])),
 				]
 			);
-	
+
 		// Loguear la acción
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-	
+
 		return response()->json([
 			'status' => 1,
 			'message' => 'Alerta actualizada correctamente.'
@@ -266,9 +260,10 @@ class AlertaController extends Controller
 	}
 
 	/*******************************************************************************************************************************
-	*******************************************************************************************************************************/
-	public function ajax_delete($id, MyController $myController){
-/*         $permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
+	 *******************************************************************************************************************************/
+	public function ajax_delete($id, MyController $myController)
+	{
+		/*         $permiso_eliminar_roles = $myController->tiene_permiso('del_rol');
 		if (!$permiso_eliminar_roles) {
 			return response()->json(["error"=>"No tienes permiso para realizar esta acción, contáctese con un administrador."], "405");
 		}
@@ -278,11 +273,11 @@ class AlertaController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = "Eliminó el alerta \"$alerta->nombre\"";
+		$message = "Eliminó la alerta \"$alerta->nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$alertas_detalles->delete();
 		$alerta->delete();
-		return response()->json(["status"=>true]);
-    }
+		return response()->json(["status" => true]);
+	}
 }

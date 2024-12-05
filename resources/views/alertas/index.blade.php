@@ -105,6 +105,7 @@
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
 			limpiarErrores();
+			$('#detalles_alertas tbody').empty();
 			$('#modal_form_alertas').modal('show');
 			$('.modal-title').text('Agregar Alerta');
 			$('#accion').val('add');
@@ -200,11 +201,25 @@
 					console.error(jqXHR.responseText);
 				}
 			});
+			$('#modal_form_alertas').on('hidden.bs.modal', function () {
+				limpiarErrores();
+				$('#form')[0].reset(); // Opcional: resetear el formulario
+			});
+/* 			const tablaDinamica = document.getElementById("detalles_alertas");
+			console.log('tablaDinamica ',tablaDinamica.tbody);
+			// Elimina todas las filas dinámicas
+			while (tablaDinamica.firstChild) {
+				tablaDinamica.removeChild(tablaDinamica.firstChild+1);
+			}
+ */					// Limpiar la tabla de detalles antes de llenarla
+					$('#detalles_alertas tbody').empty();
+
 		}
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function validarFormulario() {
+			console.log('validar formulario ');
 			let nombre = document.querySelector('input[name="nombre"]').value.trim();
 			let descripcion = document.querySelector('input[name="descripcion"]').value.trim();
 			let tiposAlertasId = document.querySelector('select[name="tipos_alertas_id"]').value;
@@ -218,6 +233,8 @@
 			// Limpiar errores previos
 			document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
 			document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+			errores = [];
+			console.log('limpiar errores ');
 
 			if (!nombre) errores.push({ campo: 'nombre', mensaje: "El campo 'Nombre' es obligatorio." });
 			if (!descripcion) errores.push({ campo: 'descripcion', mensaje: "El campo 'Descripción' es obligatorio." });
@@ -244,7 +261,8 @@
 					filaErrores[index] = erroresFila;
 				}
 			});
-
+			console.log('filaErrores.length ',filaErrores.length);
+			console.log('errores ',errores);
 			if (filaErrores.length > 0 || errores.length > 0) {
 				mostrarErroresPorFila(filaErrores);
 				errores.forEach(err => mostrarErrorGeneral(err.campo, err.mensaje));
@@ -319,7 +337,7 @@
 
 			newRow.innerHTML = `
 				<td>
-					<select class="form-control" name="funciones_id[]" required>
+					<select class="form-control" name="funciones_id[]" >
 						<option value="0">Elija una Función</option>
 						@foreach($funciones as $funcion)
 						<option value="{{ $funcion->id }}">{{ $funcion->nombre }}</option>
@@ -569,7 +587,7 @@
 										<input type="hidden" name="detalles_id[]" value="${detalle.id}">
 										<input type="hidden" name="alertas_id[]" value="${detalle.alertas_id}">
 										<td>
-											<select class="form-control" name="funciones_id[]" required>
+											<select class="form-control" name="funciones_id[]" >
 												${opcionesFunciones}
 											</select>
 										</td>

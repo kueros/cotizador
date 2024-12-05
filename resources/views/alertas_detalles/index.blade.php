@@ -1,21 +1,21 @@
 <x-app-layout title="Detalles de Alertas" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard'],['title' => 'Alertas', 'url' => '/alertasIndex']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
-			{{ __('Detalle del Alerta') }}
+			{{ __('Detalle de l Alerta') }}
 		</h2>
 	</x-slot>
 	<!-- Primary Navigation Menu -->
-<!--	@php
+	<!--	@php
  	$user = Auth::user()->username;
 	$email = Auth::user()->email;
 	$permiso_agregar_roles = tiene_permiso('add_alerta');
 	$permiso_editar_roles = tiene_permiso('edit_rol');
 	$permiso_eliminar_roles = tiene_permiso('del_rol');
 @endphp
--->	
-<?php
-#dd($detalles_alertas);
-?>
+-->
+	<?php
+	#dd($detalles_alertas);
+	?>
 	<script type="text/javascript">
 		alertas_id = <?php echo $id; ?>;
 		var table;
@@ -25,17 +25,25 @@
 			table = $('#detalles_alertas_table').DataTable({
 				processing: true,
 				serverSide: true,
- 				ajax: {
+				ajax: {
 					url: "{{ url('alertas_detalles/ajax_listado') }}",
 					type: 'GET',
- 					data: function(d) {
+					data: function(d) {
 						d.alertas_id = alertas_id;
 					}
 				},
-				columns: [
-					{ data: 'nombre_funcion', title: 'Función' },
-					{ data: 'fecha_desde', title: 'Fecha Desde' },
-					{ data: 'fecha_hasta', title: 'Fecha Hasta' }
+				columns: [{
+						data: 'nombre_funcion',
+						title: 'Función'
+					},
+					{
+						data: 'fecha_desde',
+						title: 'Fecha Desde'
+					},
+					{
+						data: 'fecha_hasta',
+						title: 'Fecha Hasta'
+					}
 				],
 				language: traduccion_datatable,
 				//dom: 'Bfrtip',
@@ -43,7 +51,7 @@
 					"targets": 'no-sort',
 					"orderable": false
 				}],
- 				layout: {
+				layout: {
 					topStart: {
 						buttons: [{
 								"extend": 'pdf',
@@ -74,7 +82,7 @@
 					},
 					bottomEnd: {
 						paging: {
-							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
+							firstLast: false // Esto debería eliminar los botones "Primero" y "Último"
 						}
 					}
 				},
@@ -120,7 +128,7 @@
 				type: "GET",
 				dataType: "JSON",
 				success: function(detalles) {
-					console.log('data :',data);
+					console.log('data :', data);
 					$('[name="id"]').val(data.id);
 					$('[name="funciones_id"]').val(data.funciones_id);
 					$('[name="fecha_desde"]').val(data.fecha_desde);
@@ -220,7 +228,8 @@
 			});
 		}
 	</script>
-<?php #dd($detalles); ?>
+	<?php #dd($detalles); 
+	?>
 	<!--LISTADO-->
 	<div class="container">
 		<div class="row">
@@ -287,14 +296,14 @@
 						<div class="mb-3 row">
 							<label class="col-form-label col-md-3">Fecha Desde</label>
 							<div class="col-md-9">
-								<input 
-									name="fecha_desde" 
-									maxlength="255" 
-									placeholder="Descripción del alerta" 
-									class="form-control" 
-									type="date" 
-									required 
-									pattern="^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$" 
+								<input
+									name="fecha_desde"
+									maxlength="255"
+									placeholder="Descripción de la alerta"
+									class="form-control"
+									type="date"
+									required
+									pattern="^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$"
 									title="Solo se permiten letras, números, espacios, comas y puntos.">
 								<span class="help-block"></span>
 							</div>
@@ -302,14 +311,14 @@
 						<div class="mb-3 row">
 							<label class="col-form-label col-md-3">Fecha Hasta</label>
 							<div class="col-md-9">
-								<input 
-									name="fecha_hasta" 
-									maxlength="255" 
-									placeholder="Descripción del alerta" 
-									class="form-control" 
-									type="date" 
-									required 
-									pattern="^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$" 
+								<input
+									name="fecha_hasta"
+									maxlength="255"
+									placeholder="Descripción de la alerta"
+									class="form-control"
+									type="date"
+									required
+									pattern="^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$"
 									title="Solo se permiten letras, números, espacios, comas y puntos.">
 								<span class="help-block"></span>
 							</div>
