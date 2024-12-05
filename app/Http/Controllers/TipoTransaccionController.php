@@ -89,7 +89,7 @@ class TipoTransaccionController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " Eliminó el tipo de transacción " . $nombre;
+		$message = $username . " eliminó el tipo de transacción " . $nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$tipos_transacciones->delete();
@@ -129,7 +129,7 @@ class TipoTransaccionController extends Controller
 				'string',
 				'max:255',
 				'min:3',
-				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Permitir solo letras y espacios
 				Rule::unique('tipos_transacciones'),
 			],
 		], [
@@ -210,7 +210,7 @@ class TipoTransaccionController extends Controller
 		$nombre = $tipos_transacciones->nombre;
 		// Elimina el rol
 		$tipos_transacciones->delete();
-		$message = Auth::user()->username . " Eliminó el tipo de transacción " . $nombre;
+		$message = Auth::user()->username . " eliminó el tipo de transacción " . $nombre;
 		Log::info($message);
 		return Redirect::route('tipos_transacciones.index')
 			->with('success', 'Tipo de transacción exitosamente borrado');

@@ -78,7 +78,7 @@ class AlertaTipoController extends Controller
 				'string',
 				'max:255',
 				'min:3',
-				'regex:/^[a-zA-Z\s]+$/', // Solo letras y espacios
+				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Solo letras sin acentos y espacios
 				Rule::unique('tipos_alertas', 'nombre') // Verifica la unicidad en la tabla
 			],
 		], [
@@ -145,7 +145,7 @@ class AlertaTipoController extends Controller
 				'string',
 				'max:255',
 				'min:3',
-				'regex:/^[a-zA-Z\s]+$/', // Solo letras y espacios
+				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Solo letras sin acentos y espacios
 				Rule::unique('tipos_alertas', 'nombre') // Verifica la unicidad en la tabla
 			],
 		], [

@@ -103,7 +103,7 @@ class AlertaController extends Controller
 				'string',
 				'max:255',
 				'min:3',
-				'regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
+				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Solo letras sin acentos y espacios
 				Rule::unique('alertas', 'nombre'), // Asegura la unicidad
 			],
 			'descripcion' => 'required|string|max:255',
@@ -190,7 +190,7 @@ class AlertaController extends Controller
 	{
 		// Validación de los datos
 		$validatedData = Validator::make($request->all(), [
-			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/',
+			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Solo letras sin acentos y espacios
 			Rule::unique('alertas', 'nombre'),
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',

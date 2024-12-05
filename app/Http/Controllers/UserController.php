@@ -115,7 +115,7 @@ class UserController extends Controller
 					'required',
 					'string',
 					'max:255',
-					'regex:/^[a-zA-Z0-9._-]+$/', // Permitir solo letras, números, puntos, guiones y guiones bajos
+					'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Permitir solo letras, números, puntos, guiones y guiones bajos
 					Rule::unique('users')->whereNull('deleted_at'), // Verifica unicidad sin registros eliminados
 				],
 				'nombre' => [
@@ -123,14 +123,14 @@ class UserController extends Controller
 					'string',
 					'max:255',
 					'min:3',
-					'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+					'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Permitir solo letras y espacios
 				],
 				'apellido' => [
 					'required',
 					'string',
 					'max:255',
 					'min:3',
-					'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+					'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Permitir solo letras y espacios
 				],
 				'email' => [
 					'required',
@@ -417,7 +417,7 @@ class UserController extends Controller
 			$username = $user->username;
 			// Elimina el usuario
 			$user->delete();
-			$message = Auth::user()->username . " Eliminó el usuario " . $username;
+			$message = Auth::user()->username . " eliminó el usuario " . $username;
 			Log::info($message);
 			$subject = "Borrado de usuario";
 			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;
@@ -478,7 +478,7 @@ class UserController extends Controller
 			$username = $user->username;
 			// Elimina el usuario
 			$user->delete();
-			$message = Auth::user()->username . " Eliminó el usuario " . $username;
+			$message = Auth::user()->username . " eliminó el usuario " . $username;
 			Log::info($message);
 			$subject = "Borrado de usuario";
 			$body = "Usuario " . $username . " borrado correctamente por " . Auth::user()->username;

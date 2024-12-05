@@ -110,7 +110,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " Eliminó el tipo de transacción " . $nombre;
+		$message = $username . " eliminó el tipo de transacción " . $nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$campos_adicionales->delete();
@@ -134,7 +134,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 				'string',
 				'max:255',
 				'min:3',
-				'regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
+				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Solo letras sin acentos y espacios
 				Rule::unique('tipos_transacciones_campos_adicionales', 'nombre_campo'),
 			],
 			'nombre_mostrar' => 'required|string|max:255',
@@ -254,14 +254,14 @@ class TipoTransaccionCampoAdicionalController extends Controller
 				'string',
 				'max:255',
 				'min:3',
-				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Permitir solo letras y espacios
 				Rule::unique('tipos_transacciones_campos_adicionales'),
 			],
 			'nombre_mostrar' => [
 				'string',
 				'max:255',
 				'min:3',
-				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Permitir solo letras y espacios
 			],
 			'visible' => [
 				'integer',
@@ -402,7 +402,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		$nombre = $tipos_transacciones_campos_adicionales->nombre_campo;
 		// Elimina el rol
 		$tipos_transacciones_campos_adicionales->delete();
-		$message = Auth::user()->username . " Eliminó el campo adicional de tipo de transacción " . $nombre;
+		$message = Auth::user()->username . " eliminó el campo adicional de tipo de transacción " . $nombre;
 		Log::info($message);
 		return Redirect::route('tipos_transacciones_campos_adicionales')
 			->with('success', 'Campo adicional de tipo de transacción exitosamente borrado');

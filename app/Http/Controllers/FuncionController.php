@@ -77,7 +77,7 @@ class FuncionController extends Controller
 
 		// Validar los datos del usuario manualmente
 		$validator = \Validator::make($request->all(), [
-			'nombre' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/|unique:funciones,nombre',
+			'nombre' => 'required|string|max:255|regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/|unique:funciones,nombre',
 			'formula' => 'required',
 		], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
@@ -152,7 +152,7 @@ class FuncionController extends Controller
 */
 		// Validación de los datos
 		$validatedData = Validator::make($request->all(), [
-			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-Z\s]+$/', // Solo letras sin acentos y espacios
+			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Solo letras sin acentos y espacios
 			Rule::unique('alertas', 'nombre'),
 			'formula' => 'required|string|max:255',
 		], [
@@ -204,7 +204,7 @@ class FuncionController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " Eliminó la función " . $nombre;
+		$message = $username . " eliminó la función " . $nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$funcion->delete();

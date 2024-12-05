@@ -217,7 +217,7 @@ class PermisoController extends Controller
 		$nombre = $permiso->nombre;
 		// Elimina el permiso
 		$permiso->delete();
-		$message = Auth::user()->username . " Eliminó el permiso " . $nombre;
+		$message = Auth::user()->username . " eliminó el permiso " . $nombre;
 		Log::info($message);
 		$subject = "Borrado de permiso";
 		$body = "Permiso " . $nombre . " borrado correctamente por " . Auth::user()->username;

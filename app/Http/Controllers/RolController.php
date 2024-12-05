@@ -80,7 +80,7 @@ class RolController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " Eliminó el rol " . $nombre;
+		$message = $username . " eliminó el rol " . $nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$rol->delete();
@@ -121,7 +121,7 @@ class RolController extends Controller
 				'string',
 				'max:255',
 				'min:3',
-				'regex:/^[\pL\s]+$/u', // Permitir solo letras y espacios
+				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Permitir solo letras y espacios
 				Rule::unique('roles'),
 			],
 		], [
@@ -213,7 +213,7 @@ class RolController extends Controller
 		$nombre = $rol->nombre;
 		// Elimina el rol
 		$rol->delete();
-		$message = Auth::user()->username . " Eliminó el rol " . $nombre;
+		$message = Auth::user()->username . " eliminó el rol " . $nombre;
 		Log::info($message);
 		return Redirect::route('roles.index')
 			->with('success', 'Rol deleted successfully');
