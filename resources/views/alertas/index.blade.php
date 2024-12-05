@@ -19,52 +19,60 @@
 	<script type="text/javascript">
 var table;
 var save_method;
-let errores = [];
-		jQuery(document).ready(function($){
-			table = $('#log-acciones-table').DataTable({
-				"ajax": {
-					url : "{{ url('monitoreo/ajax_log_administracion') }}",
-					type : 'GET'
-				},
-				"order": [[ 0, "desc" ]],
-				"ordering": true,
-				bAutoWidth: false, 
-				aoColumns : [
-					{ sWidth: '5%' },
-					{ sWidth: '10%' },
-					{ sWidth: '30%' },
-					{ sWidth: '15%' },
-					{ sWidth: '15%' }
-				],
-				language: traduccion_datatable,
-				"pageLength": 100,
-				//dom: 'Bfrtip',
-				layout: {
-					topStart: {
-						buttons: [
-							{"extend": 'copy', "text":'Portapapeles',"className": 'btn btn-primary', title: 'Log de acciones'},
-							{"extend": 'pdf', "text":'PDF',"className": 'btn btn-danger', title: 'Log de acciones'},
-							{"extend": 'excel', "text":'Excel',"className": 'btn btn-success', title: 'Log de acciones'},
-							{"extend": 'print', "text":'Imprimir',"className": 'btn btn-secondary', title: 'Log de acciones'}
-						],
-					},
-					bottomEnd: {
-						paging: {
-							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
-						}
-					}
-				},
-				columnDefs: [
-					{ targets: '_all', className: 'text-start' },
-				],
-				initComplete: function () {
-					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
-					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
-					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
-					$('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
-				}
-			});
-		});
+jQuery(document).ready(function($) {
+    table = $('#alertas_table').DataTable({
+        "ajax": {
+            url: "{{ url('alertas/ajax_listado') }}",
+            type: 'GET',
+        },
+        language: traduccion_datatable,
+        columnDefs: [{
+            "targets": 'no-sort',
+            "orderable": true
+        }],
+        dom: 'Bfrtip', // Habilitar los botones de exportación
+        buttons: [
+            {
+                "extend": 'pdf',
+                "text": '<i class="fas fa-file-pdf"></i> PDF',
+                "className": 'btn btn-danger',
+                "orientation": 'landscape',
+                title: 'Alertas',
+                exportOptions: {
+                    columns: [0, 1, 2, 3] // Índices de las columnas que deseas incluir en la exportación
+                }
+            },
+            {
+                "extend": 'copy',
+                "text": '<i class="fas fa-copy"></i> Copiar',
+                "className": 'btn btn-primary',
+                title: 'Alertas',
+                exportOptions: {
+                    columns: ':visible' // Solo las columnas visibles
+                }
+            },
+            {
+                "extend": 'excel',
+                "text": '<i class="fas fa-file-excel"></i> Excel',
+                "className": 'btn btn-success',
+                title: 'Alertas',
+                exportOptions: {
+                    columns: [0, 1, 2, 3] // Índices de las columnas específicas
+                }
+            },
+            {
+                "extend": 'print',
+                "text": '<i class="bi bi-printer"></i> Imprimir',
+                "className": 'btn btn-secondary',
+                title: 'Alertas',
+                exportOptions: {
+                    columns: ':visible' // Exportar solo las columnas visibles
+                }
+            }
+        ],
+        "order": [[2, 'asc']]
+    });
+});
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
@@ -76,18 +84,16 @@ let errores = [];
 		 *******************************************************************************************************************************/
 		function add_alerta() {
 			save_method = 'add';
-			eliminarValores();
 			$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
-			limpiarErrores();
 			$('#modal_form_alertas').modal('show');
+			//$('#modal_form').modal('show');
 			$('.modal-title').text('Agregar Alerta');
 			$('#accion').val('add');
 			$('#form').attr('action', "{{ url('alertas') }}");
 			$('#method').val('POST');
 			console.log('accion1: ', $('#accion').val());
-			console.log('errores ',errores);
 		}
 
 		/*******************************************************************************************************************************
@@ -105,10 +111,6 @@ let errores = [];
 					success: function(data) {
 						swal.fire("Aviso", "Alerta eliminada con éxito.", "success");
 
-						$('#modal_form_alertas').on('hidden.bs.modal', function () {
-							limpiarErrores();
-							$('#form')[0].reset(); // Opcional: resetear el formulario
-						});
 						$('#modal_form_alertas').modal('hide');
 						reload_table();
 					},
@@ -161,10 +163,6 @@ let errores = [];
 							text: data.message,
 							icon: "success"
 						}).then(() => {
-							$('#modal_form_alertas').on('hidden.bs.modal', function () {
-								limpiarErrores();
-								$('#form')[0].reset(); // Opcional: resetear el formulario
-							});
 							$('#modal_form_alertas').modal('hide');
 							reload_table();
 						});
@@ -181,6 +179,7 @@ let errores = [];
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function validarFormulario() {
+			let errores = [];
 			let nombre = document.querySelector('input[name="nombre"]').value.trim();
 			let descripcion = document.querySelector('input[name="descripcion"]').value.trim();
 			let tiposAlertasId = document.querySelector('select[name="tipos_alertas_id"]').value;
@@ -197,8 +196,8 @@ let errores = [];
 
 			if (!nombre) errores.push({ campo: 'nombre', mensaje: "El campo 'Nombre' es obligatorio." });
 			if (!descripcion) errores.push({ campo: 'descripcion', mensaje: "El campo 'Descripción' es obligatorio." });
-			if (!tiposAlertasId || tiposAlertasId === "0") errores.push({ campo: 'tipos_alertas_id', mensaje: "El campo 'Tipo de Alerta' es obligatorio." });
-			if (!tiposTratamientosId || tiposTratamientosId === "0") errores.push({ campo: 'tipos_tratamientos_id', mensaje: "El campo 'Tipo de Tratamiento' es obligatorio." });
+			if (!tiposAlertasId || tiposAlertasId === "0") errores.push({ campo: 'tipos_alertas_id', mensaje: "Seleccione un 'Tipo de Alerta'." });
+			if (!tiposTratamientosId || tiposTratamientosId === "0") errores.push({ campo: 'tipos_tratamientos_id', mensaje: "Seleccione un 'Tipo de Tratamiento'." });
 
 			// Validar filas de la tabla
 			let filaErrores = [];
@@ -275,18 +274,6 @@ let errores = [];
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		function limpiarErrores() {
-			// Remover clases de error
-			document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-
-			// Eliminar mensajes de error
-			document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-
-			// Limpiar el array de errores
-			errores = [];
-		}
-		/*******************************************************************************************************************************
-		 *******************************************************************************************************************************/
 		function agregar_valor_selector() {
 			const tableBody = document.querySelector("#detalles_alertas tbody");
 
@@ -310,7 +297,7 @@ let errores = [];
 				</td>
 				<td>
 					<button type="button" class="btn btn-danger btn-sm" onclick="remove_row(this)">
-						<i class="fa fa-trash"></i> 
+						<i class="fa fa-trash"></i> Eliminar
 					</button>
 				</td>
 			`;
@@ -324,11 +311,8 @@ let errores = [];
 			const row = button.closest("tr");
 			row.remove();
 		}
- 		/*******************************************************************************************************************************
-		 *******************************************************************************************************************************/
- 		// Función para eliminar los valores dinámicos
+/* 		// Función para eliminar los valores dinámicos
 		function eliminarValores() {
-			console.log('errores ',errores);
 			const tablaDinamica = document.getElementById("detalles_alertas");
 			
 			// Elimina todas las filas dinámicas
@@ -336,15 +320,14 @@ let errores = [];
 				tablaDinamica.removeChild(tablaDinamica.firstChild);
 			}
 		}
-
+ */
 		// Evento para asociar el botón "Cancelar" a la función "eliminarValores".
 		document.getElementById("btn-cancelar").addEventListener("click", function() {
 			eliminarValores(); // Llama a la función para limpiar la tabla
 		});
 
 		
-/*
- 		/*******************************************************************************************************************************
+/* 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************
 		function eliminar_valor(button) {
 			// Obtener la fila <tr> que contiene el botón de eliminar
@@ -355,7 +338,6 @@ let errores = [];
 		}
  */	
  </script>
-
 	<!--LISTADO-->
 	<div class="container">
 
@@ -557,7 +539,7 @@ let errores = [];
 										</td>
 										<td>
 											<button type="button" class="btn btn-danger btn-sm" onclick="remove_row(this)">
-												<i class="fa fa-trash"></i>
+												<i class="fa fa-trash"></i> Eliminar
 											</button>
 										</td>
 									</tr>`;
@@ -603,10 +585,5 @@ let errores = [];
 		}
 		// Llamar a la función eliminarValores
 		document.addEventListener("DOMContentLoaded", eliminarValores);
-		$('#modal_form_alertas').on('hidden.bs.modal', function () {
-			limpiarErrores();
-			$('#form')[0].reset(); // Opcional: resetear el formulario
-		});
-
 	</script>
 </x-app-layout>
