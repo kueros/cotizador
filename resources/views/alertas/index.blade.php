@@ -243,7 +243,7 @@
 
 			// Validar contenido de la tabla 'detalles_alertas'
 			if (!detallesTable || detallesTable.children.length === 0) {
-				errores.push({ campo: 'detalles_alertas', mensaje: "Debe agregar al menos un detalle en la tabla de detalles." });
+				errores.push({ campo: 'detalles_alertas', mensaje: "Debe agregar al menos un dato en la tabla de detalles." });
 			}
 
 			// Validar filas de la tabla
