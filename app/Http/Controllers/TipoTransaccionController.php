@@ -89,7 +89,7 @@ class TipoTransaccionController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " eliminó el tipo de transacción " . $nombre;
+		$message = "Eliminó el tipo de transacción \"$nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$tipos_transacciones->delete();
@@ -147,7 +147,8 @@ class TipoTransaccionController extends Controller
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
-		$message = $username . " creó el tipo de transacción " . $request->input('nombre');
+		$nombre = $request->input('nombre');
+		$message = "Creó el tipo de transacción \"$nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		return Redirect::route('tipos_transacciones.index')->with('success', 'Tipo de transacción creado exitosamente.');
@@ -179,21 +180,58 @@ class TipoTransaccionController extends Controller
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
 
-	public function update(Request $request, $id)
-	{
-		// Validar los datos
-		$validatedData = $request->validate([
-			'nombre' => 'required|string|max:255',
-		]);
-
-		// Obtener el modelo
-		$tipo_transaccion = TipoTransaccion::findOrFail($id);
-
-		// Actualizar el modelo con los datos validados
-		$tipo_transaccion->update($validatedData);
-
-		return redirect()->route('tipos_transacciones.index')->with('success', 'Tipo de transacción actualizado correctamente.');
-	}
+	 public function ttUpdate(Request $request, MyController $myController, $id)
+	 {
+		 // Validar los datos
+		 $validatedData = Validator::make($request->all(), [
+			 'nombre' => [
+				 'required',
+				 'string',
+				 'max:255',
+				 'min:3',
+				 'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/',
+				 Rule::unique('tipos_transacciones', 'nombre')->ignore($id), // Excluye el ID actual
+			 ],
+		 ], [
+			 'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+			 'nombre.unique' => 'Este nombre de tipo de transacción ya está en uso.',
+		 ]);
+	 
+		 // Verificar si hay errores
+		 if ($validatedData->fails()) {
+			 return response()->json([
+				 'status' => 0,
+				 'message' => '',
+				 'errors' => $validatedData->errors(),
+			 ]);
+		 }
+	 
+		 // Validación exitosa
+		 $validated = $validatedData->validated();
+	 
+		 // Obtener el modelo
+		 $tipo_transaccion = TipoTransaccion::findOrFail($id);
+	 
+		 // Construir el mensaje de cambios
+		 $cambios = [];
+		 foreach (['nombre'] as $campo) {
+			 if ($tipo_transaccion->$campo != $validated[$campo]) {
+				 $cambios[] = "cambiando $campo de \"{$tipo_transaccion->$campo}\" a \"{$validated[$campo]}\"";
+			 }
+		 }
+	 
+		 $mensajeCambios = implode(', ', $cambios);
+		 $clientIP = \Request::ip();
+		 $userAgent = \Request::userAgent();
+		 $username = Auth::user()->username;
+		 $message = "Actualizó el tipo de transacción \"{$tipo_transaccion->nombre}\" $mensajeCambios.";
+		 $myController->loguear($clientIP, $userAgent, $username, $message);
+	 
+		 // Actualizar los datos
+		 $tipo_transaccion->update($validated);
+	 
+		 return redirect()->route('tipos_transacciones.index')->with('success', 'Tipo de transacción actualizado correctamente.');
+	 }
 
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/

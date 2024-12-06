@@ -21,40 +21,49 @@
 			table = $('#tipos_transacciones_table').DataTable({
 				"ajax": {
 					url: "{{ url('tipos_transacciones/ajax_listado') }}",
-					type: 'GET'
+					type: 'GET',
 				},
 				language: traduccion_datatable,
-				//dom: 'Bfrtip',
-				columnDefs: [{
-					"targets": 'no-sort',
-					"orderable": false
-				}],
+				//dom: 'Bfrtip', // Habilitar los botones de exportación
 				layout: {
 					topStart: {
-						buttons: [{
+						buttons: [
+							{
 								"extend": 'pdf',
-								"text": 'Export',
+								"text": '<i class="fas fa-file-pdf"></i> PDF',
 								"className": 'btn btn-danger',
 								"orientation": 'landscape',
-								title: 'Tipos de Transacciones'
+								title: 'Alertas',
+								exportOptions: {
+									columns: [0, 1, 2, 3] // Índices de las columnas que deseas incluir en la exportación
+								}
 							},
 							{
 								"extend": 'copy',
-								"text": 'Export',
+								"text": '<i class="fas fa-copy"></i> Copiar',
 								"className": 'btn btn-primary',
-								title: 'Tipos de Transacciones'
+								title: 'Alertas',
+								exportOptions: {
+									columns: ':visible' // Solo las columnas visibles
+								}
 							},
 							{
 								"extend": 'excel',
-								"text": 'Export',
+								"text": '<i class="fas fa-file-excel"></i> Excel',
 								"className": 'btn btn-success',
-								title: 'Tipos de Transacciones'
+								title: 'Alertas',
+								exportOptions: {
+									columns: [0, 1, 2, 3] // Índices de las columnas específicas
+								}
 							},
 							{
 								"extend": 'print',
-								"text": 'Export',
+								"text": '<i class="bi bi-printer"></i> Imprimir',
 								"className": 'btn btn-secondary',
-								title: 'Tipos de Transacciones'
+								title: 'Alertas',
+								exportOptions: {
+									columns: ':visible' // Exportar solo las columnas visibles
+								}
 							}
 						]
 					},
@@ -64,7 +73,12 @@
 						}
 					}
 				},
-				initComplete: function() {
+				columnDefs: [{
+					"targets": 'no-sort',
+					"orderable": true
+				}],
+				//pagingType: 'simple_numbers',
+				initComplete: function () {
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
 					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
@@ -72,6 +86,7 @@
 				}
 			});
 		});
+
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
@@ -86,6 +101,7 @@
 			$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
+			$('.is-invalid').removeClass('is-invalid'); // Limpia las clases de error
 			$('#modal_form').modal('show');
 			$('.modal-title').text('Agregar tipo de transacción');
 			$('#accion').val('add');
@@ -152,6 +168,145 @@
 
 			}
 		}
+
+		$('#form').submit(function(event) {
+			event.preventDefault(); // Prevenir la acción por defecto del formulario
+
+			let formData = $(this).serialize();
+			let actionUrl = $(this).attr('action');
+			let method = $('#method').val();
+
+			$.ajax({
+				url: actionUrl,
+				type: method,
+				data: formData,
+				success: function(response) {
+					if (response.status === 0) {
+						// Mostrar errores de validación
+						$.each(response.errors, function(key, value) {
+							let input = $('[name="' + key + '"]');
+							input.addClass('is-invalid');
+							input.siblings('.help-block').text(value[0]);
+						});
+					} else {
+						// Procesar éxito
+						$('#modal_form').modal('hide');
+						reload_table();
+						Swal.fire('Éxito', 'Tipo de transacción actualizado correctamente.', 'success');
+					}
+				},
+				error: function(xhr) {
+					Swal.fire('Error', 'Ocurrió un problema al procesar la solicitud.', 'error');
+				}
+			});
+		});
+
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function guardar_datos() {
+			let form_data = $('#form').serializeArray();
+			let url_guarda_datos = "{{ url('tipos_transacciones/ajax_store') }}";
+			let type_guarda_datos = "POST";
+
+			if ($('#accion').val() != "add") {
+				let ttIdValue = form_data.find(item => item.name == 'id')?.value;
+				url_guarda_datos = "{{ url('ttUpdate') }}" + "/" + ttIdValue;
+				//url_guarda_datos = "{{ url('alertasUpdate') }}" + "/" + alertasIdValue;
+				type_guarda_datos = "PUT";
+				form_data.push({ name: '_method', value: 'PUT' });
+			}
+			show_loading();
+			$.ajax({
+				url: url_guarda_datos,
+				type: type_guarda_datos,
+				data: $.param(form_data),
+				dataType: "JSON",
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				success: function(data) {
+					hide_loading();
+					if (data.status === 0) {
+						let errorMessage = data.message + "<br/>";
+						if (data.errors) {
+							for (let field in data.errors) {
+								if (data.errors.hasOwnProperty(field)) {
+									errorMessage += `${data.errors[field].join(", ")}<br/>`;
+									//errorMessage += `${field.charAt(0).toUpperCase()}${field.slice(1).toLowerCase()}: ${data.errors[field].join(", ")}<br/>`;
+								}
+							}
+						}
+						swal.fire("Aviso", errorMessage, "warning");
+					} else {
+						swal.fire({
+							title: "Aviso",
+							text: data.message,
+							icon: "success"
+						}).then(() => {
+							$('#modal_form').on('hidden.bs.modal', function () {
+								limpiarErrores();
+								$('#form')[0].reset(); // Opcional: resetear el formulario
+							});
+							$('#modal_form').modal('hide');
+							reload_table();
+						});
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					hide_loading();
+					swal.fire("Error", "Ocurrió un problema en la solicitud. Intenta nuevamente.", "error");
+					console.error(jqXHR.responseText);
+				}
+			});
+		}
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function validarFormulario() {
+			let nombre = document.querySelector('input[name="nombre"]').value.trim();
+
+			// Limpiar errores previos
+			document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+			document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+			if (!nombre) errores.push({ campo: 'nombre', mensaje: "El campo 'Nombre' es obligatorio." });
+
+			return true;
+		}
+
+
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function mostrarErrorGeneral(campo, mensaje) {
+			let input = document.querySelector(`[name="${campo}"]`);
+			if (input) {
+				input.classList.add('is-invalid');
+				let errorSpan = input.parentNode.querySelector('.invalid-feedback');
+				if (!errorSpan) {
+					errorSpan = document.createElement('span');
+					errorSpan.classList.add('invalid-feedback');
+					errorSpan.style.display = 'block';
+					input.parentNode.appendChild(errorSpan);
+				}
+				errorSpan.innerHTML = mensaje;
+			}
+		}
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function limpiarErrores() {
+			// Remover clases de error
+			document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+			// Eliminar mensajes de error
+			document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+			// Limpiar el array de errores
+			errores = [];
+		}
+
 	</script>
 
 	<!--LISTADO-->
@@ -161,13 +316,11 @@
 				<h2>ABM Tipos de Transacciones</h2>
 				@include('layouts.partials.message')
 				@if ($errors->any())
-				<div class="alert alert-danger">
-					<ul>
+					<div class="alert alert-danger">
 						@foreach ($errors->all() as $error)
-						<li>{{ $error }}</li>
+							{{ $error }}</br>
 						@endforeach
-					</ul>
-				</div>
+					</div>
 				@endif
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
@@ -208,15 +361,15 @@
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">Nombre</label>
 								<div class="col-md-9">
-									<input name="nombre" maxlength="255" placeholder="Nombre del tipo de transacción" class="form-control" type="text">
-									<span class="help-block"></span>
+									<input name="nombre" maxlength="255" placeholder="Nombre del tipo de transacción" class="form-control" type="text" required>
+									<span class="help-block text-danger"></span>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="submit" class="btn btn-primary">Guardar</button>
-						<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+					<a onclick="if (validarFormulario()) guardar_datos();" class="btn btn-primary">Guardar</a>
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
 					</div>
 				</form>
 			</div>

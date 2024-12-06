@@ -19,7 +19,6 @@
 	<script type="text/javascript">
 		var table;
 		var save_method;
-		let errores = [];
 		jQuery(document).ready(function($) {
 			table = $('#alertas_table').DataTable({
 				"ajax": {
@@ -229,6 +228,7 @@
 			let fechasHasta = document.querySelectorAll('input[name="fecha_hasta[]"]');
 			let hoy = new Date();
 			hoy.setHours(0, 0, 0, 0);
+			let detallesTable = document.querySelector('#detalles_alertas tbody');
 
 			// Limpiar errores previos
 			document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
@@ -240,6 +240,11 @@
 			if (!descripcion) errores.push({ campo: 'descripcion', mensaje: "El campo 'Descripción' es obligatorio." });
 			if (!tiposAlertasId || tiposAlertasId === "0") errores.push({ campo: 'tipos_alertas_id', mensaje: "El campo 'Tipo de Alerta' es obligatorio." });
 			if (!tiposTratamientosId || tiposTratamientosId === "0") errores.push({ campo: 'tipos_tratamientos_id', mensaje: "El campo 'Tipo de Tratamiento' es obligatorio." });
+
+			// Validar contenido de la tabla 'detalles_alertas'
+			if (!detallesTable || detallesTable.children.length === 0) {
+				errores.push({ campo: 'detalles_alertas', mensaje: "Debe agregar al menos un detalle en la tabla de detalles." });
+			}
 
 			// Validar filas de la tabla
 			let filaErrores = [];
@@ -301,17 +306,32 @@
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function mostrarErrorGeneral(campo, mensaje) {
-			let input = document.querySelector(`[name="${campo}"]`);
+			let input = document.querySelector(`[name="${campo}"]`) || document.querySelector(`#${campo}`);
 			if (input) {
-				input.classList.add('is-invalid');
-				let errorSpan = input.parentNode.querySelector('.invalid-feedback');
-				if (!errorSpan) {
-					errorSpan = document.createElement('span');
-					errorSpan.classList.add('invalid-feedback');
-					errorSpan.style.display = 'block';
-					input.parentNode.appendChild(errorSpan);
+				if (campo === 'detalles_alertas') {
+					let tabla = document.querySelector(`#${campo}`);
+					if (tabla) {
+						let errorSpan = tabla.parentNode.querySelector('.invalid-feedback');
+						if (!errorSpan) {
+							errorSpan = document.createElement('span');
+							errorSpan.classList.add('invalid-feedback');
+							errorSpan.style.display = 'block';
+							errorSpan.style.color = 'red';
+							tabla.parentNode.appendChild(errorSpan);
+						}
+						errorSpan.innerHTML = mensaje;
+					}
+				} else {
+					input.classList.add('is-invalid');
+					let errorSpan = input.parentNode.querySelector('.invalid-feedback');
+					if (!errorSpan) {
+						errorSpan = document.createElement('span');
+						errorSpan.classList.add('invalid-feedback');
+						errorSpan.style.display = 'block';
+						input.parentNode.appendChild(errorSpan);
+					}
+					errorSpan.innerHTML = mensaje;
 				}
-				errorSpan.innerHTML = mensaje;
 			}
 		}
 
@@ -522,6 +542,7 @@
 									<!-- Filas dinámicas se añadirán aquí -->
 								</tbody>
 							</table>
+							<span class="invalid-feedback" style="display: none; color: red;"></span>
 						</div>
 						<div class="modal-footer">
 							<a onclick="if (validarFormulario()) guardar_datos();" class="btn btn-primary">Guardar</a>

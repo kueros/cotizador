@@ -168,17 +168,33 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		$inserted_id->orden_listado = $orden_listado;
 		$inserted_id->save();
 		// Si el tipo es "selector" (id = 4), verificar valores
+
 		if ($validated['tipo'] == 4) {
-			if (empty($validated['tipo'])) {
+			$formData = $request->input('form_data'); // Datos enviados desde la vista
+		
+			// Filtrar los elementos con name "valores[]"
+			$valores = array_map(function ($item) {
+				return $item['value'];
+			}, array_filter($formData, function ($item) {
+				return $item['name'] === 'valores[]';
+			}));
+		
+			// Reindexar el array para eliminar los índices originales
+			$valores = array_values($valores);
+		
+			// Verificar si hay valores
+			if (empty($valores)) {
 				return response()->json([
 					'errors' => ['valores' => 'Se deben agregar valores para el selector.']
 				], 400);
-			} else {
-				$valores = $validated['valores'];
-				$inserted_id->valores = json_encode($valores);
-				$inserted_id->save();
 			}
+		
+			// Guardar los valores en la base de datos
+			$inserted_id->valores = json_encode($valores);
+			$inserted_id->save();
 		}
+
+		#dd($inserted_id->valores);
 		$nombre_campo = $validated['nombre_campo'];
 		$tipo = $validated['tipo'];
 

@@ -103,7 +103,7 @@ class AlertaController extends Controller
 			'tipos_tratamientos_id' => 'required|integer|exists:alertas_tipos_tratamientos,id',
 			'funciones_id' => 'required|exists:funciones,id',
 		], [
-			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
 			'nombre.unique' => 'Este nombre  ya está en uso.',
 			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
@@ -184,7 +184,7 @@ class AlertaController extends Controller
 	{
 		// Validación de los datos
 		$validatedData = Validator::make($request->all(), [
-			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Solo letras sin acentos y espacios
+			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', 
 			Rule::unique('alertas', 'nombre'),
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',

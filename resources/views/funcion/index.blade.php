@@ -16,48 +16,68 @@
 	<script type="text/javascript">
 		var table;
 		var save_method;
-
 		jQuery(document).ready(function($) {
-			/*******************************************************************************************************************************
-			 *******************************************************************************************************************************/
 			table = $('#funciones-table').DataTable({
 				"ajax": {
 					url: "{{ url('funciones/ajax_listado') }}",
-					type: 'GET'
+					type: 'GET',
 				},
 				language: traduccion_datatable,
-				dom: 'Bfrtip',
+				//dom: 'Bfrtip', // Habilitar los botones de exportación
+				layout: {
+					topStart: {
+						buttons: [
+							{
+								"extend": 'pdf',
+								"text": '<i class="fas fa-file-pdf"></i> PDF',
+								"className": 'btn btn-danger',
+								"orientation": 'landscape',
+								title: 'Alertas',
+								exportOptions: {
+									columns: [0, 1, 2, 3] // Índices de las columnas que deseas incluir en la exportación
+								}
+							},
+							{
+								"extend": 'copy',
+								"text": '<i class="fas fa-copy"></i> Copiar',
+								"className": 'btn btn-primary',
+								title: 'Alertas',
+								exportOptions: {
+									columns: ':visible' // Solo las columnas visibles
+								}
+							},
+							{
+								"extend": 'excel',
+								"text": '<i class="fas fa-file-excel"></i> Excel',
+								"className": 'btn btn-success',
+								title: 'Alertas',
+								exportOptions: {
+									columns: [0, 1, 2, 3] // Índices de las columnas específicas
+								}
+							},
+							{
+								"extend": 'print',
+								"text": '<i class="bi bi-printer"></i> Imprimir',
+								"className": 'btn btn-secondary',
+								title: 'Alertas',
+								exportOptions: {
+									columns: ':visible' // Exportar solo las columnas visibles
+								}
+							}
+						]
+					},
+					bottomEnd: {
+						paging: {
+							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
+						}
+					}
+				},
 				columnDefs: [{
 					"targets": 'no-sort',
-					"orderable": false
+					"orderable": true
 				}],
-				buttons: [{
-						"extend": 'pdf',
-						"text": 'Export',
-						"className": 'btn btn-danger',
-						"orientation": 'landscape',
-						title: 'Funciones'
-					},
-					{
-						"extend": 'copy',
-						"text": 'Export',
-						"className": 'btn btn-primary',
-						title: 'Funciones'
-					},
-					{
-						"extend": 'excel',
-						"text": 'Export',
-						"className": 'btn btn-success',
-						title: 'Funciones'
-					},
-					{
-						"extend": 'print',
-						"text": 'Export',
-						"className": 'btn btn-secondary',
-						title: 'Funciones'
-					}
-				],
-				initComplete: function() {
+				//pagingType: 'simple_numbers',
+				initComplete: function () {
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
 					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');

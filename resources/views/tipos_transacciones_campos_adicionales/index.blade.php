@@ -318,7 +318,7 @@
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function cambiar_tipo_campo(selector) {
-			//alert(selector);
+			alert(selector);
 			var tipo_campo = $(selector).val();
 			switch (tipo_campo) {
 				case '4':
@@ -332,17 +332,19 @@
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
-		function agregar_valor_selector() {
-			var td = '<tr><td><input class="form-control" type="text" maxlength="255" minlength="1" required name="valores[]"/></td><td><a class="btn btn-danger" onclick="eliminar_valor(this)"><i class="bi bi-trash"></i></td></tr>';
-			$('#valores_selector tbody').append(td);
-		}
-
 		function eliminar_valor(button) {
 			// Obtener la fila <tr> que contiene el botón de eliminar
 			var row = button.closest('tr');
 			
 			// Eliminar la fila
 			row.remove();
+		}
+
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function agregar_valor_selector() {
+			var td = '<tr><td><input class="form-control" type="text" maxlength="255" minlength="1" required name="valores[]"/></td><td><a class="btn btn-danger" onclick="eliminar_valor(this)"><i class="bi bi-trash"></i></td></tr>';
+			$('#valores_selector tbody').append(td);
 		}
 	</script>
 	<!--LISTADO-->
@@ -475,7 +477,7 @@
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Tipo de Campo') }}</label>
 								<div class="col-md-9">
-									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" required>
+									<select id="tipo" name="tipo" class="mt-1 block w-full form-control" onchange="cambiar_tipo_campo(this)">
 										<option value="">
 											{{ __('Elija un Tipo de Campo') }}
 										</option>
@@ -489,17 +491,21 @@
 								</div>
 							</div>
 						</div>
-						<div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Valores') }}</label>
-								<div class="col-md-9">
-									<input name="valor_default" minlength="3" maxlength="255" placeholder="Valor por defecto"
-										id="valor_default" class="form-control" type="text">
-									<span class="help-block"></span>
-								</div>
+						<div id="div_valores_selector" class="form-group" style="display:none">
+							<hr>
+							<a class="btn btn-success" onclick="agregar_valor_selector()">Agregar valor</a>
+							<div class="table-responsive">
+								<table class="table" id="valores_selector">
+									<thead>
+										<th>Valor</th>
+										<th>Acción</th>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
 							</div>
 						</div>
-
+						
 					</div>
 					<div class="modal-footer">
 						<a onclick="guardar_datos()" class="btn btn-primary">{{ __('Guardar') }}</a>
