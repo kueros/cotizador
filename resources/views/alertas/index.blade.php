@@ -100,6 +100,7 @@
 		function add_alerta() {
 			save_method = 'add';
 			eliminarValores();
+			$('#detalles_alertas tbody').empty();
 			$('#form')[0].reset();
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
@@ -204,14 +205,8 @@
 				limpiarErrores();
 				$('#form')[0].reset(); // Opcional: resetear el formulario
 			});
-/* 			const tablaDinamica = document.getElementById("detalles_alertas");
-			console.log('tablaDinamica ',tablaDinamica.tbody);
-			// Elimina todas las filas dinámicas
-			while (tablaDinamica.firstChild) {
-				tablaDinamica.removeChild(tablaDinamica.firstChild+1);
-			}
- */					// Limpiar la tabla de detalles antes de llenarla
-					$('#detalles_alertas tbody').empty();
+					// Limpiar la tabla de detalles antes de llenarla
+					//$('#detalles_alertas tbody').empty();
 
 		}
 
@@ -237,6 +232,8 @@
 			console.log('limpiar errores ');
 
 			if (!nombre) errores.push({ campo: 'nombre', mensaje: "El campo 'Nombre' es obligatorio." });
+			if (nombre.length > 100) errores.push({ campo: 'nombre', mensaje: "El campo 'Nombre' no debe exceder los 100 caracteres." });
+			if (nombre.length < 3) errores.push({ campo: 'nombre', mensaje: "El campo 'Nombre' no debe tener menos de 3 caracteres." });
 			if (!descripcion) errores.push({ campo: 'descripcion', mensaje: "El campo 'Descripción' es obligatorio." });
 			if (!tiposAlertasId || tiposAlertasId === "0") errores.push({ campo: 'tipos_alertas_id', mensaje: "El campo 'Tipo de Alerta' es obligatorio." });
 			if (!tiposTratamientosId || tiposTratamientosId === "0") errores.push({ campo: 'tipos_tratamientos_id', mensaje: "El campo 'Tipo de Tratamiento' es obligatorio." });
@@ -272,9 +269,12 @@
 				mostrarErroresPorFila(filaErrores);
 				errores.forEach(err => mostrarErrorGeneral(err.campo, err.mensaje));
 				return false;
+			} else {
+				// Limpiar la tabla de detalles antes de llenarla
+				//$('#detalles_alertas tbody').empty();
+				return true;
 			}
 
-			return true;
 		}
 
 		/*******************************************************************************************************************************
