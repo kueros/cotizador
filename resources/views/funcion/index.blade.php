@@ -1,4 +1,4 @@
-<x-app-layout title="Roles" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
+<x-app-layout title="Funciones" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
 			{{ __('Funciones') }}
