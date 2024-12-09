@@ -105,7 +105,7 @@ class AlertaController extends Controller
 			'funciones_id' => 'required|array', // Asegura que funciones_id sea un array
 			'funciones_id.*' => 'integer|exists:funciones,id', // Cada elemento debe ser un ID válido
 		], [
-			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+			'nombre.regex' => 'El nombre solo puede contener letras, números y espacios.',
 			'nombre.unique' => 'Este nombre ya está en uso.',
 			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
@@ -200,7 +200,7 @@ class AlertaController extends Controller
 			Rule::unique('detalles_alertas', 'funciones_id'),
 			'funciones_id.*' => 'exists:funciones,id',
 		], [
-			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+			'nombre.regex' => 'El nombre solo puede contener letras, números y espacios.',
 			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
 			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
