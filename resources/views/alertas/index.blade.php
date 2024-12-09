@@ -149,6 +149,7 @@
 		 *******************************************************************************************************************************/
 		function guardar_datos() {
 			let form_data = $('#form').serializeArray();
+			console.log('form_data ',form_data);
 			let url_guarda_datos = "{{ url('alertas/ajax_store') }}";
 			let type_guarda_datos = "POST";
 
@@ -554,6 +555,13 @@
 		</div>
 	</div>
 	<script>
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function formatDateToISO(date) {
+			console.log('date ',date);
+			const [day, month, year] = date.split("-");
+			return `${day}-${month}-${year}`;
+		}
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
@@ -581,22 +589,21 @@
 					$('.modal-title').text('Editar Alerta');
 					// Limpiar la tabla de detalles antes de llenarla
 					$('#detalles_alertas tbody').empty();
-					
 					// Asignar los datos de detalles_alertas
 					if (response.alertas_detalles.length > 0) {
 						response.alertas_detalles.forEach(function(detalle) {
+							console.log('detalle ',detalle);
 							const funcionesIds = detalle.funciones_id.split(',');
 							const fechasDesde = detalle.fecha_desde.split(',');
 							const fechasHasta = detalle.fecha_hasta.split(',');
 
 							for (let i = 0; i < funcionesIds.length; i++) {
 								// Convertir las fechas a formato yyyy-MM-dd
-								const fechaDesdeParts = fechasDesde[i].split('-');
-								const fechaDesdeFormatted = `${fechaDesdeParts[2]}-${fechaDesdeParts[1]}-${fechaDesdeParts[0]}`;
 
-								const fechaHastaParts = fechasHasta[i].split('-');
-								const fechaHastaFormatted = `${fechaHastaParts[2]}-${fechaHastaParts[1]}-${fechaHastaParts[0]}`;
-
+								fechaDesdeFormatted = formatDateToISO(fechasDesde[i]);
+								fechaHastaFormatted = formatDateToISO(fechasHasta[i]);
+console.log('fechaDesdeFormatted ',fechaDesdeFormatted);
+console.log('fechaHastaFormatted ',fechaHastaFormatted);
 								let opcionesFunciones = '';
 								response.funciones.forEach(function(funcion) {
 									const selected = funcion.id == funcionesIds[i] ? 'selected' : '';
@@ -636,11 +643,10 @@
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		// Función para eliminar una fila de detalles
-		function remove_row(button) 
-		{
+		function remove_row(button) {
+			console.log("Eliminando fila...");
 			$(button).closest('tr').remove();
 		}
-
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function eliminarValores() 
@@ -650,15 +656,17 @@
 			if (botonEliminar) {
 				botonEliminar.addEventListener("click", function () {
 					// Selecciona el tbody dentro de la tabla
-					const tablaBody = document.querySelector("#detalles_alertas tbody");
-					if (tablaBody) {
-						// Elimina todas las filas dinámicas del tbody
-						while (tablaBody.firstChild) {
-							tablaBody.removeChild(tablaBody.firstChild);
+					$(document).on('click', '#eliminar_filas', function () {
+						const tablaBody = document.querySelector("#detalles_alertas tbody");
+						if (tablaBody) {
+							console.log("Eliminando todas las filas dinámicas...");
+							while (tablaBody.firstChild) {
+								tablaBody.removeChild(tablaBody.firstChild);
+							}
+						} else {
+							console.error("No se encontró un <tbody> en la tabla.");
 						}
-					} else {
-						console.error("No se encontró un <tbody> en la tabla.");
-					}
+					});				
 				});
 			} else {
 				console.error("El botón con ID #eliminar_filas no existe en el DOM.");
@@ -669,7 +677,7 @@
 		$('#modal_form_alertas').on('hidden.bs.modal', function () {
 			limpiarErrores();
 			$('#form')[0].reset(); // Opcional: resetear el formulario
+			$('#detalles_alertas tbody').empty(); // Vaciar las filas dinámicas
 		});
-
 	</script>
 </x-app-layout>

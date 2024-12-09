@@ -186,28 +186,130 @@ class AlertaController extends Controller
 
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
-	public function alertasUpdate(Request $request, Alerta $alerta, MyController $myController)
+
+
+	 public function alertasUpdate(Request $request, Alerta $alerta, MyController $myController)
+	 {
+		 #dd($request->all());
+		 // Validación de los datos
+		 $validatedData = Validator::make($request->all(), [
+			 'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', 
+			 Rule::unique('alertas', 'nombre'),
+			 'descripcion' => 'required|string|max:255',
+			 'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
+			 'funciones_id' => 'required|array',
+			 'funciones_id.*' => 'integer|exists:funciones,id',
+			 'fecha_desde' => 'required|array',
+			 'fecha_desde.*' => 'date|date_format:Y-m-d',
+			 'fecha_hasta' => 'required|array',
+			 'fecha_hasta.*' => 'date|date_format:Y-m-d',
+		 ], [
+			 'fecha_desde.required' => 'El campo fecha_desde es obligatorio.',
+			 'fecha_desde.*.date' => 'Cada fecha en fecha_desde debe ser una fecha válida.',
+			 'fecha_desde.*.date_format' => 'Cada fecha en fecha_desde debe tener el formato Y-m-d.',
+			 'fecha_hasta.required' => 'El campo fecha_hasta es obligatorio.',
+			 'fecha_hasta.*.date' => 'Cada fecha en fecha_hasta debe ser una fecha válida.',
+			 'fecha_hasta.*.date_format' => 'Cada fecha en fecha_hasta debe tener el formato Y-m-d.',
+		 ]);
+	 
+		 if ($validatedData->fails()) {
+			 return response()->json([
+				 'status' => 0,
+				 'message' => '',
+				 'errors' => $validatedData->errors()
+			 ]);
+		 }
+	 
+		 $validated = $validatedData->validated();
+	 
+		 // Obtener el registro existente (usando findOrFail para garantizar un modelo único)
+		 $alertaExistente = Alerta::where('id', $request->alertas_id)->first();
+		 if (!$alertaExistente) {
+			 return response()->json([
+				 'status' => 0,
+				 'message' => 'Alerta no encontrada.'
+			 ]);
+		 }
+	 
+		 // Eliminar los detalles antiguos que no estén en la nueva solicitud
+		 // Esto eliminará los registros de AlertaDetalle que no están en el array de funciones_id
+		 if (isset($validated['funciones_id']) && is_array($validated['funciones_id'])) {
+			 // Obtener los IDs de los detalles actuales
+			 $funcionesIds = $validated['funciones_id'];
+			 
+			 // Eliminar los detalles que no estén en los nuevos datos
+			 AlertaDetalle::where('alertas_id', $request->alertas_id)
+				 ->whereNotIn('funciones_id', $funcionesIds)
+				 ->delete();
+		 }
+	 
+		 // Construir el mensaje de cambios
+		 $cambios = [];
+		 foreach (['nombre', 'descripcion', 'tipos_alertas_id'] as $campo) {
+			 if ($alertaExistente->$campo != $validated[$campo]) {
+				 $cambios[] = "cambiando $campo de \"{$alertaExistente->$campo}\" a \"{$validated[$campo]}\"";
+			 }
+		 }
+	 
+		 $mensajeCambios = implode(', ', $cambios);
+		 $username = Auth::user()->username;
+		 $message = "Actualizó la alerta \"{$alertaExistente->nombre}\" $mensajeCambios.";
+	 
+		 // Actualizar los datos de la alerta
+		 $alertaExistente->update($validated);
+	 
+		 // Crear detalles de alerta (o actualizarlos)
+		 foreach ($validated['funciones_id'] as $index => $funcionId) {
+			 AlertaDetalle::updateOrInsert(
+				 [
+					 'alertas_id' => $request->input('alertas_id')[0],
+					 'funciones_id' => $funcionId,
+				 ],
+				 [
+					 'fecha_desde' => \Carbon\Carbon::parse($validated['fecha_desde'][$index])->format('Y-m-d'),
+					 'fecha_hasta' => \Carbon\Carbon::parse($validated['fecha_hasta'][$index])->format('Y-m-d'),
+				 ]
+			 );
+		 }
+	 
+		 // Loguear la acción
+		 $clientIP = \Request::ip();
+		 $userAgent = \Request::userAgent();
+		 $myController->loguear($clientIP, $userAgent, $username, $message);
+	 
+		 return response()->json([
+			 'status' => 1,
+			 'message' => 'Alerta actualizada correctamente.'
+		 ]);
+	 }
+
+
+
+
+	 /* 	public function alertasUpdate(Request $request, Alerta $alerta, MyController $myController)
 	{
+		#dd($request->all());
 		// Validación de los datos
 		$validatedData = Validator::make($request->all(), [
 			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', 
 			Rule::unique('alertas', 'nombre'),
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
-			//'tipos_tratamientos_id' => 'required|integer|exists:alertas_tipos_tratamientos,id',
 			'funciones_id' => 'required|array',
-			Rule::unique('detalles_alertas', 'funciones_id'),
-			'funciones_id.*' => 'exists:funciones,id',
+			'funciones_id.*' => 'integer|exists:funciones,id',
+			'fecha_desde' => 'required|array',
+			'fecha_desde.*' => 'date|date_format:Y-m-d',
+			'fecha_hasta' => 'required|array',
+			'fecha_hasta.*' => 'date|date_format:Y-m-d',
 		], [
-			'nombre.regex' => 'El nombre solo puede contener letras, números y espacios.',
-			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
-			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
-			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
-			//'tipos_tratamientos_id.required' => 'Este campo no puede quedar vacío.',
-			//'tipos_tratamientos_id.exists' => 'El tipo de campo seleccionado no es válido.',
-			'funciones_id.unique' => 'Esta función ya está en uso.',
+			'fecha_desde.required' => 'El campo fecha_desde es obligatorio.',
+			'fecha_desde.*.date' => 'Cada fecha en fecha_desde debe ser una fecha válida.',
+			'fecha_desde.*.date_format' => 'Cada fecha en fecha_desde debe tener el formato Y-m-d.',
+			'fecha_hasta.required' => 'El campo fecha_hasta es obligatorio.',
+			'fecha_hasta.*.date' => 'Cada fecha en fecha_hasta debe ser una fecha válida.',
+			'fecha_hasta.*.date_format' => 'Cada fecha en fecha_hasta debe tener el formato Y-m-d.',
 		]);
-
+		#dd($validatedData);
 		if ($validatedData->fails()) {
 			return response()->json([
 				'status' => 0,
@@ -242,19 +344,26 @@ class AlertaController extends Controller
 		// Actualizar los datos
 		$alertaExistente->update($validated);
 
-		DB::table('detalles_alertas')
-			->updateOrInsert(
-				['alertas_id' => $alertaExistente->id],
+		#dd($request->input('alertas_id'));
+		if (!is_array($validated['funciones_id'])) {
+			return response()->json([
+				'status' => 0,
+				'message' => 'El campo funciones_id debe ser un array válido.'
+			]);
+		}
+		// Crear detalles de alerta
+		foreach ($validated['funciones_id'] as $index => $funcionId) {
+			AlertaDetalle::updateOrInsert(
 				[
-					'funciones_id' => implode(',', $validated['funciones_id']),
-					'fecha_desde' => implode(',', array_map(function ($fecha) {
-						return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
-					}, $request['fecha_desde'])),
-					'fecha_hasta' => implode(',', array_map(function ($fecha) {
-						return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
-					}, $request['fecha_hasta'])),
+					'alertas_id' => $request->input('alertas_id')[0],
+					'funciones_id' => $funcionId,
+				],
+				[
+					'fecha_desde' => \Carbon\Carbon::parse($validated['fecha_desde'][$index])->format('Y-m-d'),
+					'fecha_hasta' => \Carbon\Carbon::parse($validated['fecha_hasta'][$index])->format('Y-m-d'),
 				]
 			);
+		}
 
 		// Loguear la acción
 		$clientIP = \Request::ip();
@@ -265,7 +374,7 @@ class AlertaController extends Controller
 			'status' => 1,
 			'message' => 'Alerta actualizada correctamente.'
 		]);
-	}
+	} */
 
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
