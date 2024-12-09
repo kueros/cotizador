@@ -124,16 +124,31 @@ class FuncionController extends Controller
 			$funcion->formula = [];  // Asegúrate de que sea un array vacío si no tiene valor
 		}
 		$formulaArray = collect(explode(',', rtrim($funcion->formula, ','))) // Separa y elimina la última coma
-			->map(function ($item) {
-				// Clasifica el elemento como operator o value
-				$type = is_numeric($item) ? 'value' : 'operator';
-				return ['type' => $type, 'value' => $item];
-			});
-		$resultado = [
-			'id' => $funcion->id,
-			'nombre' => $funcion->nombre,
-			'formula' => $formulaArray,
-		];
+		->map(function ($item) {
+			// Clasifica el elemento según las reglas
+			if (is_numeric($item)) {
+				$type = 'valor';
+			} elseif (in_array($item, ['+', '-', '*', '/'])) {
+				$type = 'operador';
+			} elseif (in_array($item, ['<', '>', 'AND', 'OR', 'NOT'])) {
+				$type = 'condicion';
+			} elseif (str_starts_with($item, 'tipo')) {
+				$type = 'tipo';
+			} elseif (str_starts_with($item, 'campo')) {
+				$type = 'campo';
+			} elseif (str_starts_with($item, 'funcion')) {
+				$type = 'Otra funcion';
+			} else {
+				$type = 'desconocido'; // Por si no coincide con ninguna regla
+			}
+			return ['type' => $type, 'value' => $item];
+		});
+	
+	$resultado = [
+		'id' => $funcion->id,
+		'nombre' => $funcion->nombre,
+		'formula' => $formulaArray,
+	];
 		$data = json_encode($resultado, JSON_PRETTY_PRINT);
 		#dd($data);
 		return response()->json($data);
@@ -245,8 +260,8 @@ class FuncionController extends Controller
 	 *******************************************************************************************************************************/
 	public function obtenerTiposTransacciones()
 	{
-		$campos = DB::table('tipos_transacciones')->pluck('nombre');
-		return response()->json($campos);
+		$tipos = TipoTransaccion::select('id', 'nombre')->get();
+		return response()->json($tipos);
 	}
 
 	/*******************************************************************************************************************************

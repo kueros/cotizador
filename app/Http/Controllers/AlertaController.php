@@ -88,30 +88,34 @@ class AlertaController extends Controller
 		$request->merge([
 			'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
 		]);
-		// Validar los datos
+	
+		// Validar los datos básicos
 		$validatedData = Validator::make($request->all(), [
 			'nombre' => [
 				'required',
 				'string',
 				'max:255',
 				'min:3',
-				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Solo letras sin acentos y espacios
+				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/',
 				Rule::unique('alertas', 'nombre'), // Asegura la unicidad
 			],
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
-			'tipos_tratamientos_id' => 'required|integer|exists:alertas_tipos_tratamientos,id',
-			'funciones_id' => 'required|exists:funciones,id',
+			//'tipos_tratamientos_id' => 'required|integer|exists:alertas_tipos_tratamientos,id',
+			'funciones_id' => 'required|array', // Asegura que funciones_id sea un array
+			'funciones_id.*' => 'integer|exists:funciones,id', // Cada elemento debe ser un ID válido
 		], [
 			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-			'nombre.unique' => 'Este nombre  ya está en uso.',
+			'nombre.unique' => 'Este nombre ya está en uso.',
 			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
-			'tipos_tratamientos_id.required' => 'Este campo no puede quedar vacío.',
-			'tipos_tratamientos_id.exists' => 'El tipo de campo seleccionado no es válido.',
+			//'tipos_tratamientos_id.required' => 'Este campo no puede quedar vacío.',
+			//'tipos_tratamientos_id.exists' => 'El tipo de campo seleccionado no es válido.',
 			'funciones_id.required' => '"Detalles de la Alerta" no puede quedar vacío.',
+			'funciones_id.*.exists' => 'Una o más funciones seleccionadas no son válidas.',
 		]);
-		// Si la validación falla
+	
+		// Si la validación inicial falla
 		if ($validatedData->fails()) {
 			return response()->json([
 				'status' => 0,
@@ -119,47 +123,50 @@ class AlertaController extends Controller
 				'errors' => $validatedData->errors()
 			]);
 		}
-
-		$validated = $validatedData->validated(); // Obtiene los datos validados como array
-		#$inserted_id = Alerta::create($validated);
-
+	
+		// Validación adicional: Verificar duplicados en funciones_id
+		$funcionesId = $request->input('funciones_id');
+		if (count($funcionesId) !== count(array_unique($funcionesId))) {
+			return response()->json([
+				'status' => 0,
+				'message' => '',
+				'errors' => ['funciones_id' => ['No se permiten funciones duplicadas dentro del mismo registro.']]
+			]);
+		}
+	
+		$validated = $validatedData->validated(); // Datos validados
+	
+		// Crear la alerta
 		$alerta = Alerta::create([
 			'nombre' => $validated['nombre'],
 			'descripcion' => $validated['descripcion'],
 			'tipos_alertas_id' => $validated['tipos_alertas_id'],
-			'tipos_tratamientos_id' => $validated['tipos_tratamientos_id'],
+			//'tipos_tratamientos_id' => $validated['tipos_tratamientos_id'],
 		]);
-		#dd($alerta->id);
-		AlertaDetalle::create([
-			'alertas_id' => $alerta->id,
-			'funciones_id' => implode(',', $validated['funciones_id']), // Convertir array a cadena separada por comas
-			'fecha_desde' => implode(',', array_map(function ($fecha) {
-				return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
-			}, $request['fecha_desde'])),
-			'fecha_hasta' => implode(',', array_map(function ($fecha) {
-				return \Carbon\Carbon::parse($fecha)->format('d-m-Y');
-			}, $request['fecha_hasta'])),
-		]);
-
+	
+		// Crear detalles de alerta
+		foreach ($validated['funciones_id'] as $index => $funcionId) {
+			AlertaDetalle::create([
+				'alertas_id' => $alerta->id,
+				'funciones_id' => $funcionId,
+				'fecha_desde' => \Carbon\Carbon::parse($request['fecha_desde'][$index])->format('d-m-Y'),
+				'fecha_hasta' => \Carbon\Carbon::parse($request['fecha_hasta'][$index])->format('d-m-Y'),
+			]);
+		}
+	
 		// Loguear la acción
 		$clientIP = \Request::ip();
 		$clientIP_sc = str_replace('"', '', $clientIP);
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
-		$message = "Creó la alerta \"$validated[nombre]\"";
+		$message = "Creó la alerta \"{$validated['nombre']}\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-		#dd($clientIP_sc);
-		$response = [
-			'status' => 0,
-			'message' => $validatedData->errors()
-		];
+	
 		// Respuesta exitosa
-		$response = [
+		return response()->json([
 			'status' => 1,
 			'message' => 'Alerta creada correctamente.'
-		];
-		#dd($response);
-		return response()->json($response);
+		]);
 	}
 
 	/*******************************************************************************************************************************
@@ -188,16 +195,18 @@ class AlertaController extends Controller
 			Rule::unique('alertas', 'nombre'),
 			'descripcion' => 'required|string|max:255',
 			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
-			'tipos_tratamientos_id' => 'required|integer|exists:alertas_tipos_tratamientos,id',
+			//'tipos_tratamientos_id' => 'required|integer|exists:alertas_tipos_tratamientos,id',
 			'funciones_id' => 'required|array',
+			Rule::unique('detalles_alertas', 'funciones_id'),
 			'funciones_id.*' => 'exists:funciones,id',
 		], [
-			'nombre.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
+			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
 			'nombre.unique' => 'Este nombre de alerta ya está en uso.',
 			'tipos_alertas_id.required' => 'Este campo no puede quedar vacío.',
 			'tipos_alertas_id.exists' => 'El tipo de campo seleccionado no es válido.',
-			'tipos_tratamientos_id.required' => 'Este campo no puede quedar vacío.',
-			'tipos_tratamientos_id.exists' => 'El tipo de campo seleccionado no es válido.',
+			//'tipos_tratamientos_id.required' => 'Este campo no puede quedar vacío.',
+			//'tipos_tratamientos_id.exists' => 'El tipo de campo seleccionado no es válido.',
+			'funciones_id.unique' => 'Esta función ya está en uso.',
 		]);
 
 		if ($validatedData->fails()) {
@@ -221,7 +230,7 @@ class AlertaController extends Controller
 
 		// Construir el mensaje de cambios
 		$cambios = [];
-		foreach (['nombre', 'descripcion', 'tipos_alertas_id', 'tipos_tratamientos_id'] as $campo) {
+		foreach (['nombre', 'descripcion', 'tipos_alertas_id'] as $campo) {
 			if ($alertaExistente->$campo != $validated[$campo]) {
 				$cambios[] = "cambiando $campo de \"{$alertaExistente->$campo}\" a \"{$validated[$campo]}\"";
 			}

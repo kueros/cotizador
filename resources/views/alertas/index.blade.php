@@ -154,7 +154,8 @@
 
 			if ($('#accion').val() != "add") {
 				let alertasIdValue = form_data.find(item => item.name == 'alertas_id')?.value;
-				url_guarda_datos = "{{ url('alertasUpdate') }}" + "/" + alertasIdValue;
+				// url_guarda_datos = "{{ url('alertasUpdate') }}" + "/" + alertasIdValue;
+				url_guarda_datos = "{{ route('alertasUpdate', ':id') }}".replace(':id', alertasIdValue);
 				type_guarda_datos = "PUT";
 				form_data.push({ name: '_method', value: 'PUT' });
 			}
@@ -217,7 +218,7 @@
 			let nombre = document.querySelector('input[name="nombre"]').value.trim();
 			let descripcion = document.querySelector('input[name="descripcion"]').value.trim();
 			let tiposAlertasId = document.querySelector('select[name="tipos_alertas_id"]').value;
-			let tiposTratamientosId = document.querySelector('select[name="tipos_tratamientos_id"]').value;
+			//let tiposTratamientosId = document.querySelector('select[name="tipos_tratamientos_id"]').value;
 			let funcionesId = document.querySelectorAll('select[name="funciones_id[]"]');
 			let fechasDesde = document.querySelectorAll('input[name="fecha_desde[]"]');
 			let fechasHasta = document.querySelectorAll('input[name="fecha_hasta[]"]');
@@ -236,7 +237,7 @@
 			if (nombre.length < 3) errores.push({ campo: 'nombre', mensaje: "El campo 'Nombre' no debe tener menos de 3 caracteres." });
 			if (!descripcion) errores.push({ campo: 'descripcion', mensaje: "El campo 'Descripción' es obligatorio." });
 			if (!tiposAlertasId || tiposAlertasId === "0") errores.push({ campo: 'tipos_alertas_id', mensaje: "El campo 'Tipo de Alerta' es obligatorio." });
-			if (!tiposTratamientosId || tiposTratamientosId === "0") errores.push({ campo: 'tipos_tratamientos_id', mensaje: "El campo 'Tipo de Tratamiento' es obligatorio." });
+			//if (!tiposTratamientosId || tiposTratamientosId === "0") errores.push({ campo: 'tipos_tratamientos_id', mensaje: "El campo 'Tipo de Tratamiento' es obligatorio." });
 
 			// Validar contenido de la tabla 'detalles_alertas'
 			if (!detallesTable || detallesTable.children.length === 0) {
@@ -503,7 +504,7 @@
 							</div>
 						</div>
 
-						<div class="form-body">
+						<!--div class="form-body">
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Tipo de Tratamiento') }}</label>
 								<div class="col-md-9">
@@ -520,7 +521,7 @@
 									<span class="help-block"></span>
 								</div>
 							</div>
-						</div>
+						</div-->
 
 
 						<!-- Detalles de Alerta -->
@@ -575,7 +576,7 @@
 					$('#form [name="nombre"]').val(response.alertas.nombre);
 					$('#form [name="descripcion"]').val(response.alertas.descripcion);
 					$('#form [name="tipos_alertas_id"]').val(response.alertas.tipos_alertas_id);
-					$('#form [name="tipos_tratamientos_id"]').val(response.alertas.tipos_tratamientos_id);
+					//$('#form [name="tipos_tratamientos_id"]').val(response.alertas.tipos_tratamientos_id);
 					// Mostrar la modal
 					$('#modal_form_alertas').modal('show');
 					$('.modal-title').text('Editar Alerta');

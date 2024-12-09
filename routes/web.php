@@ -219,8 +219,8 @@ Route::middleware('auth')->group(
 
 Route::middleware('auth')->group(
 	function () {
-		Route::get('/alertasIndex', 							[AlertaController::class, 'alertasIndex'])->name('alertasIndex');
 		Route::put('/alertasUpdate/{id}', 						[AlertaController::class, 'alertasUpdate'])->name('alertasUpdate');
+		Route::get('/alertasIndex', 							[AlertaController::class, 'alertasIndex'])->name('alertasIndex');
 		Route::post('/alertas/ajax_store/', 					[AlertaController::class, 'ajax_store'])->name('alertas.ajax_store');
 		Route::get('/alertas/ajax_listado', 					[AlertaController::class, 'ajax_listado'])->name('alertas.ajax_listado');
 		Route::get('/alertas/ajax_edit/{id}', 					[AlertaController::class, 'ajax_edit'])->name('alertas.ajax_edit');

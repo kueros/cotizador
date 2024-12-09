@@ -147,15 +147,40 @@
 					if (Array.isArray(data.formula)) {
 						data.formula.forEach(element => {
 							console.log('element: ', element);
-							if (element.type === 'value') {
+							if (element.type === 'valor') {
 								addOption('Valor numérico', element.value);
-							} else if (element.type === 'operator') {
+							} else if (element.type === 'operador') {
 								addOption('Operador', element.value);
+							} else if (element.type === 'contador') {
+								addOption('Contador', element.value);
+							} else if (element.type === 'acumulador') {
+								addOption('Acumulador', element.value);
+							} else if (element.type === 'condicion') {
+								console.log('Condicion: ', element.value);
+								addOption('Condicion', element.value);
+							} else if (element.type === 'tipo') {
+								addOption('Tipo', element.value);
+							} else if (element.type === 'campo') {
+								addOption('Campo', element.value);
+							} else if (element.type === 'funcion') {
+								addOption('Funcion', element.value);
 							} else {
 								addOption('Campo estático', element.value);
 							}
 						});
 					}
+
+/* 					<li><button class="dropdown-item" type="button" onclick="addOption('Value')">Valor numérico</button></li>
+											<li><button class="dropdown-item" type="button" onclick="addOption('Operador')">Operador</button></li>
+											<li><button class="dropdown-item" type="button" onclick="addOption('Contador')">Contador</button></li>
+											<li><button class="dropdown-item" type="button" onclick="addOption('Acumulador')">Acumulador</button></li>
+											<li><button class="dropdown-item" type="button" onclick="addOption('Condición')">Condición</button></li>
+											<li><button class="dropdown-item" type="button" onclick="addOption('Tipos de Transacciones')">Tipos de Transacciones</button></li>
+											<li><button class="dropdown-item" type="button" onclick="addOption('Campos de Transacciones')">Campos de Transacciones</button></li>
+											<li><button class="dropdown-item" type="button" onclick="addOption('Otra función')">Otra función</button></li>
+ */
+
+
 					$('#modal_form_add').modal('show');
 					$('.modal-title').text('Editar función');
 					$('#form').attr('action', "{{ url('funciones') }}" + "/" + id);
@@ -325,12 +350,13 @@
 
 			/*******************************************************************************************************************************/
 			if (optionText === 'Valor numérico') {
+				console.log('Valor numérico seleccionado:', optionText);
 				newInput.type = 'number';
 				newInput.value = defaultValue;
 
 				const elementIndex = formulaElements.length;
 				formulaElements.push({
-					type: 'value',
+					type: 'valor',
 					value: ''
 				});
 
@@ -341,6 +367,7 @@
 				newInput.removeAttribute('readonly');
 			/*******************************************************************************************************************************/
 			} else if (optionText === 'Operador') {
+				console.log('Operador seleccionado:', optionText);
 				// Lógica para el operador
 				newInput.setAttribute('readonly', true);
 				newInput.type = 'text';
@@ -369,48 +396,7 @@
 						newInput.value = op;
 						operatorDropdown.style.display = 'none';
 						formulaElements.push({
-							type: 'operator',
-							value: op
-						});
-					};
-					li.appendChild(button);
-					dropdownMenu.appendChild(li);
-				});
-
-				operatorDropdown.appendChild(dropdownButton);
-				operatorDropdown.appendChild(dropdownMenu);
-				wrapper.appendChild(operatorDropdown);
-			/*******************************************************************************************************************************/
-			} else if (optionText === 'Condición') {
-				// Lógica para la condición
-				newInput.setAttribute('readonly', true);
-				newInput.type = 'text';
-				const operatorDropdown = document.createElement('div');
-				operatorDropdown.className = 'dropdown ms-2';
-
-				const dropdownButton = document.createElement('button');
-				dropdownButton.className = 'btn btn-primary dropdown-toggle';
-				dropdownButton.type = 'button';
-				dropdownButton.id = `dropdownOperator-${Date.now()}`;
-				dropdownButton.setAttribute('data-bs-toggle', 'dropdown');
-				dropdownButton.innerText = 'Seleccionar condición';
-
-				const dropdownMenu = document.createElement('ul');
-				dropdownMenu.className = 'dropdown-menu';
-				dropdownMenu.setAttribute('aria-labelledby', dropdownButton.id);
-
-				const operators = ['=', '<', '>', 'SI', 'AND', 'OR', 'NOT', '<=', '>=', '!='];
-				operators.forEach(op => {
-					const li = document.createElement('li');
-					const button = document.createElement('button');
-					button.className = 'dropdown-item';
-					button.type = 'button';
-					button.innerText = op;
-					button.onclick = () => {
-						newInput.value = op;
-						operatorDropdown.style.display = 'none';
-						formulaElements.push({
-							type: 'operator',
+							type: 'operador',
 							value: op
 						});
 					};
@@ -423,16 +409,17 @@
 				wrapper.appendChild(operatorDropdown);
 			/*******************************************************************************************************************************/
 			} else if (optionText === 'Contador') {
+				console.log('Contador seleccionado:', optionText);
 				newInput.setAttribute('readonly', true);
 
 				// Verificar si se ha elegido un campo de transacciones
-				if (!campoSeleccionado) {
+/* 				if (!campoSeleccionado) {
 					const avisoError = document.getElementById('aviso-error');
 					avisoError.style.display = 'block';
 					avisoError.innerText = '¡Por favor, elija primero un campo de transacciones antes de seleccionar un contador!';
 					return; // Detener la ejecución si no se ha seleccionado un campo de transacciones
 				}
-				console.log('campoSeleccionado: ', campoSeleccionado),
+*/
 
 					// Lógica para el contador
 					fetch('/funciones/contar-transacciones', {
@@ -467,15 +454,16 @@
 
 			/*******************************************************************************************************************************/
 			} else if (optionText === 'Acumulador') {
+				console.log('Acumulador seleccionado:', optionText);
 				newInput.setAttribute('readonly', true);
 
 				// Verificar si se ha elegido un campo de transacciones
-				if (!campoSeleccionado) {
+/* 				if (!campoSeleccionado) {
 					const avisoError = document.getElementById('aviso-error');
 					avisoError.style.display = 'block';
 					avisoError.innerText = '¡Por favor, elija primero un campo de transacciones antes de seleccionar un acumulador!';
 					return; // Detener la ejecución si no se ha seleccionado un campo de transacciones
-				}
+				} */
 					// Lógica para el acumulador
 					fetch('/funciones/acumular-transacciones', {
 						method: 'POST',
@@ -509,57 +497,102 @@
 
 
 			/*******************************************************************************************************************************/
-			} else if (optionText === 'Otra función') {
-					newInput.setAttribute('readonly', true);
-					newInput.type = 'text';
-					
-					const avisoError = document.getElementById('aviso-error');
-					avisoError.style.display = 'none';
-					avisoError.innerText = '';
+			} else if (optionText === 'Otra funcion') {
+				console.log('Otra función seleccionada:', optionText);
+				newInput.setAttribute('readonly', true);
+				newInput.type = 'text';
+				
+				const avisoError = document.getElementById('aviso-error');
+				avisoError.style.display = 'none';
+				avisoError.innerText = '';
 
-					const dropdownContainer = document.createElement('div');
-					dropdownContainer.className = 'dropdown ms-2';
+				const dropdownContainer = document.createElement('div');
+				dropdownContainer.className = 'dropdown ms-2';
 
-					const dropdownButton = document.createElement('button');
-					dropdownButton.className = 'btn btn-primary dropdown-toggle';
-					dropdownButton.type = 'button';
-					dropdownButton.id = `dropdownFunciones-${Date.now()}`;
-					dropdownButton.setAttribute('data-bs-toggle', 'dropdown');
-					dropdownButton.innerText = 'Seleccionar función';
+				const dropdownButton = document.createElement('button');
+				dropdownButton.className = 'btn btn-primary dropdown-toggle';
+				dropdownButton.type = 'button';
+				dropdownButton.id = `dropdownFunciones-${Date.now()}`;
+				dropdownButton.setAttribute('data-bs-toggle', 'dropdown');
+				dropdownButton.innerText = 'Seleccionar función';
 
-					const dropdownMenu = document.createElement('ul');
-					dropdownMenu.className = 'dropdown-menu';
-					dropdownMenu.setAttribute('aria-labelledby', dropdownButton.id);
+				const dropdownMenu = document.createElement('ul');
+				dropdownMenu.className = 'dropdown-menu';
+				dropdownMenu.setAttribute('aria-labelledby', dropdownButton.id);
 
-					// Hacer una solicitud al backend para obtener las funciones
-					fetch('/funciones/listado')
-						.then(response => response.json())
-						.then(funciones => {
-							funciones.forEach(funcion => {
-								const li = document.createElement('li');
-								const button = document.createElement('button');
-								button.className = 'dropdown-item';
-								button.type = 'button';
-								button.innerText = funcion.nombre; // Campo 'nombre' recibido desde el backend
-								button.onclick = () => {
-									newInput.value = funcion.nombre;
-									formulaElements.push({ type: 'function', value: funcion.nombre }); // Guardar como elemento de tipo 'function'
-									dropdownContainer.style.display = 'none';
-								};
-								li.appendChild(button);
-								dropdownMenu.appendChild(li);
-							});
-						})
-						.catch(error => console.error('Error al cargar funciones:', error));
+				// Hacer una solicitud al backend para obtener las funciones
+				fetch('/funciones/listado')
+					.then(response => response.json())
+					.then(funciones => {
+						funciones.forEach(funcion => {
+							const li = document.createElement('li');
+							const button = document.createElement('button');
+							button.className = 'dropdown-item';
+							button.type = 'button';
+							button.innerText = funcion.nombre; // Campo 'nombre' recibido desde el backend
+							button.onclick = () => {
+								newInput.value = funcion.nombre;
+								formulaElements.push({ type: 'funcion', value: funcion.nombre });
+								dropdownContainer.style.display = 'none';
+							};
+							li.appendChild(button);
+							dropdownMenu.appendChild(li);
+						});
+					})
+					.catch(error => console.error('Error al cargar funciones:', error));
 
-					dropdownContainer.appendChild(dropdownButton);
-					dropdownContainer.appendChild(dropdownMenu);
+				dropdownContainer.appendChild(dropdownButton);
+				dropdownContainer.appendChild(dropdownMenu);
 
-					wrapper.appendChild(dropdownContainer);
-
+				wrapper.appendChild(dropdownContainer);
 
 			/*******************************************************************************************************************************/
-			} else if (optionText === 'Tipos de Transacciones') {
+			} else if (optionText === 'Condicion') {
+				console.log('Condición seleccionada:', optionText);
+				// Lógica para la condición
+				newInput.setAttribute('readonly', true);
+				newInput.type = 'text';
+				const operatorDropdown = document.createElement('div');
+				operatorDropdown.className = 'dropdown ms-2';
+
+				const dropdownButton = document.createElement('button');
+				dropdownButton.className = 'btn btn-primary dropdown-toggle';
+				dropdownButton.type = 'button';
+				dropdownButton.id = `dropdownOperator-${Date.now()}`;
+				dropdownButton.setAttribute('data-bs-toggle', 'dropdown');
+				dropdownButton.innerText = 'Seleccionar condición';
+
+				const dropdownMenu = document.createElement('ul');
+				dropdownMenu.className = 'dropdown-menu';
+				dropdownMenu.setAttribute('aria-labelledby', dropdownButton.id);
+
+				const operators = ['=', '<', '>', 'SI', 'AND', 'OR', 'NOT', '<=', '>=', '!='];
+				operators.forEach(op => {
+					const li = document.createElement('li');
+					const button = document.createElement('button');
+					button.className = 'dropdown-item';
+					button.type = 'button';
+					button.innerText = op;
+					button.onclick = () => {
+						newInput.value = op;
+						operatorDropdown.style.display = 'none';
+						formulaElements.push({
+							type: 'condicion',
+							value: op
+						});
+					};
+					li.appendChild(button);
+					dropdownMenu.appendChild(li);
+				});
+
+				operatorDropdown.appendChild(dropdownButton);
+				operatorDropdown.appendChild(dropdownMenu);
+				wrapper.appendChild(operatorDropdown);
+
+			/*******************************************************************************************************************************/
+
+			} else if (optionText.trim().toLowerCase() === 'tipo') {
+				console.log('Tipos de transacciones seleccionados:', optionText);
 				newInput.setAttribute('readonly', true);
 				newInput.type = 'text';
 				const avisoError = document.getElementById('aviso-error');
@@ -576,30 +609,41 @@
 				dropdownButton.setAttribute('data-bs-toggle', 'dropdown');
 				dropdownButton.innerText = 'Seleccionar tipo';
 
+/*
+
+VERIFICAR SI ESTOY EN EDICION O CREACION DE FUNCIONES
+				LUEGO DE ESO, SI ESTOY EN CREACION, LA LINEA ANTERIOR ESTÁ BIEN, PERO SI ESTOY EN EDICION
+				EN LUGAR DE SELECCIONAR TIPO DEBERÍA IR EL VALOR QUE TRAE DESDE LA TABLA.
+
+*/
+
+
 				const dropdownMenu = document.createElement('ul');
 				dropdownMenu.className = 'dropdown-menu';
 				dropdownMenu.setAttribute('aria-labelledby', dropdownButton.id);
 
 				// Hacer una solicitud al backend para obtener los tipos
+
 				fetch('/funciones/tipos_transacciones')
-					.then(response => response.json())
-					.then(campos => {
-						campos.forEach(campo => {
-							console.log(campo);
-							const li = document.createElement('li');
-							const button = document.createElement('button');
-							button.className = 'dropdown-item';
-							button.type = 'button';
-							button.innerText = campo; // Campo recibido desde el backend
-							button.onclick = () => {
-								tipoSeleccionado = campo; // Guardar el campo seleccionado
-								newInput.value = campo;
-								dropdownContainer.style.display = 'none';
-							};
-							li.appendChild(button);
-							dropdownMenu.appendChild(li);
-						});
-					})
+						.then(response => response.json())
+						.then(tipos => {
+							console.log('Datos recibidos del backend:', tipos); // Verifica la respuesta
+							tipos.forEach(tipo => {
+								const li = document.createElement('li');
+								const button = document.createElement('button');
+								button.className = 'dropdown-item';
+								button.type = 'button';
+								button.innerText = tipo.nombre; // Campo 'nombre' recibido desde el backend
+								button.onclick = () => {
+									newInput.value = tipo.nombre;
+									formulaElements.push({ type: 'tipo', value: tipo.nombre });
+									dropdownContainer.style.display = 'none';
+									tipoSeleccionado = tipo.nombre; // Guardar el campo seleccionado
+								};
+								li.appendChild(button);
+								dropdownMenu.appendChild(li);
+							});
+						})
 					.catch(error => console.error('Error al cargar tipos:', error));
 
 				dropdownContainer.appendChild(dropdownButton);
@@ -608,93 +652,94 @@
 				wrapper.appendChild(dropdownContainer);
 
 			/*******************************************************************************************************************************/
-/*******************************************************************************************************************************/
-} else if (optionText === 'Campos de Transacciones') {
-    newInput.setAttribute('readonly', true);
-    newInput.type = 'text';
-    const avisoError = document.getElementById('aviso-error');
-    avisoError.style.display = 'none';
-    avisoError.innerText = '';
+			} else if (optionText === 'campo') {
+				console.log('Campos de transacciones seleccionados:', optionText);
+				newInput.setAttribute('readonly', true);
+				newInput.type = 'text';
+				const avisoError = document.getElementById('aviso-error');
+				avisoError.style.display = 'none';
+				avisoError.innerText = '';
 
-    console.log('tipoSeleccionado: ', tipoSeleccionado);
+				console.log('tipoSeleccionado: ', tipoSeleccionado);
 
-    // Verificar si se ha elegido un tipo de transacciones
-    if (!tipoSeleccionado) {
-        avisoError.style.display = 'block';
-        avisoError.innerText = '¡Por favor, elija primero un tipo de transacciones antes de seleccionar los campos!';
-        return; // Detener la ejecución si no se ha seleccionado un tipo de transacciones
-    }
+				// Verificar si se ha elegido un tipo de transacciones
+				if (!tipoSeleccionado) {
+					avisoError.style.display = 'block';
+					avisoError.innerText = '¡Por favor, elija primero un tipo de transacciones antes de seleccionar los campos!';
+					return; // Detener la ejecución si no se ha seleccionado un tipo de transacciones
+				}
 
-    const dropdownContainer = document.createElement('div');
-    dropdownContainer.className = 'dropdown ms-2';
+				const dropdownContainer = document.createElement('div');
+				dropdownContainer.className = 'dropdown ms-2';
 
-    const dropdownButton = document.createElement('button');
-    dropdownButton.className = 'btn btn-primary dropdown-toggle';
-    dropdownButton.type = 'button';
-    dropdownButton.id = `dropdownCampos-${Date.now()}`;
-    dropdownButton.setAttribute('data-bs-toggle', 'dropdown');
-    dropdownButton.innerText = 'Seleccionar campo';
+				const dropdownButton = document.createElement('button');
+				dropdownButton.className = 'btn btn-primary dropdown-toggle';
+				dropdownButton.type = 'button';
+				dropdownButton.id = `dropdownCampos-${Date.now()}`;
+				dropdownButton.setAttribute('data-bs-toggle', 'dropdown');
+				dropdownButton.innerText = 'Seleccionar campo';
 
-    const dropdownMenu = document.createElement('ul');
-    dropdownMenu.className = 'dropdown-menu';
-    dropdownMenu.setAttribute('aria-labelledby', dropdownButton.id);
+				const dropdownMenu = document.createElement('ul');
+				dropdownMenu.className = 'dropdown-menu';
+				dropdownMenu.setAttribute('aria-labelledby', dropdownButton.id);
 
-    // Hacer una solicitud al backend para obtener los campos relacionados al tipo seleccionado
-	fetch('/funciones/campos-transacciones', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-    },
-    body: JSON.stringify({ tipo_transaccion: tipoSeleccionado })
-})
-    .then(response => response.json())
-    .then(campos => {
-        console.log('Datos recibidos del backend:', campos); // Verifica la respuesta
+				// Hacer una solicitud al backend para obtener los campos relacionados al tipo seleccionado
+				fetch('/funciones/campos-transacciones', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+						},
+						body: JSON.stringify({ tipo_transaccion: tipoSeleccionado })
+					})
+					.then(response => response.json())
+					.then(campos => {
+						console.log('Datos recibidos del backend:', campos); // Verifica la respuesta
 
-        if (campos.error) {
-            avisoError.style.display = 'block';
-            avisoError.innerText = campos.error;
-            return;
-        }
+						if (campos.error) {
+							avisoError.style.display = 'block';
+							avisoError.innerText = campos.error;
+							return;
+						}
 
-        if (!campos || campos.length === 0) {
-            avisoError.style.display = 'block';
-            avisoError.innerText = 'No se encontraron campos disponibles.';
-            return;
-        }
+						if (!campos || campos.length === 0) {
+							avisoError.style.display = 'block';
+							avisoError.innerText = 'No se encontraron campos disponibles.';
+							return;
+						}
 
-		campos.forEach(campo => {
-    console.log('Campo procesado:', campo); // Verifica cada elemento
+						campos.forEach(campo => {
+							console.log('Campo procesado:', campo); // Verifica cada elemento
 
-    const li = document.createElement('li');
-    const button = document.createElement('button');
-    button.className = 'dropdown-item';
-    button.type = 'button';
-    button.innerText = campo; // Ya que el backend devuelve un string
-    button.onclick = () => {
-        newInput.value = campo; // Ajusta según el backend
-        campoSeleccionado = campo; // Guarda el valor seleccionado
-        dropdownContainer.style.display = 'none';
-    };
+							const li = document.createElement('li');
+							const button = document.createElement('button');
+							button.className = 'dropdown-item';
+							button.type = 'button';
+							button.innerText = campo; // Ya que el backend devuelve un string
+							button.onclick = () => {
+								newInput.value = campo; // Ajusta según el backend
+								campoSeleccionado = campo; // Guarda el valor seleccionado
+								dropdownContainer.style.display = 'none';
+							};
 
-    li.appendChild(button);
-    dropdownMenu.appendChild(li);
-});
+							li.appendChild(button);
+							dropdownMenu.appendChild(li);
+						});
 
-    })
-    .catch(error => {
-        console.error('Error al cargar campos:', error);
-    });
+					})
+					.catch(error => {
+						console.error('Error al cargar campos:', error);
+				});
 
 
-    dropdownContainer.appendChild(dropdownButton);
-    dropdownContainer.appendChild(dropdownMenu);
+				dropdownContainer.appendChild(dropdownButton);
+				dropdownContainer.appendChild(dropdownMenu);
 
-    wrapper.appendChild(dropdownContainer);
+				wrapper.appendChild(dropdownContainer);
 
 			/*******************************************************************************************************************************/
 			} else {
+				console.log('Campo estático seleccionado:', optionText);
 				newInput.value = optionText;
 				formulaElements.push({
 					type: 'static',
@@ -715,42 +760,7 @@
 			serializeFormula();
 		}
 
-		/*******************************************************************************************************************************
-		 *******************************************************************************************************************************/
-		function createDropdown(optionText, formulaElements) {
-			const dropdown = document.createElement('div');
-			dropdown.className = 'dropdown ms-2';
 
-			const dropdownButton = document.createElement('button');
-			dropdownButton.className = 'btn btn-primary dropdown-toggle';
-			dropdownButton.type = 'button';
-			dropdownButton.setAttribute('data-bs-toggle', 'dropdown');
-			dropdownButton.innerText = `Seleccionar ${optionText}`;
-
-			const dropdownMenu = document.createElement('ul');
-			dropdownMenu.className = 'dropdown-menu';
-
-			const items = optionText === 'Operador' ? ['+', '-', '*', '/'] : ['=', '<', '>', 'AND', 'OR'];
-			items.forEach(op => {
-				const li = document.createElement('li');
-				const button = document.createElement('button');
-				button.className = 'dropdown-item';
-				button.type = 'button';
-				button.innerText = op;
-				button.onclick = () => {
-					formulaElements.push({
-						type: 'operator',
-						value: op
-					});
-				};
-				li.appendChild(button);
-				dropdownMenu.appendChild(li);
-			});
-
-			dropdown.appendChild(dropdownButton);
-			dropdown.appendChild(dropdownMenu);
-			return dropdown;
-		}
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		// Función para serializar la fórmula
@@ -921,7 +931,7 @@
 											<i class="fas fa-undo"></i>
 										</button>
 										<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-											<li><button class="dropdown-item" type="button" onclick="addOption('1')">Valor numérico</button></li>
+											<li><button class="dropdown-item" type="button" onclick="addOption('Value')">Valor numérico</button></li>
 											<li><button class="dropdown-item" type="button" onclick="addOption('Operador')">Operador</button></li>
 											<li><button class="dropdown-item" type="button" onclick="addOption('Contador')">Contador</button></li>
 											<li><button class="dropdown-item" type="button" onclick="addOption('Acumulador')">Acumulador</button></li>
