@@ -451,7 +451,6 @@
 							<th>Nombre</th>
 							<th>Descripción</th>
 							<th>Tipo de alerta</th>
-							<th>Tipo de tratamiento</th>
 							<th style="width:20%;" class="no-sort">Acción</th>
 						</thead>
 						<tbody>

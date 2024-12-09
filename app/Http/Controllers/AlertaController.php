@@ -66,7 +66,6 @@ class AlertaController extends Controller
 				$r->nombre,
 				$r->descripcion,
 				$r->tipo_alerta,
-				$r->tipo_tratamiento,
 				$accion
 			);
 		}

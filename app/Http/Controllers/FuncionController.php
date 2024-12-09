@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Funcion;
+use App\Models\AlertaDetalle;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -213,16 +214,33 @@ class FuncionController extends Controller
 		if (!$permiso_eliminar_roles) {
 			return response()->json(["error"=>"No tienes permiso para realizar esta acción, contáctese con un administrador."], "405");
 		}
-*/
+		*/
+		$usoFuncion = AlertaDetalle::where('funciones_id', $id)->exists();
+#dd($usoFuncion);
+		if ($usoFuncion) {
+			return response()->json([
+				"error" => "No puedes eliminar esta función porque ya está asociada a una o más alertas."
+			], 400); // Código HTTP 400 para "Bad Request"
+		}
+
+		// Continuar con la eliminación si no está en uso
 		$funcion = Funcion::find($id);
+
+		if (!$funcion) {
+			return response()->json(["error" => "La función no existe."], 404); // Código HTTP 404 para "Not Found"
+		}
+
 		$nombre = $funcion->nombre;
 		$clientIP = \Request::ip();
 		$userAgent = \Request::userAgent();
 		$username = Auth::user()->username;
+
+		// Registrar el evento en logs
 		$message = $username . " eliminó la función " . $nombre;
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
 		$funcion->delete();
+
 		return response()->json(["status" => true]);
 	}
 
