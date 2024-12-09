@@ -219,7 +219,16 @@ class AlertaController extends Controller
 				 'errors' => $validatedData->errors()
 			 ]);
 		 }
-	 
+		 
+		// Validación adicional: Verificar duplicados en funciones_id
+		$funcionesId = $request->input('funciones_id');
+		if (count($funcionesId) !== count(array_unique($funcionesId))) {
+			return response()->json([
+				'status' => 0,
+				'message' => '',
+				'errors' => ['funciones_id' => ['No se permiten funciones duplicadas dentro del mismo registro.']]
+			]);
+		}
 		 $validated = $validatedData->validated();
 	 
 		 // Obtener el registro existente (usando findOrFail para garantizar un modelo único)
