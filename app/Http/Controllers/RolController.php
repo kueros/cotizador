@@ -114,7 +114,7 @@ class RolController extends Controller
 		$request->merge([
 			'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
 		]);
-		// Validar los datos del usuario
+		// Validar los datos
 		$validatedData = $request->validate([
 			'nombre' => [
 				'required',
@@ -125,7 +125,7 @@ class RolController extends Controller
 				Rule::unique('roles'),
 			],
 		], [
-			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+			'nombre.regex' => 'El nombre solo puede contener letras, números y espacios.',
 			'nombre.unique' => 'Este nombre de rol ya está en uso.',
 		]);
 

@@ -177,7 +177,7 @@ Route::middleware('auth')->group(
 		Route::get('/tipos_transacciones/ajax_listado', 		[TipoTransaccionController::class, 'ajax_listado'])->name('tipos_transacciones.ajax_listado');
 		Route::get('/tipos_transacciones', 						[TipoTransaccionController::class, 'index'])->name('tipos_transacciones.index');
 		Route::get('/tipos_transacciones/create', 				[TipoTransaccionController::class, 'create'])->name('tipos_transacciones.create');
-		Route::post('/tipos_transacciones', 					[TipoTransaccionController::class, 'store'])->name('tipos_transacciones.store');
+		Route::post('/tipos_transacciones/ajax_store', 			[TipoTransaccionController::class, 'ajax_store'])->name('tipos_transacciones.ajax_store');
 		Route::get('/tipos_transacciones/{id}/edit',			[TipoTransaccionController::class, 'edit'])->name('tipos_transacciones.edit');
 		Route::delete('/tipos_transacciones/{id}', 				[TipoTransaccionController::class, 'destroy'])->name('tipos_transacciones.destroy');
 		Route::post('/tipos_transacciones/options', 			[TipoTransaccionController::class, 'options'])->name('tipos_transacciones.options');

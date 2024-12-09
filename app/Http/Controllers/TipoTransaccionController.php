@@ -113,16 +113,18 @@ class TipoTransaccionController extends Controller
 	 * 
 	 ********************************************************************************************************************************/
 
-	public function store(Request $request, MyController $myController): RedirectResponse
+	public function ajax_store(Request $request, MyController $myController)
 	{
-		#dd($request->input('nombre'));
 		/*     $permiso_agregar_roles = $myController->tiene_permiso('add_rol');
     if (!$permiso_agregar_roles) {
         abort(403, '.');
         return false;
     }
  */
-		// Validar los datos del usuario
+		$request->merge([
+			'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
+		]);
+		// Validar los datos
 		$validatedData = $request->validate([
 			'nombre' => [
 				'required',
@@ -133,15 +135,9 @@ class TipoTransaccionController extends Controller
 				Rule::unique('tipos_transacciones'),
 			],
 		], [
-			'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+			'nombre.regex' => 'El nombre solo puede contener letras, números y espacios.',
 			'nombre.unique' => 'Este nombre de tipo de transacción ya está en uso.',
 		]);
-
-		$tipoTransacciónExistente = TipoTransaccion::where('nombre', $request->input('nombre'))->first();
-		if ($tipoTransacciónExistente) {
-			return redirect()->back()->withErrors(['nombre' => 'Este nombre de tipo de transacción ya está en uso.'])->withInput();
-		}
-
 		TipoTransaccion::create($validatedData);
 
 		$clientIP = \Request::ip();
@@ -151,7 +147,11 @@ class TipoTransaccionController extends Controller
 		$message = "Creó el tipo de transacción \"$nombre\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
 
-		return Redirect::route('tipos_transacciones.index')->with('success', 'Tipo de transacción creado exitosamente.');
+		// Respuesta exitosa
+		return response()->json([
+			'status' => 1,
+			'message' => 'Tipo de Transacción creado correctamente.'
+		]);
 	}
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
@@ -230,7 +230,11 @@ class TipoTransaccionController extends Controller
 		 // Actualizar los datos
 		 $tipo_transaccion->update($validated);
 	 
-		 return redirect()->route('tipos_transacciones.index')->with('success', 'Tipo de transacción actualizado correctamente.');
+		// Respuesta exitosa
+		return response()->json([
+			'status' => 1,
+			'message' => 'Tipo de Transacción actualizado correctamente.'
+		]);
 	 }
 
 	/*******************************************************************************************************************************

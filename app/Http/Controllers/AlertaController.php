@@ -212,7 +212,7 @@ class AlertaController extends Controller
 		if ($validatedData->fails()) {
 			return response()->json([
 				'status' => 0,
-				'message' => 'Error en validación',
+				'message' => '',
 				'errors' => $validatedData->errors()
 			]);
 		}

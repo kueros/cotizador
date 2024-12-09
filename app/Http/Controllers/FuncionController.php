@@ -178,7 +178,7 @@ class FuncionController extends Controller
 		if ($validatedData->fails()) {
 			$response = [
 				'status' => 0,
-				'message' => 'error en validacion',
+				'message' => '',
 				'errors' => $validatedData->errors()
 			];
 			return response()->json($response);

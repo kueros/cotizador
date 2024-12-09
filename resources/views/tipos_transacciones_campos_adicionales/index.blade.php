@@ -22,61 +22,6 @@
 
 		jQuery(document).ready(function($) {
 
-			/*******************************************************************************************************************************
-			*******************************************************************************************************************************/
-			/*$("#form").submit(function(e) {
-				e.preventDefault();
-				var formData = new FormData(this);
-
-				//show_loading();
-				$.ajax({
-					url: "{{ url('tipos_transacciones_campos_adicionales/ajax_store') }}",
-					type: "POST",
-					data: formData,
-					method: 'POST',
-					cache: false,
-					contentType: false,
-					processData: false,
-					success: function(data) {
-						//hide_loading();
-						console.log(data)
-						if(data.status == 0){
-						let errorMessage = data.message + "</br>";
-    					if (data.errors && Object.keys(data.errors).length > 0) {
-							// Recorre cada campo y sus mensajes de error
-							for (let field in data.errors) {
-								if (data.errors.hasOwnProperty(field)) {
-									errorMessage += `${field}: ${data.errors[field].join(", ")}</br>`;
-								}
-							}
-						} else {
-							errorMessage += "No se encontraron errores específicos para los campos.";
-						}
-
-						swal.fire("Aviso", errorMessage, "warning");
-						return false;
-					}else{
-						swal.fire({
-							title: "Aviso",
-							text: data.message,
-							icon: "success"
-						}).then(() => {
-							// Recargar la tabla DataTables al cerrar el modal de éxito
-							location.reload();
-						});
-					}					},
-					error: function(jqXHR) {
-						hide_loading();
-						var mensaje = "Ocurrió un error al guardar la columna.";
-						if (jqXHR.responseText) {
-							mensaje = jqXHR.responseText;
-						}
-						if (mensaje != "") {
-							swal("Aviso", mensaje, "warning");
-						}
-					}
-				});
-			});*/
 
 			/*******************************************************************************************************************************
 			 *******************************************************************************************************************************/
@@ -183,12 +128,19 @@
 					$('[name="orden_listado"]').val(data.orden_listado);
 					$('[name="requerido"]').val(data.requerido);
 					$('[name="tipo"]').val(data.tipo);
+					$('[name="valores"]').val(data.valores);
 					$('[name="posicion"]').val(data.orden_listado);
 					$('[name="valor_default"]').val(data.valor_default);
 
 					$('[name="visible"]').prop('checked', data.visible == 1);
 					$('[name="requerido"]').prop('checked', data.requerido == 1);
 
+					// Mostrar u ocultar el campo "valores" basado en el tipo
+					if (data.tipo == 4) {
+						$('#div_valores_selector').show(); // Habilitar para edición
+					} else {
+						$('#div_valores_selector').hide(); // Ocultar en otros casos
+					}
 
 					$('#modal_form_campo_adicional').modal('show');
 					$('.modal-title').text('Editar campo adicional de tipo de transacción');

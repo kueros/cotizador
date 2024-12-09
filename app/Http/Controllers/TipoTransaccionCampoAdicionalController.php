@@ -88,13 +88,14 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		#dd($id);
 		#$data = TipoTransaccionCampoAdicional::where('id',$id)->first();
 		$data = TipoTransaccionCampoAdicional::find($id);
-
+#dd($data);
 		if (!$data) {
 			return response()->json(['error' => 'Registro no encontrado'], 404);
 		}
 
 		return response()->json($data);
 	}
+
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/
 	public function ajax_delete($id, MyController $myController)
@@ -156,7 +157,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		if ($validatedData->fails()) {
 			$response = [
 				'status' => 0,
-				'message' => 'error en validacion',
+				'message' => '',
 				'errors' => $validatedData->errors()
 			];
 			return response()->json($response);
@@ -297,7 +298,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		if ($validatedData->fails()) {
 			$response = [
 				'status' => 0,
-				'message' => 'Error en validacion',
+				'message' => '',
 				'errors' => $validatedData->errors()
 			];
 			return response()->json($response);
@@ -355,7 +356,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 		if ($validatedData->fails()) {
 			$response = [
 				'status' => 0,
-				'message' => 'Error en validacion',
+				'message' => '',
 				'errors' => $validatedData->errors()
 			];
 			return response()->json($response);
