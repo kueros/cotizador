@@ -151,7 +151,7 @@ class UserController extends Controller
 			]);
 			// Verifica si la validación falla
 			if ($validatedData->fails()) {
-				$response["message"] = 'Error en la validación de los datos.';
+				$response["message"] = '';
 				$response["errors"] = $validatedData->errors();
 				return response()->json($response);
 			}
@@ -312,6 +312,7 @@ class UserController extends Controller
 			$messages = [
 				'username.unique' => 'El nombre de usuario ya está en uso por otro usuario.',
 				'email.unique' => 'El correo electrónico ya está registrado por otro usuario.',
+				'email.regex' => 'El correo electrónico debe tener un nombre de al menos 3 caracteres y un dominio válido.',
 				'rol_id.required' => 'El rol es obligatorio.',
 				'rol_id.exists' => 'El rol seleccionado no es válido.',
 			];
@@ -320,14 +321,21 @@ class UserController extends Controller
 				'username' => 'required|string|max:255|unique:users,username,' . $user->user_id . ',user_id',
 				'nombre' => 'required|string|max:255',
 				'apellido' => 'required|string|max:255',
-				'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
+				'email' => [
+					'required',
+					'string',
+					'email',
+					'max:255',
+					'regex:/^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', // Validar formato de email
+					Rule::unique('users')->whereNull('deleted_at')], // Verifica unicidad sin registros eliminados
+				//'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
 				'rol_id' => 'required|exists:roles,rol_id',
 				'habilitado' => 'required|boolean',
 				'bloqueado' => 'required|boolean'
 			], $messages);
 			// Verifica si la validación falla
 			if ($validatedData->fails()) {
-				$response["message"] = 'Error en la validación de los datos.';
+				$response["message"] = '';
 				$response["errors"] = $validatedData->errors();
 				return response()->json($response);
 			}
