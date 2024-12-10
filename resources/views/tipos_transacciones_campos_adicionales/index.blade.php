@@ -15,73 +15,66 @@
 	<?php
 	#dd($id); 
 	?>
-
 	<script type="text/javascript">
 		var table;
 		var save_method;
-
 		jQuery(document).ready(function($) {
-
-
-			/*******************************************************************************************************************************
-			 *******************************************************************************************************************************/
 			tipo_transaccion_id = <?php echo $id; ?>;
 			table = $('#tipos_transacciones_table').DataTable({
 				"ajax": {
 					url: "{{ url('tipos_transacciones_campos_adicionales/ajax_listado') }}",
 					type: 'GET',
-					data: function(d) { // Agrega parámetros adicionales a la solicitud
+					data: function(d) {
 						d.tipo_transaccion_id = tipo_transaccion_id;
-        			}
-				},
-				language: traduccion_datatable,
-				//dom: 'Bfrtip',
-				columnDefs: [{
-					"targets": 'no-sort',
-					"orderable": true
-				}],
-				layout: {
-					topStart: {
-						buttons: [{
-								"extend": 'pdf',
-								"text": 'Export',
-								"className": 'btn btn-danger',
-								"orientation": 'landscape',
-								title: 'Campos Adicionales <?php echo $tipo_transaccion_nombre; ?>'
-							},
-							{
-								"extend": 'copy',
-								"text": 'Export',
-								"className": 'btn btn-primary',
-								title: 'Campos Adicionales <?php echo $tipo_transaccion_nombre; ?>'
-							},
-							{
-								"extend": 'excel',
-								"text": 'Export',
-								"className": 'btn btn-success',
-								title: 'Campos Adicionales <?php echo $tipo_transaccion_nombre; ?>'
-							},
-							{
-								"extend": 'print',
-								"text": 'Export',
-								"className": 'btn btn-secondary',
-								title: 'Campos Adicionales <?php echo $tipo_transaccion_nombre; ?>'
-							}
-						]
-					},
-					bottomEnd: {
-						paging: {
-							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
-						}
 					}
 				},
+				language: traduccion_datatable,
+				dom: 'Bfrtip',
+				buttons: [{
+						extend: 'pdf',
+						text: 'Exportar PDF',
+						className: 'btn btn-danger',
+						orientation: 'landscape',
+						title: 'Campos Adicionales <?php echo $tipo_transaccion_nombre; ?>',
+					},
+					{
+						extend: 'copy',
+						text: 'Copiar',
+						className: 'btn btn-primary',
+						exportOptions: {
+							columns: [0]
+						}
+					},
+					{
+						extend: 'excel',
+						text: 'Exportar Excel',
+						className: 'btn btn-success',
+						exportOptions: {
+							columns: [0]
+						}
+					},
+					{
+						extend: 'print',
+						text: 'Imprimir',
+						className: 'btn btn-secondary',
+						exportOptions: {
+							columns: [0]
+						}
+					}
+				],
+				columnDefs: [{
+					targets: 'no-sort',
+					orderable: true
+				}],
 				initComplete: function() {
 					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
 					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
 					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
-					$('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
+					$('.buttons-print').html('<span class="bi bi-printer"></span> Imprimir');
 				},
-				"order": [[2, 'asc']]
+				order: [
+					[2, 'asc']
+				]
 			});
 		});
 
@@ -109,7 +102,6 @@
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function edit_campos_adicionales(id) {
-			//console.log('edit_campos_adicionales '+id);
 			save_method = 'update';
 			$('#form_campo_adicional')[0].reset();
 			$('.form-group').removeClass('has-error');
@@ -121,6 +113,7 @@
 				type: "GET",
 				dataType: "JSON",
 				success: function(data) {
+					console.log(data);
 					$('[name="id"]').val(data.id);
 					$('[name="nombre_campo"]').val(data.nombre_campo);
 					$('[name="nombre_mostrar"]').val(data.nombre_mostrar);
@@ -135,17 +128,31 @@
 					$('[name="visible"]').prop('checked', data.visible == 1);
 					$('[name="requerido"]').prop('checked', data.requerido == 1);
 
-					// Mostrar u ocultar el campo "valores" basado en el tipo
 					if (data.tipo == 4) {
-						$('#div_valores_selector').show(); // Habilitar para edición
+						$('#div_valores_selector').show();
+
+						// Limpiar contenido previo de la tabla
+						$('#valores_selector tbody').empty();
+						if (typeof data.valores === 'string') {
+							data.valores = JSON.parse(data.valores);
+						}
+						if (data.valores && Array.isArray(data.valores)) {
+							data.valores.forEach(valor => {
+								var fila = `
+									<tr>
+										<td><input class="form-control" type="text" value="${valor}" maxlength="255" minlength="1" required name="valores[]"/></td>
+										<td><a class="btn btn-danger" onclick="eliminar_valor(this)"><i class="bi bi-trash"></i></a></td>
+									</tr>`;
+								$('#valores_selector tbody').append(fila);
+								console.log('fila ', fila);
+							});
+						}
 					} else {
-						$('#div_valores_selector').hide(); // Ocultar en otros casos
+						$('#div_valores_selector').hide();
 					}
 
 					$('#modal_form_campo_adicional').modal('show');
 					$('.modal-title').text('Editar campo adicional de tipo de transacción');
-					//$('#form').attr('action', "{{ url('tipos_transacciones_campos_adicionales') }}" + "/" + id);
-					//$('#method').val('PUT');
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					if (jqXHR.status === 404) {
@@ -183,19 +190,21 @@
 			}
 		}
 
-		function validar_campos_requeridos(form_id){
+		/*******************************************************************************************************************************
+		 *******************************************************************************************************************************/
+		function validar_campos_requeridos(form_id) {
 			var form_status = true;
 
-			$($('#'+form_id).find(':input')).each(function(){
-				if($(this).prop("required") && !$(this).prop("disabled")){
-					if($(this).val()){
-						if(!$(this)[0].checkValidity()){
+			$($('#' + form_id).find(':input')).each(function() {
+				if ($(this).prop("required") && !$(this).prop("disabled")) {
+					if ($(this).val()) {
+						if (!$(this)[0].checkValidity()) {
 							$(this).addClass('field-required');
 							form_status = false;
-						}else{
+						} else {
 							$(this).removeClass('field-required');
 						}
-					}else{
+					} else {
 						$(this).addClass('field-required');
 						form_status = false;
 					}
@@ -211,15 +220,20 @@
 			let url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales/ajax_store') }}";
 			let type_guarda_datos = "POST";
 
-			if(!validar_campos_requeridos('form_campo_adicional')){
+			if (!validar_campos_requeridos('form_campo_adicional')) {
 				$('#form_campo_adicional')[0].reportValidity();
 				return false;
 			}
 
 			if ($('#accion').val() != "add") {
-				url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales') }}" + "/" + $('[name="id"]').val();
+				let id = $('[name="id"]').val();
+				if (!id) {
+					console.error('El campo ID está vacío.');
+					swal.fire("Error", "El ID no está definido.", "error");
+					return false;
+				}
+				url_guarda_datos = "{{ url('tipos_transacciones_campos_adicionales') }}" + "/" + id;
 				type_guarda_datos = "PUT";
-				console.log('asdf '+$('name="id"').val());
 			}
 
 			show_loading();
@@ -238,7 +252,6 @@
 					if (data.status == 0) {
 						let errorMessage = data.message + "</br>";
 						if (data.errors && Object.keys(data.errors).length > 0) {
-							// Recorre cada campo y sus mensajes de error
 							for (let field in data.errors) {
 								if (data.errors.hasOwnProperty(field)) {
 									errorMessage += `${field}: ${data.errors[field].join(", ")}</br>`;
@@ -247,7 +260,6 @@
 						} else {
 							errorMessage += "No se encontraron errores específicos para los campos.";
 						}
-
 						swal.fire("Aviso", errorMessage, "warning");
 						return false;
 					} else {
@@ -256,7 +268,6 @@
 							text: data.message,
 							icon: "success"
 						}).then(() => {
-							// Recargar la tabla DataTables al cerrar el modal de éxito
 							location.reload();
 						});
 					}
@@ -287,7 +298,7 @@
 		function eliminar_valor(button) {
 			// Obtener la fila <tr> que contiene el botón de eliminar
 			var row = button.closest('tr');
-			
+
 			// Eliminar la fila
 			row.remove();
 		}
@@ -320,7 +331,7 @@
 					<div class="d-flex mb-2">
 						<button id="agregar" class="btn btn-success mr-2" onclick="add_campo_adicional()">
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-								<path d="M8 4v8m4-4H4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+								<path d="M8 4v8m4-4H4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
 							</svg> {{ __('Agregar Campo Adicional') }}
 						</button>
 					</div>
@@ -344,9 +355,9 @@
 	</div>
 
 	<?php
-		#dd($id);
-		#dd($campos_adicionales);
-		#dd($ultima_posicion);
+	#dd($id);
+	#dd($campos_adicionales);
+	#dd($ultima_posicion);
 	?>
 	<?php
 	?>
@@ -363,7 +374,7 @@
 					@csrf
 					<input name="_method" type="hidden" id="method">
 					<div class="modal-body form">
-					<input name="tipo_transaccion_id" id="tipo_transaccion_id" class="form-control" type="hidden" value="<?php echo $id; ?>">
+						<input name="tipo_transaccion_id" id="tipo_transaccion_id" class="form-control" type="hidden" value="<?php echo $id; ?>">
 						<input type="hidden" value="" name="accion" id="accion" />
 						<input type="hidden" value="" name="id" />
 						<div class="form-body">
@@ -457,7 +468,7 @@
 								</table>
 							</div>
 						</div>
-						
+
 					</div>
 					<div class="modal-footer">
 						<a onclick="guardar_datos()" class="btn btn-primary">{{ __('Guardar') }}</a>
@@ -468,5 +479,9 @@
 			</div>
 		</div>
 	</div>
-
+    <script>
+        $.get("{{ url('tipos_transacciones_campos_adicionales/ajax_listado') }}", function(data) {
+            console.log(data); // Asegúrate de que el JSON sea válido y contenga la clave 'data'
+        });
+    </script>
 </x-app-layout>
