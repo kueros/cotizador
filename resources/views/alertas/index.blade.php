@@ -155,6 +155,10 @@
 
 			if ($('#accion').val() != "add") {
 				let alertasIdValue = form_data.find(item => item.name == 'alertas_id')?.value;
+				if (!alertasIdValue) {
+					console.error('El valor de alertasIdValue es inválido.');
+					return;
+				}
 				// url_guarda_datos = "{{ url('alertasUpdate') }}" + "/" + alertasIdValue;
 				url_guarda_datos = "{{ route('alertasUpdate', ':id') }}".replace(':id', alertasIdValue);
 				type_guarda_datos = "PUT";
@@ -503,27 +507,6 @@
 								</div>
 							</div>
 						</div>
-
-						<!--div class="form-body">
-							<div class="mb-3 row">
-								<label class="col-form-label col-md-3">{{ __('Tipo de Tratamiento') }}</label>
-								<div class="col-md-9">
-									<select id="tipos_tratamientos_id" name="tipos_tratamientos_id" class="mt-1 block w-full form-control" required>
-										<option value="0">
-											{{ __('Elija un Tipo de Tratamiento') }}
-										</option>
-										@foreach($alertas_tipos_tratamientos as $alerta_tipo_tratamiento)
-										<option value="{{ $alerta_tipo_tratamiento->id }}">
-											{{ $alerta_tipo_tratamiento->nombre }}
-										</option>
-										@endforeach
-									</select>
-									<span class="help-block"></span>
-								</div>
-							</div>
-						</div-->
-
-
 						<!-- Detalles de Alerta -->
 						<div  style="margin-top:15px; margin-bottom:15px;">
 							<h5>Detalles de la Alerta</h5>
@@ -601,6 +584,8 @@
 							for (let i = 0; i < funcionesIds.length; i++) {
 								// Convertir las fechas a formato yyyy-MM-dd
 
+console.log('fechasDesde[i] ',fechasDesde[i]);
+console.log('fechasHasta[i] ',fechasHasta[i]);
 								fechaDesdeFormatted = formatDateToISO(fechasDesde[i]);
 								fechaHastaFormatted = formatDateToISO(fechasHasta[i]);
 console.log('fechaDesdeFormatted ',fechaDesdeFormatted);

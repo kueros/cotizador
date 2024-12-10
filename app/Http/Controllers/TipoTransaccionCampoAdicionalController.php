@@ -214,7 +214,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			if (!Schema::hasColumn($tabla, $nombre_campo)) {
 				$tipoDB = TipoCampo::where('id', $tipo)->value('tipo');
 				Schema::table($tabla, function (Blueprint $table) use ($nombre_campo, $tipoDB) {
-					$table->{$tipoDB}($nombre_campo)->nullable()->after('nombre');
+					$table->{$tipoDB}($nombre_campo)->nullable()->after('tipo_transaccion_id');
 				});
 			}
 		}

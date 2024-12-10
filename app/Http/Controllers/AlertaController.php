@@ -83,6 +83,7 @@ class AlertaController extends Controller
 	 *******************************************************************************************************************************/
 	public function ajax_store(Request $request, MyController $myController)
 	{
+		#dd($request->all());
 		// Limpia el campo nombre
 		$request->merge([
 			'nombre' => preg_replace('/\s+/', ' ', trim($request->input('nombre')))
@@ -275,8 +276,8 @@ class AlertaController extends Controller
 					 'funciones_id' => $funcionId,
 				 ],
 				 [
-					 'fecha_desde' => \Carbon\Carbon::parse($validated['fecha_desde'][$index])->format('Y-m-d'),
-					 'fecha_hasta' => \Carbon\Carbon::parse($validated['fecha_hasta'][$index])->format('Y-m-d'),
+					 'fecha_desde' => \Carbon\Carbon::parse($validated['fecha_desde'][$index])->format('d-m-Y'),
+					 'fecha_hasta' => \Carbon\Carbon::parse($validated['fecha_hasta'][$index])->format('d-m-Y'),
 				 ]
 			 );
 		 }
@@ -291,99 +292,6 @@ class AlertaController extends Controller
 			 'message' => 'Alerta actualizada correctamente.'
 		 ]);
 	 }
-
-
-
-
-	 /* 	public function alertasUpdate(Request $request, Alerta $alerta, MyController $myController)
-	{
-		#dd($request->all());
-		// Validación de los datos
-		$validatedData = Validator::make($request->all(), [
-			'nombre' => 'required|string|max:255|min:3|regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', 
-			Rule::unique('alertas', 'nombre'),
-			'descripcion' => 'required|string|max:255',
-			'tipos_alertas_id' => 'required|integer|exists:tipos_alertas,id',
-			'funciones_id' => 'required|array',
-			'funciones_id.*' => 'integer|exists:funciones,id',
-			'fecha_desde' => 'required|array',
-			'fecha_desde.*' => 'date|date_format:Y-m-d',
-			'fecha_hasta' => 'required|array',
-			'fecha_hasta.*' => 'date|date_format:Y-m-d',
-		], [
-			'fecha_desde.required' => 'El campo fecha_desde es obligatorio.',
-			'fecha_desde.*.date' => 'Cada fecha en fecha_desde debe ser una fecha válida.',
-			'fecha_desde.*.date_format' => 'Cada fecha en fecha_desde debe tener el formato Y-m-d.',
-			'fecha_hasta.required' => 'El campo fecha_hasta es obligatorio.',
-			'fecha_hasta.*.date' => 'Cada fecha en fecha_hasta debe ser una fecha válida.',
-			'fecha_hasta.*.date_format' => 'Cada fecha en fecha_hasta debe tener el formato Y-m-d.',
-		]);
-		#dd($validatedData);
-		if ($validatedData->fails()) {
-			return response()->json([
-				'status' => 0,
-				'message' => '',
-				'errors' => $validatedData->errors()
-			]);
-		}
-
-		$validated = $validatedData->validated();
-
-		// Obtener el registro existente (usando findOrFail para garantizar un modelo único)
-		$alertaExistente = Alerta::where('id', $request->alertas_id)->first();
-		if (!$alertaExistente) {
-			return response()->json([
-				'status' => 0,
-				'message' => 'Alerta no encontrada.'
-			]);
-		}
-
-		// Construir el mensaje de cambios
-		$cambios = [];
-		foreach (['nombre', 'descripcion', 'tipos_alertas_id'] as $campo) {
-			if ($alertaExistente->$campo != $validated[$campo]) {
-				$cambios[] = "cambiando $campo de \"{$alertaExistente->$campo}\" a \"{$validated[$campo]}\"";
-			}
-		}
-
-		$mensajeCambios = implode(', ', $cambios);
-		$username = Auth::user()->username;
-		$message = "Actualizó la alerta \"{$alertaExistente->nombre}\" $mensajeCambios.";
-
-		// Actualizar los datos
-		$alertaExistente->update($validated);
-
-		#dd($request->input('alertas_id'));
-		if (!is_array($validated['funciones_id'])) {
-			return response()->json([
-				'status' => 0,
-				'message' => 'El campo funciones_id debe ser un array válido.'
-			]);
-		}
-		// Crear detalles de alerta
-		foreach ($validated['funciones_id'] as $index => $funcionId) {
-			AlertaDetalle::updateOrInsert(
-				[
-					'alertas_id' => $request->input('alertas_id')[0],
-					'funciones_id' => $funcionId,
-				],
-				[
-					'fecha_desde' => \Carbon\Carbon::parse($validated['fecha_desde'][$index])->format('Y-m-d'),
-					'fecha_hasta' => \Carbon\Carbon::parse($validated['fecha_hasta'][$index])->format('Y-m-d'),
-				]
-			);
-		}
-
-		// Loguear la acción
-		$clientIP = \Request::ip();
-		$userAgent = \Request::userAgent();
-		$myController->loguear($clientIP, $userAgent, $username, $message);
-
-		return response()->json([
-			'status' => 1,
-			'message' => 'Alerta actualizada correctamente.'
-		]);
-	} */
 
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/

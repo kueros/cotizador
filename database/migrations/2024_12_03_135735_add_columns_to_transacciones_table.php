@@ -12,11 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('transacciones', function (Blueprint $table) {
-            $table->string('descripcion');
-            $table->string('monto');
-            $table->string('usuario_id');
-            $table->string('tipo_moneda_id');
-            $table->string('tipo_transaccion_id');
+            $table->string('descripcion')->after('nombre');
+            $table->string('monto')->after('nombre');
+            $table->string('usuario_id')->after('nombre');
+            $table->string('tipo_moneda_id')->after('nombre');
         });
     }
 
@@ -30,7 +29,6 @@ return new class extends Migration
             $table->dropColumn('monto');
             $table->dropColumn('usuario_id');
             $table->dropColumn('tipo_moneda_id');
-            $table->dropColumn('tipo_transaccion_id');
         });
     }
 };
