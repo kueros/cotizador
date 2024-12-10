@@ -560,7 +560,8 @@
 		function formatDateToISO(date) {
 			console.log('date ',date);
 			const [day, month, year] = date.split("-");
-			return `${day}-${month}-${year}`;
+			//return `${day}-${month}-${year}`;
+			return `${year}-${month}-${day}`;
 		}
 
 		/*******************************************************************************************************************************
