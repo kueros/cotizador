@@ -16,6 +16,8 @@ use App\Http\Controllers\AlertaController;
 use App\Http\Controllers\AlertaDetalleController;
 use App\Http\Controllers\AlertaTipoController;
 use App\Http\Controllers\AlertaTipoTratamientoController;
+use App\Http\Controllers\TransaccionController;
+use App\Http\Controllers\BaseTransaccionController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -166,8 +168,31 @@ Route::middleware('auth')->group(
 
 Route::middleware('auth')->group(
 	function () {
-		Route::get('/send/mail', 								[OrderShipmentController::class, 'store'])->name('enviarmail');
+		#Route::get('/send/mail', 								[OrderShipmentController::class, 'store'])->name('enviarmail');
 		Route::get('/obtenerusername', 							[MyController::class, 'get_username'])->name('obtenerusername1');
+	}
+);
+
+Route::middleware('auth')->group(
+	function () {
+		Route::get('/transacciones/edit/{id}', 					[TransaccionController::class, 'edit'])->name('transacciones.edit');
+		Route::post('/transacciones/store', 					[TransaccionController::class, 'store'])->name('transacciones.store');
+		#Route::get('transacciones/listado{id}', 				[TransaccionController::class, 'listado'])->name('transacciones.listado');
+		Route::get('transacciones/listado/{id}', 				[TransaccionController::class, 'listado']);
+		Route::get('/transacciones/{id}', 						[TransaccionController::class, 'index'])->name('transacciones');
+		Route::post('/transacciones/delete/{id}', 				[TransaccionController::class, 'delete'])->name('transacciones.delete');
+		Route::put('/transacciones/{id}',						[TransaccionController::class, 'update'])->name('transacciones.update');
+	}
+);
+
+Route::middleware('auth')->group(
+	function () {
+		Route::post('/base_transacciones/store', 					[BaseTransaccionController::class, 'store'])->name('base_transacciones.store');
+		Route::get('/base_transacciones/listado', 					[BaseTransaccionController::class, 'listado'])->name('base_transacciones.listado');
+		Route::get('/base_transacciones', 							[BaseTransaccionController::class, 'index'])->name('base_transacciones');
+		Route::get('/base_transacciones/edit/{id}', 				[BaseTransaccionController::class, 'edit'])->name('base_transacciones.edit');
+		Route::post('/base_transacciones/delete/{id}', 				[BaseTransaccionController::class, 'delete'])->name('base_transacciones.delete');
+		Route::put('/base_transacciones/{id}',						[BaseTransaccionController::class, 'update'])->name('base_transacciones.update');
 	}
 );
 

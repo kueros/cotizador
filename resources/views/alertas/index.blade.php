@@ -353,6 +353,7 @@
 			// Limpiar el array de errores
 			errores = [];
 		}
+		
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
 		function agregar_valor_selector() {
@@ -489,6 +490,7 @@
 							<label for="descripcion">Descripción</label>
 							<input type="text" class="form-control" name="descripcion" required>
 						</div>
+<?php #dd($tipos_alertas); ?>
 						<div class="form-body">
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Tipo de Alerta') }}</label>

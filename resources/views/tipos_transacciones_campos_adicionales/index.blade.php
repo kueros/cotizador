@@ -25,6 +25,7 @@
 					url: "{{ url('tipos_transacciones_campos_adicionales/ajax_listado') }}",
 					type: 'GET',
 					data: function(d) {
+						console.log(d);
 						d.tipo_transaccion_id = tipo_transaccion_id;
 					}
 				},
@@ -88,11 +89,24 @@
 		 *******************************************************************************************************************************/
 		function add_campo_adicional() {
 			save_method = 'add';
+
+			// Reiniciar el formulario
 			$('#form_campo_adicional')[0].reset();
+
+			// Limpiar clases de error y mensajes de ayuda
 			$('.form-group').removeClass('has-error');
 			$('.help-block').empty();
-			//$('#modal_form_campo_adicional').modal('show');
+
+			// Ocultar el div de valores del selector
+			$('#div_valores_selector').hide();
+
+			// Limpiar la tabla de valores
+			$('#valores_selector tbody').empty();
+
+			// Mostrar la modal
 			$('#modal_form_campo_adicional').modal('show');
+
+			// Configurar el título y los valores por defecto
 			$('.modal-title').text('Agregar campo adicional');
 			$('#accion').val('add');
 			$('#form_campo_adicional').attr('action', "{{ url('tipos_transacciones_campos_adicionales') }}");
@@ -133,19 +147,30 @@
 
 						// Limpiar contenido previo de la tabla
 						$('#valores_selector tbody').empty();
-						if (typeof data.valores === 'string') {
-							data.valores = JSON.parse(data.valores);
-						}
-						if (data.valores && Array.isArray(data.valores)) {
-							data.valores.forEach(valor => {
-								var fila = `
-									<tr>
-										<td><input class="form-control" type="text" value="${valor}" maxlength="255" minlength="1" required name="valores[]"/></td>
-										<td><a class="btn btn-danger" onclick="eliminar_valor(this)"><i class="bi bi-trash"></i></a></td>
-									</tr>`;
-								$('#valores_selector tbody').append(fila);
-								console.log('fila ', fila);
-							});
+
+						// Procesar y agregar filas si es necesario
+						if (data.valores) {
+							if (typeof data.valores === 'string') {
+								try {
+									data.valores = JSON.parse(data.valores);
+								} catch (e) {
+									console.error("Error al parsear valores:", e);
+									data.valores = [];
+								}
+							}
+							if (typeof data.valores === 'object' && !Array.isArray(data.valores)) {
+								data.valores = Object.values(data.valores);
+							}
+							if (Array.isArray(data.valores)) {
+								data.valores.forEach(valor => {
+									var fila = `
+										<tr>
+											<td><input class="form-control" type="text" value="${valor}" maxlength="255" minlength="1" required name="valores[]"/></td>
+											<td><a class="btn btn-danger" onclick="eliminar_valor(this)"><i class="bi bi-trash"></i></a></td>
+										</tr>`;
+									$('#valores_selector tbody').append(fila);
+								});
+							}
 						}
 					} else {
 						$('#div_valores_selector').hide();

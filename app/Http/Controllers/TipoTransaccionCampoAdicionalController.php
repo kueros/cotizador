@@ -17,6 +17,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 
 class TipoTransaccionCampoAdicionalController extends Controller
 {
@@ -49,35 +50,41 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	public function ajax_listado(Request $request)
 	{
 		$tipo_transaccion_id = $request->input('tipo_transaccion_id');
-
+	
 		$campos_adicionales = TipoTransaccionCampoAdicional::leftJoin('tipos_campos', 'tipos_transacciones_campos_adicionales.tipo', '=', 'tipos_campos.id')
 			->select('tipos_campos.nombre as tipo_nombre', 'tipos_transacciones_campos_adicionales.*')
 			->where('tipo_transaccion_id', $tipo_transaccion_id)
 			->orderBy('orden_listado', 'asc')
 			->get();
-		#dd($campos_adicionales);// ->toSql(), $campos_adicionales->getBindings());
-
+	
 		$data = array();
 		foreach ($campos_adicionales as $r) {
+			// Decodificar el campo valores si no está vacío o nulo
+			$valores_decoded = !empty($r->valores) ? json_decode($r->valores, true) : [];
+			
+			// Formatear los valores como una cadena separada por comas
+			$valores_formateados = is_array($valores_decoded) ? implode(', ', $valores_decoded) : '';
+	
 			$accion = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_campos_adicionales(' . "'" . $r->id . "'" . ')"><i class="bi bi-pencil"></i></a>';
-
 			$accion .= '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_campos_adicionales(' . "'" . $r->id . "'" . ')"><i class="bi bi-trash"></i></a>';
+	
 			$data[] = array(
 				$r->nombre_campo,
 				$r->nombre_mostrar,
 				$r->orden_listado,
 				$r->requerido == 1 ? 'Sí' : 'No',
 				$r->tipo_nombre,
-				$r->valores = json_decode($r->valores),
+				$valores_formateados, // Usar los valores formateados aquí
 				$accion
 			);
 		}
+	
 		$output = array(
 			"recordsTotal" => $campos_adicionales->count(),
 			"recordsFiltered" => $campos_adicionales->count(),
 			"data" => $data
 		);
-
+	
 		return response()->json($output);
 	}
 
@@ -126,7 +133,6 @@ class TipoTransaccionCampoAdicionalController extends Controller
 	 *******************************************************************************************************************************/
 	public function ajax_store(Request $request, MyController $myController)
 	{
-		#dd($request->all());
 		// Validar los datos del usuario
 		$formData = [];
 		foreach ($request->input('form_data') as $input) {
@@ -138,7 +144,7 @@ class TipoTransaccionCampoAdicionalController extends Controller
 				'string',
 				'max:255',
 				'min:3',
-				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/', // Solo letras sin acentos y espacios
+				'regex:/^[a-zA-ZÁÉÍÓÚáéíóúÑñÜü0-9\s,.]+$/',
 				Rule::unique('tipos_transacciones_campos_adicionales', 'nombre_campo'),
 			],
 			'nombre_mostrar' => 'required|string|max:255',
@@ -147,63 +153,50 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			'tipo_transaccion_id' => 'integer',
 			'visible' => 'required|integer',
 			'requerido' => 'required|integer',
-			'valores' => 'nullable|array', // Si tipo == 4, esto será validado manualmente
+			'valores' => 'nullable|array', // Validar valores si es necesario
 		], [
 			'nombre_campo.regex' => 'El nombre solo puede contener letras y espacios, no acepta caracteres acentuados ni símbolos especiales.',
 			'nombre_campo.unique' => 'Este nombre de campo adicional ya está en uso.',
-			'tipo.required' => 'Este campo no puede quedar vacío.',
-			'tipo.exists' => 'El tipo de campo seleccionado no es válido.',
-			'requerido.required' => 'Este campo no puede quedar vacío.',
 		]);
-		#print_r($validatedData);
-		// Verificar si la validación falla
+	
 		if ($validatedData->fails()) {
-			$response = [
+			return response()->json([
 				'status' => 0,
 				'message' => '',
 				'errors' => $validatedData->errors()
-			];
-			return response()->json($response);
+			]);
 		}
-
-		$validated = $validatedData->validated(); // Obtiene los datos validados como array
+	
+		$validated = $validatedData->validated();
+	
+		// Crear registro en tipos_transacciones_campos_adicionales
 		$inserted_id = TipoTransaccionCampoAdicional::create($validated);
 		$orden_listado = $validated['posicion'];
 		$inserted_id->orden_listado = $orden_listado;
-		$inserted_id->save();
-		// Si el tipo es "selector" (id = 4), verificar valores
-
-		if ($validated['tipo'] == 4) {
-			$formData = $request->input('form_data'); // Datos enviados desde la vista
-		
-			// Filtrar los elementos con name "valores[]"
+	
+		if ($validated['tipo'] == 4) { // Tipo selector
+			$formData = $request->input('form_data');
+	
 			$valores = array_map(function ($item) {
 				return $item['value'];
 			}, array_filter($formData, function ($item) {
 				return $item['name'] === 'valores[]';
 			}));
-		
-			// Reindexar el array para eliminar los índices originales
-			$valores = array_values($valores);
-		
-			// Verificar si hay valores
+	
 			if (empty($valores)) {
 				return response()->json([
 					'errors' => ['valores' => 'Se deben agregar valores para el selector.']
 				], 400);
 			}
-		
-			// Guardar los valores en la base de datos
+	
 			$inserted_id->valores = json_encode($valores);
 			$inserted_id->save();
 		}
-
-		#dd($inserted_id->valores);
+	
 		$nombre_campo = $validated['nombre_campo'];
 		$tipo = $validated['tipo'];
-
-		// Crear la columna en la tabla
 		$tabla = 'transacciones';
+	
 		$tipoDB = TipoCampo::where('id', $tipo)->value('tipo');
 		if (!$tipoDB) {
 			return response()->json([
@@ -212,28 +205,32 @@ class TipoTransaccionCampoAdicionalController extends Controller
 			], 400);
 		} else {
 			if (!Schema::hasColumn($tabla, $nombre_campo)) {
-				$tipoDB = TipoCampo::where('id', $tipo)->value('tipo');
 				Schema::table($tabla, function (Blueprint $table) use ($nombre_campo, $tipoDB) {
 					$table->{$tipoDB}($nombre_campo)->nullable()->after('tipo_transaccion_id');
 				});
 			}
+	
+			// Insertar valores JSON en la columna si es un selector
+			if ($tipo == 4) {
+				DB::table($tabla)->update([
+					$nombre_campo => json_encode($valores)
+				]);
+			}
 		}
-
+	
 		// Loguear la acción
 		$clientIP = $request->ip();
 		$userAgent = $request->userAgent();
 		$username = Auth::user()->username;
 		$message = "Creó el campo adicional para tipo de transacción \"$nombre_campo\"";
 		$myController->loguear($clientIP, $userAgent, $username, $message);
-
+	
 		// Respuesta exitosa
-		$response = [
+		return response()->json([
 			'status' => 1,
 			'message' => 'Campo adicional creado correctamente.'
-		];
-		return response()->json($response);
+		]);
 	}
-
 
 	/*******************************************************************************************************************************
 	 *******************************************************************************************************************************/

@@ -49,7 +49,11 @@ class AlertaController extends Controller
 	public function ajax_listado(Request $request)
 	{
 		$alertas =
-			Alerta::leftJoin('tipos_alertas', 'alertas.tipos_alertas_id', '=', 'tipos_alertas.id')->leftJoin('alertas_tipos_tratamientos', 'alertas.tipos_tratamientos_id', '=', 'alertas_tipos_tratamientos.id')->select('tipos_alertas.nombre as tipo_alerta', 'alertas_tipos_tratamientos.nombre as tipo_tratamiento', 'alertas.*')->orderBy('nombre', 'asc')->get();
+			Alerta::leftJoin('tipos_alertas', 'alertas.tipos_alertas_id', '=', 'tipos_alertas.id')->
+			leftJoin('alertas_tipos_tratamientos', 'alertas.tipos_tratamientos_id', '=', 'alertas_tipos_tratamientos.id')->
+			select('tipos_alertas.nombre as tipo_alerta', 'alertas_tipos_tratamientos.nombre as tipo_tratamiento', 'alertas.*')->
+			orderBy('nombre', 'asc')->
+			get();
 		$data = array();
 		#dd($alertas);
 		foreach ($alertas as $r) {

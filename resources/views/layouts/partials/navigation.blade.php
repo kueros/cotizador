@@ -98,6 +98,7 @@ $permiso_configuraciones_software = tiene_permiso('setup_soft');
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('monitoreo') }}">Monitoreo</a></li>
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('roles') }}">Roles</a></li>
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('users') }}">Usuarios</a></li>
+						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('base_transacciones') }}">Base Transacciones</a></li>
 					</ul>
 				</li>
 			</ul>
