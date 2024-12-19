@@ -88,32 +88,34 @@ class TransaccionController extends Controller
 			// Obtener los datos filtrados por tipo de transacción
 			$transacciones = Transaccion::where('tipo_transaccion_id', $id)->get();
 			// Preparar los datos para DataTables
-			$data = $transacciones->map(function ($transaccion) use ($columns) {
+			$data = $transacciones->map(function ($transaccion) use ($columns, $id) {
 				$row = [];
 			
 				foreach ($columns as $column) {
 					$nombreCampo = $column['nombre_campo'];
-					if (!empty($column['hidden'])) {
-						continue;
-					}
 			
 					if (isset($transaccion->$nombreCampo)) {
 						$valorCampo = $transaccion->$nombreCampo;
 						if ($column['tipo'] == 4 && is_array($column['valores'])) {
 							$valores = $column['valores'];
-							$row[] = $valores[$valorCampo];
+							$row[$nombreCampo] = $valores[$valorCampo];
 						} else {
-							$row[] = $valorCampo;
+							$row[$nombreCampo] = $valorCampo;
 						}
 					} else {
-						$row[] = '';
+						$row[$nombreCampo] = '';
 					}
 				}
 			
-				// Agregar el ID al inicio del arreglo
-				array_unshift($row, $transaccion->id);
+				// Agregar tipo_transaccion_id como dato oculto
+				$row['tipo_transaccion_id'] = $id;
+			
+				// Agregar el ID como un campo con nombre
+				$row['id'] = $transaccion->id;
+			
 				return $row;
 			});
+			#dd($data);
 			// Preparar la respuesta JSON
 			return response()->json([
 				"columns" => array_values($columnsVisible), // Solo columnas visibles
@@ -218,13 +220,13 @@ class TransaccionController extends Controller
 		$filteredData = array_filter($request->all(), function ($key) use ($transaccionesColumns) {
 			return in_array($key, $transaccionesColumns);
 		}, ARRAY_FILTER_USE_KEY);
-	
 		// Crear el registro utilizando fill() y save()
 		$transaccion = new Transaccion();
 		$transaccion->fill($validated); // Solo los campos definidos en fillable
 		foreach ($filteredData as $key => $value) {
 			$transaccion->{$key} = $value; // Asignar dinámicamente los campos adicionales
 		}
+		#dd($transaccion);
 		$transaccion->save();
 	
 		// Loguear la acción

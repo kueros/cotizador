@@ -33,18 +33,20 @@
 					'Accept': 'application/json'
 				},
 				success: function(response) {
-					//console.log('respuesta: ', response);
+					console.log('respuesta: ', response);
 					if (!response.columns || !response.data) {
 						console.error("La respuesta no tiene los datos esperados:", response);
 						return;
 					}
-					// Crear las columnas dinámicamente, omitiendo la columna de 'id' (posición 0)
-					var columns = response.columns.map(function(col, index) {
+
+					// Crear las columnas dinámicamente usando el nombre del campo
+					var columns = response.columns.map(function(col) {
 						return {
 							title: col.nombre_mostrar,
-							data: index + 1 // Ajustar el índice para omitir la primera columna (id)
+							data: col.nombre_campo // Usar el nombre del campo como clave
 						};
 					});
+
 					// Agregar una columna para las acciones al final 
 					columns.push({
 						title: 'Acciones',
@@ -53,11 +55,10 @@
 						searchable: false,
 						render: function(data, type, row) {
 							console.log('Fila:', row);
-							return '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_transacciones(' + row[0] + ')"><i class="bi bi-pencil-fill"></i></a>' +
-								'<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_transacciones(' + row[0] + ')"><i class="bi bi-trash"></i></a>';
+							return '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_transacciones(' + row.id + ')"><i class="bi bi-pencil-fill"></i></a>' +
+								'<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="delete_transacciones(' + row.id + ')"><i class="bi bi-trash"></i></a>';
 						}
 					});
-
 					// Inicializar DataTable con columnas dinámicas
 					table = $('#transacciones_table').DataTable({
 						ajax: {
@@ -79,7 +80,7 @@
 								"orientation": 'landscape',
 								title: 'Transacciones',
 								exportOptions: {
-									columns: [0, 1, 2, 3] // Índices de las columnas que deseas incluir en la exportación
+									columns: ':visible' // Exportar todas las columnas visibles
 								}
 							}
 						],
@@ -114,12 +115,14 @@
 					$('#accion').val('add');
 					$('#form')[0].reset();
 					// Solicitar columnas al backend
+					console.log('tipos_transacciones_id 1:', tipos_transacciones_id);
 					$.ajax({
 						url: "{{ url('transacciones/listado') }}" + '/' + tipos_transacciones_id,
 						type: 'GET',
 						headers: { 'Accept': 'application/json' },
 						success: function(response) {
 							console.log('Respuesta del servidor:', response);
+							console.log('tipos_transacciones_id 2:', tipos_transacciones_id);
 							if (response.columns) {
 								abrirModalConCampos(response.columns); // Generar modal dinámico
 							} else {
@@ -282,6 +285,8 @@
 		 *******************************************************************************************************************************/
 		function guardar_datos() {
 			let form_data = $('#form').serializeArray();
+			console.log('form_data: ', form_data);
+			console.log('tipos_transacciones_id 3:', tipos_transacciones_id);
 
 			// Eliminar campos duplicados (mantener el último valor)
 			const uniqueData = [];
@@ -296,8 +301,10 @@
 
 			form_data = uniqueData;
 
-			console.log('Datos serializados únicos:', form_data);
-			console.log('accion ', $('#accion').val());
+			console.log('Datos serializados únicos (antes de agregar tipo_transaccion_id):', form_data);
+			// Agregar tipo_transaccion_id manualmente
+			form_data.push({ name: 'tipo_transaccion_id', value: tipos_transacciones_id });
+			console.log('Datos serializados únicos (después de agregar tipo_transaccion_id):', form_data);
 
 			let url_guarda_datos = "{{ url('transacciones/store') }}";
 			let type_guarda_datos = "POST";
