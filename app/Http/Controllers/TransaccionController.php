@@ -353,4 +353,43 @@ class TransaccionController extends Controller
 	
 		return response()->json(["status" => true]);
 	}
+
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+	public function importar(Request $request)
+	{
+		try {
+			$datos = json_decode($request->input('datos'), true);
+			$errores = [];
+			$importados = 0;
+	
+			foreach ($datos as $index => $fila) {
+				// Normalizar los datos
+				$fila['nombre'] = trim($fila['nombre'] ?? '');
+				$fila['descripcion'] = trim($fila['descripcion'] ?? '');
+				$fila['tipo_transaccion_id'] = intval($fila['tipo_transaccion_id'] ?? 0);
+				// Validar que todos los campos necesarios estén presentes
+				if (empty($fila['nombre']) || empty($fila['descripcion']) || empty($fila['tipo_transaccion_id'])) {
+					$errores[] = "Faltan datos en la fila " . ($index + 1);
+					continue; // Saltar esta fila
+				}
+	
+				// Procesar y guardar cada fila válida
+				Transaccion::create([
+					'nombre' => $fila['nombre'],
+					'descripcion' => $fila['descripcion'],
+					'tipo_transaccion_id' => $fila['tipo_transaccion_id'],
+				]);
+				$importados++;
+			}
+	
+			return response()->json([
+				'success' => true,
+				'message' => "$importados filas importadas correctamente.",
+				'errores' => $errores
+			]);
+		} catch (\Exception $e) {
+			return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+		}
+	}
 }

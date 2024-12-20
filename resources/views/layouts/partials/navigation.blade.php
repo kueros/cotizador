@@ -89,6 +89,14 @@ $permiso_configuraciones_software = tiene_permiso('setup_soft');
 					</ul>
 				</li>
 				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">Análisis
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+					<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('base_transacciones') }}">Base Transacciones</a></li>
+					</ul>
+				</li>
+				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">Administración
 						<span class="caret"></span>
 					</a>
@@ -98,7 +106,6 @@ $permiso_configuraciones_software = tiene_permiso('setup_soft');
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('monitoreo') }}">Monitoreo</a></li>
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('roles') }}">Roles</a></li>
 						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('users') }}">Usuarios</a></li>
-						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('base_transacciones') }}">Base Transacciones</a></li>
 					</ul>
 				</li>
 			</ul>

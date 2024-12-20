@@ -17,9 +17,11 @@
 	$permiso_eliminar_roles = tiene_permiso('del_rol');
 	@endphp
 
+	<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 	<script type="text/javascript">
 		var table;
 		var save_method;
+		//import * as XLSX from 'xlsx';
 
 		jQuery(document).ready(function($) {
 			tipos_transacciones_id = <?php echo $id; ?>;
@@ -53,6 +55,7 @@
 						data: null,  // Las acciones no se mapearán desde los datos, sino que se agregarán manualmente
 						orderable: false,
 						searchable: false,
+						className: 'no-export', // Clase para identificar esta columna
 						render: function(data, type, row) {
 							console.log('Fila:', row);
 							return '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="edit_transacciones(' + row.id + ')"><i class="bi bi-pencil-fill"></i></a>' +
@@ -74,13 +77,52 @@
 						dom: 'Bfrtip',
 						buttons: [
 							{
-								"extend": 'pdf',
-								"text": '<i class="fas fa-file-pdf"></i> PDF',
-								"className": 'btn btn-danger',
-								"orientation": 'landscape',
-								title: 'Transacciones',
+								extend: 'excel',
+								text: '<i class="fas fa-file-excel"></i> Exportar a Excel',
+								className: 'btn btn-success',
+								title: null,
 								exportOptions: {
-									columns: ':visible' // Exportar todas las columnas visibles
+									columns: ':visible', // Solo exporta columnas visibles
+									columns: ':not(.no-export)', // Excluye columnas con la clase no-export
+									format: {
+										header: function (data, columnIdx) {
+											return data.trim(); // Limpia encabezados
+										}
+									}
+								},
+								customize: function (xlsx) {
+									var sheet = xlsx.xl.worksheets['sheet1.xml'];
+									var rows = $('row', sheet);
+
+									// Inserta un encabezado para el campo tipo_transaccion_id
+									var headerRow = rows.first();
+									var headers = headerRow.find('c');
+									headers.last().after('<c t="inlineStr"><is><t>Tipo Transacción ID</t></is></c>');
+
+									// Añade tipo_transaccion_id a cada fila de datos
+									rows.each(function (index) {
+										if (index === 0) return; // Saltar encabezado
+
+										// Obtener el valor de tipo_transaccion_id de los datos de la tabla
+										var rowIndex = index - 1; // Ajustar índice porque el encabezado no cuenta
+										var rowData = table.row(rowIndex).data(); // Obtener datos de la fila
+
+										if (rowData) {
+											var tipoTransaccionId = rowData.tipo_transaccion_id || ''; // Asegurarse de que exista
+											console.log('tipoTransaccionId: ', tipoTransaccionId);
+											// Agregar la celda con tipo_transaccion_id
+											var lastCell = $(this).find('c').last();
+											lastCell.after(`<c t="inlineStr"><is><t>${tipoTransaccionId}</t></is></c>`);		
+											console.log('Sheet XML:', sheet);
+										}
+									});
+								}
+							},
+							{
+								text: '<i class="fas fa-file-import"></i> Importar desde Excel',
+								className: 'btn btn-primary',
+								action: function () {
+									$('#importarExcel').click(); // Dispara el selector de archivo
 								}
 							}
 						],
@@ -94,6 +136,68 @@
 					console.error("Error al obtener los datos:", xhr.responseText);
 				}
 			});
+
+			/*******************************************************************************************************************************
+			 *******************************************************************************************************************************/
+			document.getElementById('importarExcel').addEventListener('change', function (e) {
+				const file = e.target.files[0];
+				if (!file) return;
+
+				const reader = new FileReader();
+
+				reader.onload = function (event) {
+					const data = new Uint8Array(event.target.result);
+					const workbook = XLSX.read(data, { type: 'array' });
+
+					// Leer la primera hoja del archivo
+					const sheetName = workbook.SheetNames[0];
+					const sheet = workbook.Sheets[sheetName];
+
+					// Convertir el contenido de la hoja en un arreglo de objetos
+					const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: null }); // Asignar null a celdas vacías
+
+					console.log('Datos importados desde Excel (sin procesar):', jsonData);
+
+					// Agregar tipo_transaccion_id y procesar campos dinámicos
+					const datosProcesados = jsonData.map((fila) => ({
+						nombre: fila['Nombre'] || null,
+						descripcion: fila['Descripción'] || null,
+						tipo_transaccion_id: fila['tipo_transaccion_id'] || parseInt(fila['Tipo Transacción ID']) || null,
+						transferencias: fila['Transferencias'] || null,
+						asdf: fila['asdf'] || null
+					}));
+
+					console.log('Datos procesados para el servidor:', datosProcesados);
+					enviarDatosAlServidor(datosProcesados);
+					// Enviar los datos al servidor
+					enviarDatosAlServidor(datosProcesados);
+				};
+
+				reader.readAsArrayBuffer(file);
+			});
+
+			/*******************************************************************************************************************************
+			 *******************************************************************************************************************************/
+			function enviarDatosAlServidor(datos) {
+				console.log('Enviando datos al servidor:', datos);
+				$.ajax({
+					url: "{{ route('transacciones.importar') }}", // Ruta del servidor para procesar la importación
+					method: 'POST',
+					headers: {
+						'Accept': 'application/json',
+						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Asegúrate de incluir el token CSRF
+					},
+					data: { datos: JSON.stringify(datos) },
+					success: function (response) {
+						console.log('Datos enviados con éxito:', response);
+						// Recargar la tabla después de la importación
+						$('#transacciones_table').DataTable().ajax.reload();
+					},
+					error: function (xhr) {
+						console.error('Error al enviar los datos:', xhr.responseText);
+					}
+				});
+			}
 
 			/*******************************************************************************************************************************
 			 *******************************************************************************************************************************/
@@ -306,7 +410,7 @@
 			form_data.push({ name: 'tipo_transaccion_id', value: tipos_transacciones_id });
 			console.log('Datos serializados únicos (después de agregar tipo_transaccion_id):', form_data);
 
-			let url_guarda_datos = "{{ url('transacciones/store') }}";
+				let url_guarda_datos = "{{ url('transacciones/store') }}";
 			let type_guarda_datos = "POST";
 
 			if ($('#accion').val() != "add") {
@@ -601,6 +705,7 @@
 					<div class="modal-body form">
 						<input type="hidden" value="" name="id" />
 						<input name="accion" id="accion" class="form-control" type="hidden">
+						<input type="file" id="importarExcel" style="display: none;" accept=".xlsx,.xls" />
 						<div class="form-body">
 							<div class="mb-3 row">
 								<label class="col-form-label col-md-3">{{ __('Nombre') }}</label>
