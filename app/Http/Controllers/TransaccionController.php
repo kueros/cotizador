@@ -17,6 +17,10 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Response;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 
 class TransaccionController extends Controller
@@ -358,18 +362,18 @@ class TransaccionController extends Controller
 	*******************************************************************************************************************************/
 	public function importar(Request $request)
 	{
+		#dd($request->all());
 		try {
 			$datos = json_decode($request->input('datos'), true);
 			$errores = [];
 			$importados = 0;
-	
 			foreach ($datos as $index => $fila) {
 				// Normalizar los datos
 				$fila['nombre'] = trim($fila['nombre'] ?? '');
 				$fila['descripcion'] = trim($fila['descripcion'] ?? '');
-				$fila['tipo_transaccion_id'] = intval($fila['tipo_transaccion_id'] ?? 0);
+				#$fila['tipo_transaccion_id'] = intval($fila['tipo_transaccion_id'] ?? 0);
 				// Validar que todos los campos necesarios estén presentes
-				if (empty($fila['nombre']) || empty($fila['descripcion']) || empty($fila['tipo_transaccion_id'])) {
+				if (empty($fila['nombre']) || empty($fila['descripcion'])) {// || empty($fila['tipo_transaccion_id'])) {
 					$errores[] = "Faltan datos en la fila " . ($index + 1);
 					continue; // Saltar esta fila
 				}
@@ -378,7 +382,7 @@ class TransaccionController extends Controller
 				Transaccion::create([
 					'nombre' => $fila['nombre'],
 					'descripcion' => $fila['descripcion'],
-					'tipo_transaccion_id' => $fila['tipo_transaccion_id'],
+					#'tipo_transaccion_id' => $fila['tipo_transaccion_id'],
 				]);
 				$importados++;
 			}
@@ -392,4 +396,199 @@ class TransaccionController extends Controller
 			return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
 		}
 	}
+
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+	public function generar_bandeja_dependencias(){
+        $this->has_permission(225);
+
+        $niveles_modelo = $this->generic->get_from_table("modelo_niveles",array("disabled" => 0),"posicion asc");
+
+        $niveles_all = array();
+        foreach($niveles_modelo as $nivel){
+            $niveles_all[$nivel->id] = $nivel;
+        }
+
+        $niveles_ignorar = array();
+        foreach($niveles_modelo as $nivel){
+            if($nivel->dependencia_id){
+                if($nivel->posicion < $niveles_all[$nivel->id]->posicion){
+                    $this->session->set_flashdata('error_message', "El nivel ".$nivel->nombre." no puede posicionarse antes que su dependencia ".$niveles_all[$nivel->id]->nombre);
+                    redirect(base_url('modelo_negocio'));
+                }
+
+                if(isset($niveles_ignorar[$nivel->dependencia_id])){
+                    unset($niveles_ignorar[$nivel->dependencia_id]);
+                }
+            }else{
+                $niveles_ignorar[$nivel->id] = true;
+            }
+        }
+
+        //Genero el excel de importacion ignorando los niveles no dependientes
+        
+
+        $file_name = 'Bandeja entrada registros y dependencias modelo de negocio '.'_'.time().'.xlsx';
+        $archivo = 'uploads/documentos/'.$file_name;
+
+        //Inicializo el archivo
+        $objeto_php_excel = $this->instanciar_objeto_php_excel();
+        $this->excel_set_hoja_activa($objeto_php_excel,0);
+        $this->excel_set_nombre_hoja($objeto_php_excel,"Registros y dependencias");
+
+        $letra = "A";
+        $letra_final = "A";
+        $campos_ignorar = array("id","id_usuario","id_dependencia");
+        foreach($niveles_modelo as $nivel){
+            if(!isset($niveles_ignorar[$nivel->id])){
+                //$campos_all = $this->generic->get_table_fields($nivel->tabla);
+                $campos_all = $this->generic->get_from_table("registros_oyp_posicion",array('nivel_id' => $nivel->id),"posicion asc");
+
+                foreach($campos_all as $campo){
+                    if(!in_array($campo->campo,$campos_ignorar)){
+                        $nombre_campo = ucfirst(str_replace('_',' ',$campo->campo));
+                        $this->excel_escribir_celda($objeto_php_excel,$letra."1", $nivel->nombre." - ".$nombre_campo);
+                        $letra_final = $letra;
+                        $letra++;
+                    }
+                }
+            }
+        }
+        $this->excel_pintar_celda_negrita($objeto_php_excel,"A1:".$letra_final."1");
+
+        $this->generar_excel($objeto_php_excel,$archivo,true);
+        exit;
+    }
+
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+	public function exportStructure(Request $request)
+	{
+		try {
+			// Analiza la estructura de la tabla desde los resultados
+			$tableColumns = $request->input('results')[0] ?? null;
+	
+			if (!$tableColumns) {
+				return response()->json(['success' => false, 'message' => 'No hay datos disponibles para generar la estructura.']);
+			}
+	
+			// Extrae los nombres de las columnas
+			$columns = array_keys($tableColumns);
+	
+			// Define las columnas a excluir
+			$excludedColumns = ['id', 'tipo_transaccion_id', 'created_at', 'updated_at'];
+	
+			// Filtra las columnas excluidas
+			$filteredColumns = array_filter($columns, function ($column) use ($excludedColumns) {
+				return !in_array($column, $excludedColumns);
+			});
+	
+			// Define el orden deseado
+			$customOrder = ['nombre', 'descripcion'];
+	
+			// Mueve las columnas deseadas al inicio en el orden especificado
+			usort($filteredColumns, function ($a, $b) use ($customOrder) {
+				$aPos = array_search($a, $customOrder);
+				$bPos = array_search($b, $customOrder);
+	
+				if ($aPos === false && $bPos === false) {
+					return 0; // Mantener el orden relativo de columnas no especificadas
+				} elseif ($aPos === false) {
+					return 1; // Mover $b antes de $a
+				} elseif ($bPos === false) {
+					return -1; // Mover $a antes de $b
+				}
+	
+				return $aPos - $bPos;
+			});
+	
+			// Crear una hoja de cálculo
+			$spreadsheet = new Spreadsheet();
+			$sheet = $spreadsheet->getActiveSheet();
+	
+			// Agregar nombres de columnas como encabezados
+			foreach (array_values($filteredColumns) as $index => $column) {
+				$columnLetter = Coordinate::stringFromColumnIndex($index + 1);
+				$sheet->setCellValue($columnLetter . '1', $column); // Fila 1 para encabezados
+			}
+	
+			// Configurar nombre del archivo
+			$fileName = 'estructura_transacciones.xlsx';
+	
+			// Crear el archivo Excel
+			$writer = new Xlsx($spreadsheet);
+			$tempFile = tempnam(sys_get_temp_dir(), $fileName);
+			$writer->save($tempFile);
+	
+			// Descargar el archivo Excel
+			return Response::download($tempFile, $fileName)->deleteFileAfterSend(true);
+		} catch (\Exception $e) {
+			return response()->json(['success' => false, 'message' => 'Error al generar el archivo: ' . $e->getMessage()]);
+		}
+	}
+
+
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+	public function consultarRegistros(Request $request)
+	{
+		try {
+			// Obtén los parámetros enviados desde JavaScript
+			$table = $request->input('table');
+			$where = $request->input('where', []);
+			$order = $request->input('order', []);
+			$limit = $request->input('limit', null);
+			$select = $request->input('select', ['*']);
+
+			// Llama a la función getFromTable
+			$results = $this->getFromTable($table, $where, $order, $limit, $select);
+
+			// Devuelve la respuesta como JSON
+			return response()->json([
+				'success' => true,
+				'results' => $results
+			]);
+		} catch (\Exception $e) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Error al realizar la consulta: ' . $e->getMessage()
+			], 500);
+		}
+	}
+
+	/*******************************************************************************************************************************
+	*******************************************************************************************************************************/
+	private function getFromTable($table, $where = null, $order = null, $limit = null, $select = ['*'])
+	{
+		try {
+			$query = \DB::table($table);
+
+			if ($select) {
+				$query->select($select);
+			}
+
+			if ($where) {
+				$query->where($where);
+			}
+
+			if ($order) {
+				foreach ($order as $column => $direction) {
+					$query->orderBy($column, $direction);
+				}
+			}
+
+			if ($limit) {
+				$query->limit($limit);
+			}
+
+			return $query->get();
+		} catch (\Exception $e) {
+			throw new \Exception('Error en la consulta: ' . $e->getMessage());
+		}
+	}
+
+
+
+
 }
+

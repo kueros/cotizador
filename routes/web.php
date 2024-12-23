@@ -183,8 +183,9 @@ Route::middleware('auth')->group(
 		Route::post('/transacciones/delete/{id}', 				[TransaccionController::class, 'delete'])->name('transacciones.delete');
 		Route::put('/transacciones/{id}',						[TransaccionController::class, 'update'])->name('transacciones.update');
 		Route::post('/transacciones/importar', 					[TransaccionController::class, 'importar'])->name('transacciones.importar');
-	}
-);
+		Route::post('/transacciones/consultarRegistros', 		[TransaccionController::class, 'consultarRegistros'])->name('transacciones.consultarRegistros');
+		Route::post('/exportStructure', 					[TransaccionController::class, 'exportStructure'])->name('transacciones.exportStructure');
+	});
 
 Route::middleware('auth')->group(
 	function () {

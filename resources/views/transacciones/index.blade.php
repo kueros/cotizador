@@ -1,5 +1,6 @@
 <?php
-	use App\Models\TipoTransaccion;
+
+use App\Models\TipoTransaccion;
 ?>
 
 <x-app-layout title="Transacciones" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard'],['title' => 'Base de Transacciones', 'url' => '/base_transacciones']]">
@@ -21,14 +22,69 @@
 	<script type="text/javascript">
 		var table;
 		var save_method;
+		var tipos_transacciones_id = <?php echo $id; ?>;
 		//import * as XLSX from 'xlsx';
 
 		jQuery(document).ready(function($) {
-			tipos_transacciones_id = <?php echo $id; ?>;
-			
+			/*******************************************************************************************************************************
+			 *******************************************************************************************************************************/
+			document.getElementById('consultarRegistros').addEventListener('click', function() {
+				fetch('/transacciones/consultarRegistros', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+						},
+						body: JSON.stringify({
+							table: 'transacciones'
+						})
+					})
+					.then(response => response.json())
+					.then(data => {
+						if (data.success) {
+							console.log('Resultados:', data.results);
+
+							// Enviar resultados al servidor para generar el archivo Excel
+							fetch('/exportStructure', {
+									method: 'POST',
+									headers: {
+										'Content-Type': 'application/json',
+										'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+									},
+									body: JSON.stringify({
+										results: data.results
+									})
+								})
+								.then(response => {
+									if (response.ok) {
+										return response.blob();
+									}
+									throw new Error('Error al generar el archivo');
+								})
+								.then(blob => {
+									// Crear un enlace de descarga
+									const url = window.URL.createObjectURL(blob);
+									const a = document.createElement('a');
+									a.href = url;
+									a.download = 'estructura_transacciones.xlsx';
+									document.body.appendChild(a);
+									a.click();
+									a.remove();
+								})
+								.catch(error => console.error('Error:', error));
+						} else {
+							console.error('Error:', data.message);
+							alert('Ocurrió un error al realizar la consulta.');
+						}
+					})
+					.catch(error => console.error('Error en la solicitud:', error));
+			});
+
+
+			/*******************************************************************************************************************************
+			 *******************************************************************************************************************************/
 			// Solicitar la estructura dinámica de la tabla
-			$.ajax(
-			{
+			$.ajax({
 				url: "{{ url('transacciones/listado') }}" + '/' + tipos_transacciones_id,
 				type: 'GET',
 				headers: {
@@ -52,7 +108,7 @@
 					// Agregar una columna para las acciones al final 
 					columns.push({
 						title: 'Acciones',
-						data: null,  // Las acciones no se mapearán desde los datos, sino que se agregarán manualmente
+						data: null, // Las acciones no se mapearán desde los datos, sino que se agregarán manualmente
 						orderable: false,
 						searchable: false,
 						className: 'no-export', // Clase para identificar esta columna
@@ -74,9 +130,9 @@
 						},
 						columns: columns,
 						language: traduccion_datatable,
-						dom: 'Bfrtip',
-						buttons: [
-							{
+						//dom: 'Bfrtip',
+						dom: 'Bfrt<"ip-block mt-2 justify-content-between"ip>',
+						buttons: [{
 								extend: 'excel',
 								text: '<i class="fas fa-file-excel"></i> Exportar a Excel',
 								className: 'btn btn-success',
@@ -85,12 +141,12 @@
 									columns: ':visible', // Solo exporta columnas visibles
 									columns: ':not(.no-export)', // Excluye columnas con la clase no-export
 									format: {
-										header: function (data, columnIdx) {
+										header: function(data, columnIdx) {
 											return data.trim(); // Limpia encabezados
 										}
 									}
 								},
-								customize: function (xlsx) {
+								customize: function(xlsx) {
 									var sheet = xlsx.xl.worksheets['sheet1.xml'];
 									var rows = $('row', sheet);
 
@@ -100,7 +156,7 @@
 									headers.last().after('<c t="inlineStr"><is><t>Tipo Transacción ID</t></is></c>');
 
 									// Añade tipo_transaccion_id a cada fila de datos
-									rows.each(function (index) {
+									rows.each(function(index) {
 										if (index === 0) return; // Saltar encabezado
 
 										// Obtener el valor de tipo_transaccion_id de los datos de la tabla
@@ -112,7 +168,7 @@
 											console.log('tipoTransaccionId: ', tipoTransaccionId);
 											// Agregar la celda con tipo_transaccion_id
 											var lastCell = $(this).find('c').last();
-											lastCell.after(`<c t="inlineStr"><is><t>${tipoTransaccionId}</t></is></c>`);		
+											lastCell.after(`<c t="inlineStr"><is><t>${tipoTransaccionId}</t></is></c>`);
 											console.log('Sheet XML:', sheet);
 										}
 									});
@@ -121,12 +177,22 @@
 							{
 								text: '<i class="fas fa-file-import"></i> Importar desde Excel',
 								className: 'btn btn-primary',
-								action: function () {
+								action: function() {
 									$('#importarExcel').click(); // Dispara el selector de archivo
+								}
+							},
+							{
+								text: '<i class="fas fa-file-import"></i> Importar registros',
+								className: 'btn btn-primary',
+								action: function() {
+									var modal = new bootstrap.Modal(document.getElementById('importar-registros'));
+									modal.show();
 								}
 							}
 						],
-						order: [[0, 'asc']],
+						order: [
+							[0, 'asc']
+						],
 						initComplete: function() {
 							console.log('Tabla inicializada correctamente.');
 						}
@@ -139,38 +205,41 @@
 
 			/*******************************************************************************************************************************
 			 *******************************************************************************************************************************/
-			document.getElementById('importarExcel').addEventListener('change', function (e) {
+			document.getElementById('importarExcel').addEventListener('change', function(e) {
 				const file = e.target.files[0];
 				if (!file) return;
 
 				const reader = new FileReader();
 
-				reader.onload = function (event) {
+				reader.onload = function(event) {
 					const data = new Uint8Array(event.target.result);
-					const workbook = XLSX.read(data, { type: 'array' });
+					const workbook = XLSX.read(data, {
+						type: 'array'
+					});
 
 					// Leer la primera hoja del archivo
 					const sheetName = workbook.SheetNames[0];
 					const sheet = workbook.Sheets[sheetName];
 
 					// Convertir el contenido de la hoja en un arreglo de objetos
-					const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: null }); // Asignar null a celdas vacías
+					const jsonData = XLSX.utils.sheet_to_json(sheet, {
+						defval: null
+					}); // Asignar null a celdas vacías
 
 					console.log('Datos importados desde Excel (sin procesar):', jsonData);
 
-					// Agregar tipo_transaccion_id y procesar campos dinámicos
+/* 					// Agregar tipo_transaccion_id y procesar campos dinámicos
 					const datosProcesados = jsonData.map((fila) => ({
 						nombre: fila['Nombre'] || null,
 						descripcion: fila['Descripción'] || null,
-						tipo_transaccion_id: fila['tipo_transaccion_id'] || parseInt(fila['Tipo Transacción ID']) || null,
+						//tipo_transaccion_id: fila['tipo_transaccion_id'] || parseInt(fila['Tipo Transacción ID']) || null,
 						transferencias: fila['Transferencias'] || null,
 						asdf: fila['asdf'] || null
-					}));
+					})); */
 
-					console.log('Datos procesados para el servidor:', datosProcesados);
-					enviarDatosAlServidor(datosProcesados);
+					console.log('Datos procesados para el servidor:', jsonData);
 					// Enviar los datos al servidor
-					enviarDatosAlServidor(datosProcesados);
+					enviarDatosAlServidor(jsonData);
 				};
 
 				reader.readAsArrayBuffer(file);
@@ -187,13 +256,15 @@
 						'Accept': 'application/json',
 						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Asegúrate de incluir el token CSRF
 					},
-					data: { datos: JSON.stringify(datos) },
-					success: function (response) {
+					data: {
+						datos: JSON.stringify(datos)
+					},
+					success: function(response) {
 						console.log('Datos enviados con éxito:', response);
 						// Recargar la tabla después de la importación
 						$('#transacciones_table').DataTable().ajax.reload();
 					},
-					error: function (xhr) {
+					error: function(xhr) {
 						console.error('Error al enviar los datos:', xhr.responseText);
 					}
 				});
@@ -223,7 +294,9 @@
 					$.ajax({
 						url: "{{ url('transacciones/listado') }}" + '/' + tipos_transacciones_id,
 						type: 'GET',
-						headers: { 'Accept': 'application/json' },
+						headers: {
+							'Accept': 'application/json'
+						},
 						success: function(response) {
 							console.log('Respuesta del servidor:', response);
 							console.log('tipos_transacciones_id 2:', tipos_transacciones_id);
@@ -336,9 +409,10 @@
 						// Parsear los valores del JSON y agregar opciones al select
 						if (column.valores) {
 							try {
-								const valores = typeof column.valores === 'string'
-									? JSON.parse(column.valores) // Si es string, parsear
-									: column.valores; // Si ya es un objeto, usarlo directamente
+								const valores = typeof column.valores === 'string' ?
+									JSON.parse(column.valores) // Si es string, parsear
+									:
+									column.valores; // Si ya es un objeto, usarlo directamente
 
 								Object.entries(valores).forEach(([key, value]) => {
 									const option = document.createElement('option');
@@ -407,10 +481,13 @@
 
 			console.log('Datos serializados únicos (antes de agregar tipo_transaccion_id):', form_data);
 			// Agregar tipo_transaccion_id manualmente
-			form_data.push({ name: 'tipo_transaccion_id', value: tipos_transacciones_id });
+			form_data.push({
+				name: 'tipo_transaccion_id',
+				value: tipos_transacciones_id
+			});
 			console.log('Datos serializados únicos (después de agregar tipo_transaccion_id):', form_data);
 
-				let url_guarda_datos = "{{ url('transacciones/store') }}";
+			let url_guarda_datos = "{{ url('transacciones/store') }}";
 			let type_guarda_datos = "POST";
 
 			if ($('#accion').val() != "add") {
@@ -602,20 +679,20 @@
 			}
 		}
 
-/* 		/*******************************************************************************************************************************
-		 *******************************************************************************************************************************
-		function add_transacciones() {
-			save_method = 'add';
-			$('#form')[0].reset();
-			$('.form-group').removeClass('has-error');
-			$('.help-block').empty();
-			$('#modal_transacciones').modal('show');
-			$('.modal-title').text('Agregar Transacción');
-			$('#accion').val('add');
-			$('#form').attr('action', "{{ url('transacciones') }}");
-			$('#method').val('POST');
-		}
- */
+		/* 		/*******************************************************************************************************************************
+				 *******************************************************************************************************************************
+				function add_transacciones() {
+					save_method = 'add';
+					$('#form')[0].reset();
+					$('.form-group').removeClass('has-error');
+					$('.help-block').empty();
+					$('#modal_transacciones').modal('show');
+					$('.modal-title').text('Agregar Transacción');
+					$('#accion').val('add');
+					$('#form').attr('action', "{{ url('transacciones') }}");
+					$('#method').val('POST');
+				}
+		 */
 
 		/*******************************************************************************************************************************
 		 *******************************************************************************************************************************/
@@ -645,9 +722,10 @@
 	</script>
 	<!--LISTADO-->
 	<div class="container">
-		<?php 
+		<?php
 		#dd($id);
 		$tipo_transaccion_nombre = TipoTransaccion::find($id)->nombre;
+		$tipo_transaccion_id = TipoTransaccion::find($id)->id;
 		?>
 		<div class="row">
 			<div class="col-md-12">
@@ -666,7 +744,7 @@
 				<div class="table-responsive">
 					<div class="d-flex mb-2">
 						<!--button id="agregar" class="btn btn-success mr-2" onclick="add_transacciones()"-->
-						<button id="btn_agregar_transaccion" class="btn btn-success mr-2" >
+						<button id="btn_agregar_transaccion" class="btn btn-success mr-2">
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
 								<path d="M8 4v8m4-4H4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
 							</svg> {{ __('Agregar Transacción') }}
@@ -705,6 +783,7 @@
 					<div class="modal-body form">
 						<input type="hidden" value="" name="id" />
 						<input name="accion" id="accion" class="form-control" type="hidden">
+						<input name="tipo_transaccion_id" id="tipo_transaccion_id" class="form-control" type="hidden" value="<?php echo $tipo_transaccion_id; ?>">
 						<input type="file" id="importarExcel" style="display: none;" accept=".xlsx,.xls" />
 						<div class="form-body">
 							<div class="mb-3 row">
@@ -723,12 +802,58 @@
 
 					</div>
 					<div class="modal-footer">
-						<a onclick=" if (validarFormulario())  guardar_datos();" class="btn btn-primary">Guardar</a>
+						<a onclick=" if (validarFormulario()) guardar_datos();" class="btn btn-primary">Guardar</a>
 						<a id="eliminar_filas" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</a>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
+
+	<div class="modal fade" id="importar-registros" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h3 class="titulo-importar-registros"></h3>
+				</div>
+				<div class="modal-body form">
+					<form action="<?= ('modelo_negocio/importar_registros_dependencias'); ?>" id="importar_registros_form" method="post" enctype="multipart/form-data" class="form-horizontal">
+						<div class="alert alert-warning" role="alert">
+							Asegurese de que la posición asignada en el nivel sea correcta y que los niveles superiores se encuentren a la izquierda del archivo a importar.
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-6">Eliminar los registros de todos los niveles antes de importar</label>
+							<div class="col-md-6">
+								<label class="switch">
+									<input name="purgar_niveles" id="purgar_niveles" value="1" type="checkbox">
+									<span class="slider round"></span>
+								</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3">Seleccionar archivo</label>
+							<div class="col-md-9">
+								<input id="archivo-registros" name="archivo-registros" type="file" required accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+								<span class="help-block"></span>
+							</div>
+						</div>
+						<div class="container align-content-center">
+							<h4>Generar bandeja de entrada para el modelo actual</h4>
+							<button type="button" class="btn btn-primary" id="consultarRegistros">Consultar Registros</button>
+							<!--a style="font-size: 40px;color:#00C851" href="<?= ('modelo_negocio/generar_bandeja_dependencias') ?>" id="download-manual"></span><i class="fas fa-file-excel"></i></a-->
+							<br>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-primary">Importar</button>
+							<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 
 </x-app-layout>
