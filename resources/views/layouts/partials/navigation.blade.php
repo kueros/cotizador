@@ -72,30 +72,13 @@ $permiso_configuraciones_software = tiene_permiso('setup_soft');
 
 			<div class="logo-home">
 				<a href="{{ url('dashboard') }}">
-					<img src="{{ asset('images/aleph_logo.gif') }}" alt="" title="">
+					<!--img src="{{ asset('images/aleph_logo.gif') }}" alt="" title=""-->
+					<img decoding="async" src="https://sinerlogic.com/wp-content/uploads/2021/11/sinerlogic_logo-01.svg" alt="" title="" class="wp-image-888 et_multi_view_swapped et_multi_view_image__loaded" data-et-multi-view="{&quot;schema&quot;:{&quot;attrs&quot;:{&quot;desktop&quot;:{&quot;src&quot;:&quot;https:\/\/sinerlogic.com\/wp-content\/uploads\/2021\/11\/sinerlogic_logo-01.svg&quot;,&quot;alt&quot;:&quot;&quot;,&quot;title&quot;:&quot;&quot;,&quot;class&quot;:&quot;wp-image-888&quot;},&quot;hover&quot;:{&quot;src&quot;:&quot;https:\/\/sinerlogic.com\/wp-content\/uploads\/2021\/11\/sinerlogic_logo_cyan-01.svg&quot;}}},&quot;slug&quot;:&quot;et_pb_image&quot;}" srcset="" sizes="">
 				</a>
 			</div>
 
 			<ul class="nav navbar-nav me-auto nav-bar-1">
 				<li><a class="nav-link main-item" id="boton-inicio" href="{{ url('dashboard') }}">Inicio</a></li>
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">Configuración
-						<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('tipos_transacciones') }}">ABM Tipos de transacciones</a></li>
-						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('funciones') }}">ABM de Funciones</a></li>
-						<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('alertasIndex') }}">ABM de Alertas</a></li>
-					</ul>
-				</li>
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">Análisis
-						<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-					<li><a class="dropdown-item hover-aleph-buttons" href="{{ url('base_transacciones') }}">Base Transacciones</a></li>
-					</ul>
-				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle main-item" data-bs-toggle="dropdown" href="#">Administración
 						<span class="caret"></span>

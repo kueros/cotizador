@@ -23,7 +23,7 @@
 			body, html {
 				height: 100%;
 				background-repeat: no-repeat;
-				background: url(/images/dashboard-bg.jpg) center top no-repeat;
+				background: url(/images/dashboard_bg.jpg) center top no-repeat;
 				background-repeat: no-repeat;
 				background-size: cover;
 			}

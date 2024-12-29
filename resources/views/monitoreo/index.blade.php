@@ -1,7 +1,7 @@
 <x-app-layout title="Monitoreo" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
-			{{ __('Usuarios') }}
+			{{ __('Monitoreo') }}
 		</h2>
 	</x-slot>
 
@@ -90,15 +90,6 @@
 				</a>
 			</div>
 
-			<!-- Tarjeta 4: Log de emails -->
-			<div class="col-md-3 col-sm-6">
-				<a class="link_monitoreo" href="<?= route('monitoreo.log_emails') ?>">
-					<div class="div-contenedor-acceso">
-						<div class="div-logs-img" id="log_emails"></div>
-						<span class="monitoreo-title">Log de emails</span>
-					</div>
-				</a> 
-			</div>
 		</div>
 	</div>
 </x-app-layout>

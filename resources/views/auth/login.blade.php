@@ -39,7 +39,7 @@ $background_login_custom_path = session('background_login_custom_path');
 			body, html {
 				height: 100%;
 				background-repeat: no-repeat;
-				background: url(/images/login-background.jpg) center top no-repeat;
+				background: url(/images/login_background.jpg) center top no-repeat;
 				background-repeat: no-repeat;
 				background-size: cover;
 			}
@@ -337,7 +337,7 @@ $background_login_custom_path = session('background_login_custom_path');
 		<div class="row">
 			<div class="card card-default login-box">
 				<div class="card-heading">
-					<img id="logo-home" src="images/aleph_logo.gif" alt="" title="">
+					<img id="logo-home" src="images/sinerlogic_logo.svg" alt="" title="">
 				</div>
 				<div class="card-body">
 					<div style="margin-top:1rem;">
