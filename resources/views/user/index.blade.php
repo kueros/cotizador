@@ -463,7 +463,8 @@
 									<td>{{ $user->username }}</td>
 									<td>{{ $user->email }}</td>
 									<td>{{ $user->nombre_rol }}</td>
-									<td>{{ $user_habilitado }}</td>
+<!-- 									<td>{{ $user_habilitado }}</td>
+ -->
 									<td>{{ $user->bloqueado ? 'Sí' : 'No' }}</td>
 									<td>
 										@if ($permiso_editar_usuario)
@@ -472,7 +473,7 @@
 										</a>
 										@endif
 										
-										@if ($permiso_deshabilitar_usuario)
+<!-- 										@if ($permiso_deshabilitar_usuario)
 										<a class="btn btn-sm <?php echo $color; ?>" href="javascript:void(0)" 
 											title="<?php echo $titulo; ?>" 
 											onclick="deshabilitar_usuario('{{ $user->user_id}}',false,'{{ $habilitado }}')">
@@ -489,7 +490,7 @@
 												</a>
 											@endif
 										@endif
-
+ -->
 										@if ($permiso_blanquear_password)
 										<a class="btn btn-sm btn-outline-info" href="javascript:void(0)" title="Blanquear" onclick="blanquear_psw('{{ $user->user_id }}')">
 											<i class="fas fa-key"></i>
