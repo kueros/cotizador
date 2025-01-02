@@ -1,3 +1,4 @@
+@props(['breadcrumbs' => [], 'title' => ''])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -7,21 +8,46 @@
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 
 	<title>{{ config('app.name', 'YAFO') }}</title>
+	<link rel="shortcut icon" type="image/png" href="{{ asset('build/aleph_theme/img/favicon.png') }}"/>
 
-	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-	<!-- Fonts -->
-	<link rel="preconnect" href="https://fonts.bunny.net">
-	<link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-	<link href="https://cdn.datatables.net/2.1.5/css/dataTables.dataTables.css" rel="stylesheet">
-	<link href="/build/assets/awesome/css/solid.css" rel="stylesheet">
-	<link href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
-	<!-- Scripts -->
-	@vite(['resources/css/app.css', 'resources/js/app.js'])
+	<!--SECCION CSS-->
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/bootstrap/dist/css/bootstrap.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/aleph_theme/css/customv5.css?v3') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/jqueryui/themes/base/jquery-ui.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/font-awesome/css/all.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/font-awesome/css/fontawesome.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('build/assets/bootstrap-icons/font/bootstrap-icons.min.css') }}">
+	<!--SECCION JS-->
+	<script type="text/javascript" src="{{ asset('build/assets/jquery/jquery.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/jqueryui/jquery-ui.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/form/dist/jquery.form.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/datatables.net/js/dataTables.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/sweet-alert/resources/js/sweetalert.all.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/html2canvas/dist/html2canvas.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/buttons/dataTables.buttons.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/amcharts/plugins/export/libs/jszip/jszip.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/tableexport.jquery.plugin/libs/pdfmake/pdfmake.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/tableexport.jquery.plugin/libs/pdfmake/vfs_fonts.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/buttons/buttons.html5.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/buttons/buttons.print.min.js') }}"></script>
 </head>
 
 <body class="font-sans antialiased">
 
 	<style>
+		.accordion-header > button{
+			background-color: #e2e9ff;
+			color: #337ab7;
+		}
+
+		.accordion-header > button:hover{
+			color: #23527c;
+			text-decoration: underline;
+		}
+
 		.colapsable-aleph {
 			width: 100%;
 			height: 35px;
@@ -33,34 +59,53 @@
 			margin-top: 10px;
 			margin-bottom: 10px;
 		}
+
+        .error403{
+            font-size: 3rem;
+        }
 	</style>
 
+	@include('layouts.partials.header')
+	
+	<header>
+		@if(Auth::check())
+			@include('layouts.partials.navigation')
+			<x-breadcrumb :breadcrumbs="$breadcrumbs" :page="$title" />
+		@endif
+	</header>
+
 	<div class="min-h-screen bg-gray-100">
-		@include('layouts.navigation')
-
-		<!-- Page Heading -->
-		@isset($header)
-		<header class="bg-white shadow">
-			<div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-				{{ $header }}
-			</div>
-		</header>
-		@endisset
-
-		<!-- Page Content -->
-		<main>
+		<main class="container">
 			{{ $slot }}
 		</main>
 	</div>
-	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-	<script src="https://cdn.datatables.net/2.1.5/js/dataTables.js"></script>
-	<script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+	@include('layouts.partials.footer')
+
+	<script type="text/javascript" src="{{ asset('build/assets/jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/assets/jqueryui/jquery-ui.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/assets/datatables.net/js/dataTables.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/assets/datatables.net/js/dataTables.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/buttons/dataTables.buttons.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/assets/buttons/buttons.html5.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/assets/buttons/buttons.print.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('build/assets/sweet-alert/resources/js/sweetalert.all.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/aleph_theme/js/customv7.js?v='.date('Y-m-d')) }}"></script>
+
 	<script>
 		$(document).ready(function() {
-			new DataTable('#example');
+			//new DataTable('#example');
+
+			/*
+									targets: [0],
+						orderData: [4, 'desc']
+
+			*/
+			new DataTable('#example', {
+				order: [[4, 'desc']]
+			});
+
+			new DataTable('#permisos');
 
 			$('.dropdown-submenu a.test').on("click", function(e) {
 				$(this).next('ul').toggle();
@@ -99,9 +144,30 @@
 					return false;
 				}
 			});
-
+			
+			// Esperar 5 segundos antes de ocultar el mensaje
+			setTimeout(function() {
+                $('.alert').not('.no-fade-alert').fadeOut('slow');
+            }, 5000);
 
 		});
+
+		function show_password(elemento){
+
+            var x = document.getElementById("password");
+            if($(elemento).prop('checked')){
+                x.type = "text";
+            }else{
+                x.type = "password";
+            }
+
+            var x = document.getElementById("password_confirmation");
+            if($(elemento).prop('checked')){
+                x.type = "text";
+            }else{
+                x.type = "password";
+            }
+		}
 	</script>
 </body>
 

@@ -1,7 +1,7 @@
-<x-app-layout>
+<x-app-layout title="Monitoreo" :breadcrumbs="[['title' => 'Inicio', 'url' => 'dashboard']]">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
-			{{ __('Usuarios') }}
+			{{ __('Monitoreo') }}
 		</h2>
 	</x-slot>
 
@@ -28,7 +28,7 @@
 
 		#log_accesos {
 			padding: 5px;
-			background-image: url('/build/assets/images/log_accesos.png');
+			background-image: url('images/log_accesos.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			background-position: center;
@@ -36,7 +36,7 @@
 
 		#log_administracion {
 			padding: 5px;
-			background-image: url('/build/assets/images/log_acciones.png');
+			background-image: url('images/log_acciones.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			background-position: center;
@@ -44,7 +44,7 @@
 
 		#log_notificaciones {
 			padding: 5px;
-			background-image: url('/build/assets/images/log_notificaciones.png');
+			background-image: url('images/log_notificaciones.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			background-position: center;
@@ -52,7 +52,7 @@
 
 		#log_emails {
 			padding: 5px;
-			background-image: url('/build/assets/images/log_emails.png');
+			background-image: url('images/log_emails.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			background-position: center;
@@ -69,7 +69,7 @@
 		<div class="row mt-4">
 			<h2>Monitoreo</h2>
 		</div>
-		<div class="row mt-5">
+		<div class="row mt-5 justify-content-around">
 			<!-- Tarjeta 1: Log de accesos -->
 			<div class="col-md-3 col-sm-6">
 				<a class="link_monitoreo" href="<?= route('monitoreo.log_accesos') ?>">
@@ -85,30 +85,11 @@
 				<a class="link_monitoreo" href="<?= route('monitoreo.log_administracion') ?>">
 					<div class="div-contenedor-acceso">
 						<div class="div-logs-img" id="log_administracion"></div>
-						<span class="monitoreo-title">Log de administración</span>
+						<span class="monitoreo-title">Log de acciones</span>
 					</div>
 				</a>
 			</div>
 
-			<!-- Tarjeta 3: Log de notificaciones -->
-			<div class="col-md-3 col-sm-6">
-				<a class="link_monitoreo" href="<?= route('monitoreo.log_notificaciones') ?>">
-					<div class="div-contenedor-acceso">
-						<div class="div-logs-img" id="log_notificaciones"></div>
-						<span class="monitoreo-title">Log de notificaciones</span>
-					</div>
-				</a>
-			</div>
-
-			<!-- Tarjeta 4: Log de emails -->
-			<div class="col-md-3 col-sm-6">
-				<a class="link_monitoreo" href="<?= route('monitoreo.log_emails') ?>">
-					<div class="div-contenedor-acceso">
-						<div class="div-logs-img" id="log_emails"></div>
-						<span class="monitoreo-title">Log de emails</span>
-					</div>
-				</a>
-			</div>
 		</div>
 	</div>
 </x-app-layout>

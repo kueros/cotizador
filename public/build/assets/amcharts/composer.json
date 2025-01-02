@@ -1,0 +1,32 @@
+{
+    "name": "stinger-soft/amcharts",
+    "description": "AmCharts JavaScript Library",
+    "type": "component",
+    "homepage": "https://www.amcharts.com",
+    "license": "AmCharts Linkware",
+    "support": {
+        "issues": "https://www.amcharts.com/support/"
+    },
+    "extra": {
+        "component": {
+            "scripts": [
+                "amcharts.js",
+				"funnel.js",
+				"gantt.js",
+				"gauge.js",
+				"pie.js",
+				"radar.js",
+				"serial.js",
+				"xy.js"
+            ],
+            "files": [
+                "images/*",
+                "lang/*.js",
+				"themes/*.js"
+            ]
+        },
+		"branch-alias" : {
+			"dev-master" : "3.21.x-dev"
+		}
+    }
+}

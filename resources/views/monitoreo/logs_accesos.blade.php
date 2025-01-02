@@ -1,41 +1,97 @@
-<x-app-layout>
-	<?php #dd($logs_accesos); 
-	?>
+<x-app-layout title="Log accesos" :breadcrumbs="[['title' => 'Inicio', 'url' => route('dashboard')], ['title' => 'Monitoreo', 'url' => route('monitoreo.index')]]">
 
+	<style>
+		/* #log-acciones-table{
+			table-layout:fixed;
+		} */
+		
+		#log-acciones-table tbody td{
+			word-wrap:break-word!important;
+		}
+		table{
+		margin: 0 auto;
+		width: 100%;
+		clear: both;
+		border-collapse: collapse;
+		table-layout: fixed;
+		word-wrap:break-word; 
+		}
+	</style>
+	<script type="text/javascript">
+		var table;
+		var save_method;
+
+		jQuery(document).ready(function($){
+			table = $('#log-acciones-table').DataTable({
+				"ajax": {
+					url : "{{ url('monitoreo/ajax_log_acceso') }}",
+					type : 'GET'
+				},
+				"order": [[ 0, "desc" ]],
+				"ordering": true,
+				bAutoWidth: false, 
+				responsive: true, // Activa diseño responsive
+    			scrollX: true,
+				aoColumns : [
+					{ sWidth: '10%' },
+					{ sWidth: '25%' },
+					{ sWidth: '20%' },
+					{ sWidth: '35%' },
+					{ sWidth: '10%' }
+				],
+				language: traduccion_datatable,
+				"pageLength": 100,
+				//dom: 'Bfrtip',
+				layout: {
+					topStart: {
+						buttons: [
+							{"extend": 'copy', "text":'Portapapeles',"className": 'btn btn-primary', title: 'Log de acciones'},
+							{"extend": 'pdf', "text":'PDF',"className": 'btn btn-danger', title: 'Log de acciones'},
+							{"extend": 'excel', "text":'Excel',"className": 'btn btn-success', title: 'Log de acciones'},
+							{"extend": 'print', "text":'Imprimir',"className": 'btn btn-secondary', title: 'Log de acciones'}
+						],
+					},
+					bottomEnd: {
+						paging: {
+							firstLast: false  // Esto debería eliminar los botones "Primero" y "Último"
+						}
+					}
+				},
+				columnDefs: [
+					{ targets: '_all', className: 'text-start' },
+				],
+				initComplete: function () {
+					$('.buttons-copy').html('<i class="fas fa-copy"></i> Portapapeles');
+					$('.buttons-pdf').html('<i class="fas fa-file-pdf"></i> PDF');
+					$('.buttons-excel').html('<i class="fas fa-file-excel"></i> Excel');
+					$('.buttons-print').html('<span class="bi bi-printer" data-toggle="tooltip" title="Exportar a PDF"/> Imprimir');
+				}
+			});
+		});
+	</script>
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 leading-tight">
 			{{ __('Logs de Accesos') }}
 		</h2>
 	</x-slot>
 
-	<div style="background-image: url('/build/assets/images/dashboard-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding-top: 3rem; padding-bottom: 3rem;">
-		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-			<div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-				<div class="table-responsive">
-					<table id="example" class="cell-border" style="width:100%">
-						<thead class="thead">
-							<tr>
-								<th>ID</th>
-								<th>Usuario</th>
-								<th>Detalle</th>
-								<th>Fecha</th>
-								<th>IP</th>
-							</tr>
-						</thead>
-						<tbody>
-							@foreach ($logs_accesos as $log)
-							<?php #dd($log); ?>
-							<tr>
-								<td>{{ $log->id }}</td>
-								<td>{{ $log->email }}</td>
-								<td>{{ $log->ip_address }}</td>
-								<td>{{ $log->user_agent }}</td>
-								<td>{{ $log->created_at }}</td>
-							</tr>
-							@endforeach
-						</tbody>
-					</table>
-				</div>
+	<div class="container-full-width">
+		<div class="row">
+			<div class="col-md-12 table-responsive">
+				<h2>Log de accesos</h2>
+				<br>
+				<br>
+				<table id="log-acciones-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+					<thead>
+						<th>ID</th>
+						<th>Email</th>
+						<th>Fecha</th>
+						<th>Agente</th>
+						<th>IP</th>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>

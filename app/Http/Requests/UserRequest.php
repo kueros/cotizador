@@ -30,4 +30,13 @@ class UserRequest extends FormRequest
 			'bloqueado' => 'required|boolean',
 		];
 	}
+
+	public function validationData()
+    {
+		$formData = [];
+		foreach ($this->input('form_data') as $input) {
+			$formData[$input['name']] = $input['value'];
+		}
+        return $formData;
+    }
 }

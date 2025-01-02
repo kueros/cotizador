@@ -3,6 +3,10 @@
 	@php
 	$user = Auth::user()->username;
 	$email = Auth::user()->email;
+	$permiso_listar_usuarios = tiene_permiso('list_usr');
+	$permiso_asignar_permisos = tiene_permiso('manage_perm');
+	$permiso_listar_roles = tiene_permiso('list_roles');
+	$permiso_configuraciones_software = tiene_permiso('setup_soft');
 	@endphp
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 		<div class="flex justify-between h-16">
@@ -10,7 +14,7 @@
 				<!-- Logo -->
 				<div class="shrink-0 flex items-center">
 					<a href="{{ route('dashboard') }}">
-						<x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+						<img class="logo-home" src="/build/assets/images/log_accesos.png" width="50" height="50" alt="" title="">
 					</a>
 				</div>
 
@@ -25,34 +29,107 @@
 							<x-slot name="trigger">
 								<button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
 									<div>Administración</div>
-
-									<div class="ms-1">
-										<svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-											<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-										</svg>
-									</div>
+									<i class="fas fa-caret-down"></i>
 								</button>
 							</x-slot>
 
 							<x-slot name="content">
-								<x-dropdown-link :href="route('profile.edit')">
-									Permisos
+								@if ($permiso_asignar_permisos)
+								<x-dropdown-link :href="route('permisos_x_rol.index')">
+									Permisos x Rol
 								</x-dropdown-link>
+								@endif
+								@if ($permiso_listar_roles)
 								<x-dropdown-link :href="route('roles.index')">
 									Roles
 								</x-dropdown-link>
+								@endif
+								@if ($permiso_listar_usuarios)
 								<x-dropdown-link :href="route('users.index')">
 									Usuarios
 								</x-dropdown-link>
+								@endif
 								<x-dropdown-link :href="route('monitoreo.index')">
 									Monitoreo
 								</x-dropdown-link>
+								@if ($permiso_configuraciones_software)
 								<x-dropdown-link :href="route('configuracion.index')">
 									Configuración
 								</x-dropdown-link>
-								<x-dropdown-link :href="route('enviarmail')">
-									Mails
+								@endif
+							</x-slot>
+						</x-dropdown>
+					</div>
+					<div class="hidden sm:flex sm:items-center sm:ms-12">
+						<x-dropdown align="left" width="48">
+							<x-slot name="trigger">
+								<button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+									<div>Análisis</div>
+									<i class="fas fa-caret-down"></i>
+								</button>
+							</x-slot>
+
+							<x-slot name="content">
+								@if ($permiso_asignar_permisos)
+								<x-dropdown-link :href="route('permisos_x_rol.index')">
+									Permisos x Rol
 								</x-dropdown-link>
+								@endif
+								@if ($permiso_listar_roles)
+								<x-dropdown-link :href="route('roles.index')">
+									Roles
+								</x-dropdown-link>
+								@endif
+								@if ($permiso_listar_usuarios)
+								<x-dropdown-link :href="route('users.index')">
+									Usuarios
+								</x-dropdown-link>
+								@endif
+								<x-dropdown-link :href="route('monitoreo.index')">
+									Monitoreo
+								</x-dropdown-link>
+								@if ($permiso_configuraciones_software)
+								<x-dropdown-link :href="route('configuracion.index')">
+									Configuración
+								</x-dropdown-link>
+								@endif
+							</x-slot>
+						</x-dropdown>
+					</div>
+
+					<div class="hidden sm:flex sm:items-center sm:ms-12">
+						<x-dropdown align="left" width="48">
+							<x-slot name="trigger">
+								<button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+									<div>Configuración</div>
+									<i class="fas fa-caret-down"></i>
+								</button>
+							</x-slot>
+
+							<x-slot name="content">
+								@if ($permiso_asignar_permisos)
+								<x-dropdown-link :href="route('permisos_x_rol.index')">
+									Permisos x Rol
+								</x-dropdown-link>
+								@endif
+								@if ($permiso_listar_roles)
+								<x-dropdown-link :href="route('roles.index')">
+									Roles
+								</x-dropdown-link>
+								@endif
+								@if ($permiso_listar_usuarios)
+								<x-dropdown-link :href="route('users.index')">
+									Usuarios
+								</x-dropdown-link>
+								@endif
+								<x-dropdown-link :href="route('monitoreo.index')">
+									Monitoreo
+								</x-dropdown-link>
+								@if ($permiso_configuraciones_software)
+								<x-dropdown-link :href="route('configuracion.index')">
+									Configuración
+								</x-dropdown-link>
+								@endif
 							</x-slot>
 						</x-dropdown>
 					</div>
@@ -69,23 +146,19 @@
 							<div>{{ Auth::user()->username }}</div>
 
 							<div class="ms-1">
-								<svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-									<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-								</svg>
+									<i class="fas fa-caret-down"></i>
 							</div>
 						</button>
 					</x-slot>
 
 					<x-slot name="content">
-						<x-dropdown-link :href="route('profile.edit')">
-							{{ __('Profile') }}
-						</x-dropdown-link>
+
 
 						<!-- Authentication -->
 						<form method="POST" action="{{ route('logout') }}">
 							@csrf
 
-							<x-dropdown-link :href="route('logout')"
+							<x-dropdown-link :href="url('logout')"
 								onclick="event.preventDefault();
                                                 this.closest('form').submit();">
 								{{ __('Log Out') }}
